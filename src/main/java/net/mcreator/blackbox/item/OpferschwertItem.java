@@ -5,9 +5,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.BlockTags;
+
+import net.mcreator.blackbox.procedures.DropHeadProcedure;
 
 public class OpferschwertItem extends SwordItem {
 	private static final Tier TOOL_TIER = new Tier() {
@@ -44,5 +48,12 @@ public class OpferschwertItem extends SwordItem {
 
 	public OpferschwertItem() {
 		super(TOOL_TIER, new Item.Properties().attributes(SwordItem.createAttributes(TOOL_TIER, 3f, -3f)));
+	}
+
+	@Override
+	public boolean hurtEnemy(ItemStack itemstack, LivingEntity entity, LivingEntity sourceentity) {
+		boolean retval = super.hurtEnemy(itemstack, entity, sourceentity);
+		DropHeadProcedure.execute(entity.level(), entity);
+		return retval;
 	}
 }

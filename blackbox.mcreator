@@ -12,6 +12,28 @@
           "src/main/java/net/mcreator/blackbox/item/OpferschwertItem.java"
         ]
       }
+    },
+    {
+      "name": "DropHead",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "drop_head",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/DropHeadProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ]
+      }
     }
   ],
   "variable_elements": [],
