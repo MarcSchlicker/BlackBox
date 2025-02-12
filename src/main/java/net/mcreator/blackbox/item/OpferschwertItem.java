@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,17 +38,17 @@ public class OpferschwertItem extends SwordItem {
 
 		@Override
 		public int getEnchantmentValue() {
-			return 2;
+			return 14;
 		}
 
 		@Override
 		public Ingredient getRepairIngredient() {
-			return Ingredient.of();
+			return Ingredient.of(new ItemStack(Items.EMERALD));
 		}
 	};
 
 	public OpferschwertItem() {
-		super(TOOL_TIER, new Item.Properties().attributes(SwordItem.createAttributes(TOOL_TIER, 3f, -3f)));
+		super(TOOL_TIER, new Item.Properties().attributes(SwordItem.createAttributes(TOOL_TIER, 5f, -2.4f)));
 	}
 
 	@Override
