@@ -1,0 +1,50 @@
+{
+  "mod_elements": [
+    {
+      "name": "Opferschwert",
+      "type": "tool",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "opferschwert",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/blackbox/models/item/opferschwert.json",
+          "src/main/java/net/mcreator/blackbox/item/OpferschwertItem.java"
+        ]
+      }
+    }
+  ],
+  "variable_elements": [],
+  "sound_elements": [],
+  "tag_elements": {
+    "ITEMS:minecraft:swords": [
+      "~CUSTOM:Opferschwert"
+    ]
+  },
+  "tab_element_order": {},
+  "language_map": {
+    "en_us": {
+      "item.blackbox.opferschwert": "Opferschwert"
+    }
+  },
+  "foldersRoot": {
+    "name": "~",
+    "children": []
+  },
+  "workspaceSettings": {
+    "modid": "blackbox",
+    "modName": "BlackBox",
+    "version": "1.0.0",
+    "author": "Marc, MCreator",
+    "websiteURL": "https://mcreator.net",
+    "license": "Not specified",
+    "serverSideOnly": false,
+    "requiredMods": [],
+    "dependencies": [],
+    "dependants": [],
+    "mcreatorDependencies": [],
+    "currentGenerator": "neoforge-1.21.1",
+    "modElementsPackage": "net.mcreator.blackbox"
+  },
+  "mcreatorVersion": 202400342716
+}
