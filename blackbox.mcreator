@@ -8,8 +8,8 @@
       "registry_name": "opferschwert",
       "metadata": {
         "files": [
-          "src/main/resources/assets/blackbox/models/item/opferschwert.json",
-          "src/main/java/net/mcreator/blackbox/item/OpferschwertItem.java"
+          "src/main/java/net/mcreator/blackbox/item/OpferschwertItem.java",
+          "src/main/resources/assets/blackbox/models/item/opferschwert.json"
         ]
       },
       "path": "~/Villager"
@@ -88,5 +88,5 @@
     "currentGenerator": "neoforge-1.21.1",
     "modElementsPackage": "net.mcreator.blackbox"
   },
-  "mcreatorVersion": 202400342716
+  "mcreatorVersion": 202400452410
 }
