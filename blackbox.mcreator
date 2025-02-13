@@ -49,11 +49,27 @@
         ]
       },
       "path": "~/Villager"
+    },
+    {
+      "name": "Test",
+      "type": "tool",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "test",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/item/TestItem.java",
+          "src/main/resources/assets/blackbox/models/item/test.json"
+        ]
+      }
     }
   ],
   "variable_elements": [],
   "sound_elements": [],
   "tag_elements": {
+    "ITEMS:minecraft:pickaxes": [
+      "~CUSTOM:Test"
+    ],
     "ITEMS:minecraft:swords": [
       "~CUSTOM:Opferschwert"
     ]
@@ -61,7 +77,8 @@
   "tab_element_order": {},
   "language_map": {
     "en_us": {
-      "item.blackbox.opferschwert": "Opferschwert"
+      "item.blackbox.opferschwert": "Opferschwert",
+      "item.blackbox.test": "Test"
     }
   },
   "foldersRoot": {

@@ -23,6 +23,7 @@ public class BlackboxModTabs {
 	public static void buildTabContentsVanilla(BuildCreativeModeTabContentsEvent tabData) {
 		if (tabData.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
 			tabData.accept(BlackboxModItems.OPFERSCHWERT.get());
+			tabData.accept(BlackboxModItems.TEST.get());
 		}
 	}
 }
