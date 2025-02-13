@@ -21,7 +21,7 @@ public class BlackboxModTabs {
 
 	@SubscribeEvent
 	public static void buildTabContentsVanilla(BuildCreativeModeTabContentsEvent tabData) {
-		if (tabData.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+		if (tabData.getTabKey() == CreativeModeTabs.COMBAT) {
 
 			tabData.accept(BlackboxModItems.OPFERSCHWERT.get());
 
