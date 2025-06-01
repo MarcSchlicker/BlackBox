@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "blackbox:blocks/output_block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "blackbox:output_block"
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,19 @@
 {
-  "item.blackbox.opferschwert": "Opferschwert"
+  "item.blackbox.opferschwert": "Opferschwert",
+  "block.blackbox.emerald_bedrock": "Emerald Bedrock",
+  "block.blackbox.blackbox_block": "Blackbox Block",
+  "gui.blackbox.dimensional_workbench_gui.button_go_building": "Go Building",
+  "item.blackbox.dimension_core": "Dimension Core",
+  "gui.blackbox.black_box_gui.button_teleport": "Go Building",
+  "gui.blackbox.dimensional_workbench_gui.button_name": "Name",
+  "gui.blackbox.emerald_bedrock_gui.button_teleport": "Overworld",
+  "item_group.blackbox.blackbox_tab": "Blackbox",
+  "block.blackbox.dimensional_workbench": "Dimensional Workbench",
+  "block.blackbox.output_block": "Output Block",
+  "gui.blackbox.dimensional_workbench_gui.Worldname": "Dimensionname",
+  "biome.blackbox.farm_dimension_biome": "Farm Dimension Biome",
+  "gui.blackbox.dimensional_workbench_gui.button_teleport": "Teleport",
+  "gui.blackbox.output_block_gui.button_save_postion": "Save Postion",
+  "gui.blackbox.dimensional_workbench_gui.button_end": "End",
+  "gui.blackbox.black_box_gui.button_start": "Start"
 }

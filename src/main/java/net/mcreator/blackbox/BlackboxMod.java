@@ -18,8 +18,12 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.FriendlyByteBuf;
 
+import net.mcreator.blackbox.network.BlackboxModVariables;
 import net.mcreator.blackbox.init.BlackboxModTabs;
+import net.mcreator.blackbox.init.BlackboxModMenus;
 import net.mcreator.blackbox.init.BlackboxModItems;
+import net.mcreator.blackbox.init.BlackboxModBlocks;
+import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.Map;
@@ -39,9 +43,14 @@ public class BlackboxMod {
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);
 
+		BlackboxModBlocks.REGISTRY.register(modEventBus);
+		BlackboxModBlockEntities.REGISTRY.register(modEventBus);
 		BlackboxModItems.REGISTRY.register(modEventBus);
 
 		BlackboxModTabs.REGISTRY.register(modEventBus);
+		BlackboxModVariables.ATTACHMENT_TYPES.register(modEventBus);
+
+		BlackboxModMenus.REGISTRY.register(modEventBus);
 
 		// Start of user code block mod init
 		// End of user code block mod init

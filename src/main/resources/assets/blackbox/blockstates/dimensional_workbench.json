@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "blackbox:block/dimensional_workbench"
+    }
+  }
+}

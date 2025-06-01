@@ -49,19 +49,481 @@
         ]
       },
       "path": "~/Villager"
+    },
+    {
+      "name": "BlackboxTab",
+      "type": "tab",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "blackbox_tab",
+      "metadata": {
+        "files": []
+      },
+      "path": "~/General"
+    },
+    {
+      "name": "Farmdimension",
+      "type": "dimension",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "farmdimension",
+      "metadata": {
+        "files": [
+          "src/main/resources/data/blackbox/dimension_type/farmdimension.json",
+          "src/main/resources/data/blackbox/dimension/farmdimension.json",
+          "src/main/java/net/mcreator/blackbox/world/dimension/FarmdimensionDimension.java"
+        ]
+      },
+      "path": "~/Dimension"
+    },
+    {
+      "name": "EmeraldBedrockGUI",
+      "type": "gui",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "emerald_bedrock_gui",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/world/inventory/EmeraldBedrockGUIMenu.java",
+          "src/main/java/net/mcreator/blackbox/client/gui/EmeraldBedrockGUIScreen.java",
+          "src/main/java/net/mcreator/blackbox/network/EmeraldBedrockGUIButtonMessage.java"
+        ]
+      },
+      "path": "~/EmeraldBedrock"
+    },
+    {
+      "name": "EmeraldBedrock",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "emerald_bedrock",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/block/EmeraldBedrockBlock.java",
+          "src/main/resources/assets/blackbox/blockstates/emerald_bedrock.json",
+          "src/main/resources/data/blackbox/loot_table/blocks/emerald_bedrock.json",
+          "src/main/resources/assets/blackbox/models/item/emerald_bedrock.json",
+          "src/main/resources/assets/blackbox/models/block/emerald_bedrock.json"
+        ]
+      },
+      "path": "~/EmeraldBedrock"
+    },
+    {
+      "name": "FarmDimensionBiome",
+      "type": "biome",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "farm_dimension_biome",
+      "metadata": {
+        "files": [
+          "src/main/resources/data/blackbox/worldgen/placed_feature/farm_dimension_biome_tree.json",
+          "src/main/resources/data/blackbox/worldgen/configured_feature/farm_dimension_biome_tree.json",
+          "src/main/resources/data/blackbox/worldgen/biome/farm_dimension_biome.json"
+        ]
+      },
+      "path": "~/Dimension"
+    },
+    {
+      "name": "BlackBoxGui",
+      "type": "gui",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "black_box_gui",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/world/inventory/BlackBoxGuiMenu.java",
+          "src/main/java/net/mcreator/blackbox/client/gui/BlackBoxGuiScreen.java"
+        ]
+      },
+      "path": "~/BlackBoxBlock"
+    },
+    {
+      "name": "BlackboxBlock",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "blackbox_block",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/block/BlackboxBlockBlock.java",
+          "src/main/java/net/mcreator/blackbox/block/entity/BlackboxBlockBlockEntity.java",
+          "src/main/resources/assets/blackbox/blockstates/blackbox_block.json",
+          "src/main/resources/data/blackbox/loot_table/blocks/blackbox_block.json",
+          "src/main/resources/assets/blackbox/models/block/blackbox_block.json",
+          "src/main/resources/assets/blackbox/models/item/blackbox_block.json"
+        ]
+      },
+      "path": "~/BlackBoxBlock"
+    },
+    {
+      "name": "EmeraldBedrockTeleport",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "emerald_bedrock_teleport",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/EmeraldBedrockTeleportProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          }
+        ]
+      },
+      "path": "~/EmeraldBedrock"
+    },
+    {
+      "name": "DimensionalWorkbenchGUI",
+      "type": "gui",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "dimensional_workbench_gui",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/network/DimensionalWorkbenchGUIButtonMessage.java",
+          "src/main/java/net/mcreator/blackbox/world/inventory/DimensionalWorkbenchGUIMenu.java",
+          "src/main/java/net/mcreator/blackbox/client/gui/DimensionalWorkbenchGUIScreen.java"
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "DimensionalWorkbench",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "dimensional_workbench",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/blackbox/blockstates/dimensional_workbench.json",
+          "src/main/resources/data/blackbox/loot_table/blocks/dimensional_workbench.json",
+          "src/main/resources/assets/blackbox/models/item/dimensional_workbench.json",
+          "src/main/java/net/mcreator/blackbox/block/DimensionalWorkbenchBlock.java",
+          "src/main/java/net/mcreator/blackbox/block/entity/DimensionalWorkbenchBlockEntity.java",
+          "src/main/resources/assets/blackbox/models/block/dimensional_workbench.json"
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "DimensionCore",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "dimension_core",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/item/DimensionCoreItem.java",
+          "src/main/resources/assets/blackbox/models/item/dimension_core.json"
+        ]
+      },
+      "path": "~/General"
+    },
+    {
+      "name": "TimeCalculate",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "time_calculate",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/TimeCalculateProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ]
+      },
+      "path": "~/General"
+    },
+    {
+      "name": "Itemproduction",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "itemproduction",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/ItemproductionProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ]
+      },
+      "path": "~/BlackBoxBlock"
+    },
+    {
+      "name": "TeleporttoDimension",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "teleportto_dimension",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/TeleporttoDimensionProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          }
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "OutputBlock",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "output_block",
+      "metadata": {
+        "files": [
+          "src/main/resources/data/blackbox/loot_table/blocks/output_block.json",
+          "src/main/java/net/mcreator/blackbox/block/entity/OutputBlockBlockEntity.java",
+          "src/main/resources/assets/blackbox/blockstates/output_block.json",
+          "src/main/resources/assets/blackbox/models/block/output_block.json",
+          "src/main/resources/assets/blackbox/models/item/output_block.json",
+          "src/main/java/net/mcreator/blackbox/block/OutputBlockBlock.java"
+        ]
+      }
+    },
+    {
+      "name": "OutputBlockGUI",
+      "type": "gui",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "output_block_gui",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/client/gui/OutputBlockGUIScreen.java",
+          "src/main/java/net/mcreator/blackbox/network/OutputBlockGUIButtonMessage.java",
+          "src/main/java/net/mcreator/blackbox/world/inventory/OutputBlockGUIMenu.java"
+        ]
+      }
+    },
+    {
+      "name": "DimWBNaming",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "dim_wb_naming",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/DimWBNamingProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "guistate",
+            "type": "map"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "DimWBEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "dim_wb_end",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/DimWBEndProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "OutputBlockPosition",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "output_block_position",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/OutputBlockPositionProcedure.java"
+        ],
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          }
+        ]
+      }
     }
   ],
-  "variable_elements": [],
+  "variable_elements": [
+    {
+      "name": "OverworldPositionx",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "OverworldPositiony",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "OverworldPositionz",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "TimeinSec",
+      "type": "number",
+      "scope": "map",
+      "value": "0"
+    },
+    {
+      "name": "FarmCounter",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "global_x",
+      "type": "number",
+      "scope": "map",
+      "value": "0"
+    },
+    {
+      "name": "OutputBlock_X",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0.0"
+    },
+    {
+      "name": "OutputBlock_Y",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    },
+    {
+      "name": "OutputBlock_Z",
+      "type": "number",
+      "scope": "player_persistent",
+      "value": "0"
+    }
+  ],
   "sound_elements": [],
   "tag_elements": {
     "ITEMS:minecraft:swords": [
       "~CUSTOM:Opferschwert"
+    ],
+    "BLOCKS:minecraft:overworld_carver_replaceables": [
+      "~CUSTOM:EmeraldBedrock",
+      "~Blocks.GRANITE_SLAB"
     ]
   },
   "tab_element_order": {},
   "language_map": {
     "en_us": {
-      "item.blackbox.opferschwert": "Opferschwert"
+      "item.blackbox.opferschwert": "Opferschwert",
+      "block.blackbox.emerald_bedrock": "Emerald Bedrock",
+      "block.blackbox.blackbox_block": "Blackbox Block",
+      "gui.blackbox.dimensional_workbench_gui.button_go_building": "Go Building",
+      "item.blackbox.dimension_core": "Dimension Core",
+      "gui.blackbox.black_box_gui.button_teleport": "Go Building",
+      "gui.blackbox.dimensional_workbench_gui.button_name": "Name",
+      "gui.blackbox.emerald_bedrock_gui.button_teleport": "Overworld",
+      "item_group.blackbox.blackbox_tab": "Blackbox",
+      "block.blackbox.dimensional_workbench": "Dimensional Workbench",
+      "block.blackbox.output_block": "Output Block",
+      "gui.blackbox.dimensional_workbench_gui.Worldname": "Dimensionname",
+      "biome.blackbox.farm_dimension_biome": "Farm Dimension Biome",
+      "gui.blackbox.dimensional_workbench_gui.button_teleport": "Teleport",
+      "gui.blackbox.output_block_gui.button_save_postion": "Save Postion",
+      "gui.blackbox.dimensional_workbench_gui.button_end": "End",
+      "gui.blackbox.black_box_gui.button_start": "Start"
     }
   },
   "foldersRoot": {
@@ -69,6 +531,26 @@
     "children": [
       {
         "name": "Villager",
+        "children": []
+      },
+      {
+        "name": "EmeraldBedrock",
+        "children": []
+      },
+      {
+        "name": "General",
+        "children": []
+      },
+      {
+        "name": "Dimension",
+        "children": []
+      },
+      {
+        "name": "BlackBoxBlock",
+        "children": []
+      },
+      {
+        "name": "DimensionalWorkbench",
         "children": []
       }
     ]
@@ -88,5 +570,5 @@
     "currentGenerator": "neoforge-1.21.1",
     "modElementsPackage": "net.mcreator.blackbox"
   },
-  "mcreatorVersion": 202400342716
+  "mcreatorVersion": 202500113416
 }
