@@ -13,17 +13,17 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import net.mcreator.blackbox.world.inventory.OutputBlockGUIMenu;
 import net.mcreator.blackbox.network.OutputBlockGUIButtonMessage;
-
-import java.util.HashMap;
+import net.mcreator.blackbox.init.BlackboxModScreens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-public class OutputBlockGUIScreen extends AbstractContainerScreen<OutputBlockGUIMenu> {
-	private final static HashMap<String, Object> guistate = OutputBlockGUIMenu.guistate;
+public class OutputBlockGUIScreen extends AbstractContainerScreen<OutputBlockGUIMenu> implements BlackboxModScreens.ScreenAccessor {
 	private final Level world;
 	private final int x, y, z;
 	private final Player entity;
-	Button button_save_postion;
+	private boolean menuStateUpdateActive = false;
+	private Button button_save_postion;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/output_block_gui.png");
 
 	public OutputBlockGUIScreen(OutputBlockGUIMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -36,7 +36,11 @@ public class OutputBlockGUIScreen extends AbstractContainerScreen<OutputBlockGUI
 		this.imageHeight = 166;
 	}
 
-	private static final ResourceLocation texture = ResourceLocation.parse("blackbox:textures/screens/output_block_gui.png");
+	@Override
+	public void updateMenuState(int elementType, String name, Object elementState) {
+		menuStateUpdateActive = true;
+		menuStateUpdateActive = false;
+	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -45,11 +49,11 @@ public class OutputBlockGUIScreen extends AbstractContainerScreen<OutputBlockGUI
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int gx, int gy) {
+	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
 		RenderSystem.disableBlend();
 	}
 
@@ -70,12 +74,13 @@ public class OutputBlockGUIScreen extends AbstractContainerScreen<OutputBlockGUI
 	public void init() {
 		super.init();
 		button_save_postion = Button.builder(Component.translatable("gui.blackbox.output_block_gui.button_save_postion"), e -> {
+			int x = OutputBlockGUIScreen.this.x;
+			int y = OutputBlockGUIScreen.this.y;
 			if (true) {
 				PacketDistributor.sendToServer(new OutputBlockGUIButtonMessage(0, x, y, z));
 				OutputBlockGUIButtonMessage.handleButtonAction(entity, 0, x, y, z);
 			}
-		}).bounds(this.leftPos + 6, this.topPos + 34, 87, 20).build();
-		guistate.put("button:button_save_postion", button_save_postion);
+		}).bounds(this.leftPos + 40, this.topPos + 44, 87, 20).build();
 		this.addRenderableWidget(button_save_postion);
 	}
 }

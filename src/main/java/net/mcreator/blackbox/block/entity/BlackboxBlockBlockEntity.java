@@ -1,7 +1,4 @@
-
 package net.mcreator.blackbox.block.entity;
-
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -29,8 +26,7 @@ import java.util.stream.IntStream;
 import io.netty.buffer.Unpooled;
 
 public class BlackboxBlockBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
-	private NonNullList<ItemStack> stacks = NonNullList.<ItemStack>withSize(256, ItemStack.EMPTY);
-	private final SidedInvWrapper handler = new SidedInvWrapper(this, null);
+	private NonNullList<ItemStack> stacks = NonNullList.withSize(256, ItemStack.EMPTY);
 
 	public BlackboxBlockBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.BLACKBOX_BLOCK.get(), position, state);
@@ -637,9 +633,5 @@ public class BlackboxBlockBlockEntity extends RandomizableContainerBlockEntity i
 		if (index == 0)
 			return false;
 		return true;
-	}
-
-	public SidedInvWrapper getItemHandler() {
-		return handler;
 	}
 }

@@ -1,4 +1,3 @@
-
 package net.mcreator.blackbox.item;
 
 import net.minecraft.world.level.block.Block;

@@ -11,17 +11,9 @@ public class OutputBlockPositionProcedure {
 		{
 			BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 			_vars.OutputBlock_X = x;
-			_vars.syncPlayerVariables(entity);
-		}
-		{
-			BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 			_vars.OutputBlock_Y = y;
-			_vars.syncPlayerVariables(entity);
-		}
-		{
-			BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 			_vars.OutputBlock_Z = z;
-			_vars.syncPlayerVariables(entity);
+			_vars.markSyncDirty();
 		}
 	}
 }

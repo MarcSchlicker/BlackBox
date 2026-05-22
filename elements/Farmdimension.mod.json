@@ -1,5 +1,5 @@
 {
-  "_fv": 77,
+  "_fv": 85,
   "_type": "dimension",
   "definition": {
     "biomesInDimension": [
@@ -7,6 +7,7 @@
         "value": "CUSTOM:FarmDimensionBiome"
       }
     ],
+    "biomesInDimensionCaves": [],
     "worldGenType": "Normal world gen",
     "mainFillerBlock": {
       "value": "Blocks.GRANITE_SLAB"
@@ -22,7 +23,7 @@
     "defaultEffects": "overworld",
     "useCustomEffects": true,
     "hasClouds": false,
-    "cloudHeight": 192.0,
+    "cloudHeight": 192,
     "skyType": "NONE",
     "sunHeightAffectsFog": false,
     "canRespawnHere": false,
@@ -35,7 +36,7 @@
     "infiniburnTag": "minecraft:infiniburn_overworld",
     "bedWorks": false,
     "hasSkyLight": true,
-    "imitateOverworldBehaviour": true,
+    "imitateOverworldBehaviour": false,
     "piglinSafe": false,
     "hasRaids": true,
     "minMonsterSpawnLightLimit": 0,

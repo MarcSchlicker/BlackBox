@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "blackbox:emerald_bedrock",
-    "minecraft:granite_slab"
+    "minecraft:granite_slab",
+    "blackbox:emerald_bedrock"
   ]
 }

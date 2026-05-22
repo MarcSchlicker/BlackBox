@@ -1,4 +1,3 @@
-
 package net.mcreator.blackbox.network;
 
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -14,17 +13,13 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 
-import net.mcreator.blackbox.world.inventory.OutputBlockGUIMenu;
 import net.mcreator.blackbox.procedures.OutputBlockPositionProcedure;
 import net.mcreator.blackbox.BlackboxMod;
 
-import java.util.HashMap;
-
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public record OutputBlockGUIButtonMessage(int buttonID, int x, int y, int z) implements CustomPacketPayload {
-
 	public static final Type<OutputBlockGUIButtonMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(BlackboxMod.MODID, "output_block_gui_buttons"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, OutputBlockGUIButtonMessage> STREAM_CODEC = StreamCodec.of((RegistryFriendlyByteBuf buffer, OutputBlockGUIButtonMessage message) -> {
 		buffer.writeInt(message.buttonID);
@@ -32,6 +27,7 @@ public record OutputBlockGUIButtonMessage(int buttonID, int x, int y, int z) imp
 		buffer.writeInt(message.y);
 		buffer.writeInt(message.z);
 	}, (RegistryFriendlyByteBuf buffer) -> new OutputBlockGUIButtonMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt()));
+
 	@Override
 	public Type<OutputBlockGUIButtonMessage> type() {
 		return TYPE;
@@ -39,14 +35,7 @@ public record OutputBlockGUIButtonMessage(int buttonID, int x, int y, int z) imp
 
 	public static void handleData(final OutputBlockGUIButtonMessage message, final IPayloadContext context) {
 		if (context.flow() == PacketFlow.SERVERBOUND) {
-			context.enqueueWork(() -> {
-				Player entity = context.player();
-				int buttonID = message.buttonID;
-				int x = message.x;
-				int y = message.y;
-				int z = message.z;
-				handleButtonAction(entity, buttonID, x, y, z);
-			}).exceptionally(e -> {
+			context.enqueueWork(() -> handleButtonAction(context.player(), message.buttonID, message.x, message.y, message.z)).exceptionally(e -> {
 				context.connection().disconnect(Component.literal(e.getMessage()));
 				return null;
 			});
@@ -55,9 +44,8 @@ public record OutputBlockGUIButtonMessage(int buttonID, int x, int y, int z) imp
 
 	public static void handleButtonAction(Player entity, int buttonID, int x, int y, int z) {
 		Level world = entity.level();
-		HashMap guistate = OutputBlockGUIMenu.guistate;
 		// security measure to prevent arbitrary chunk generation
-		if (!world.hasChunkAt(new BlockPos(x, y, z)))
+		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
 		if (buttonID == 0) {
 

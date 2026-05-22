@@ -1,4 +1,3 @@
-
 package net.mcreator.blackbox.world.dimension;
 
 import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
@@ -11,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 
 public class FarmdimensionDimension {
-	@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+	@EventBusSubscriber(Dist.CLIENT)
 	public static class FarmdimensionSpecialEffectsHandler {
 		@SubscribeEvent
 		public static void registerDimensionSpecialEffects(RegisterDimensionSpecialEffectsEvent event) {

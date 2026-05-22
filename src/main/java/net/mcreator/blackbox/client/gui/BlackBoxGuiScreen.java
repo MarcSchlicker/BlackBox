@@ -6,21 +6,19 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.GuiGraphics;
 
 import net.mcreator.blackbox.world.inventory.BlackBoxGuiMenu;
-
-import java.util.HashMap;
+import net.mcreator.blackbox.init.BlackboxModScreens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-public class BlackBoxGuiScreen extends AbstractContainerScreen<BlackBoxGuiMenu> {
-	private final static HashMap<String, Object> guistate = BlackBoxGuiMenu.guistate;
+public class BlackBoxGuiScreen extends AbstractContainerScreen<BlackBoxGuiMenu> implements BlackboxModScreens.ScreenAccessor {
 	private final Level world;
 	private final int x, y, z;
 	private final Player entity;
-	Button button_start;
+	private boolean menuStateUpdateActive = false;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/black_box_gui.png");
 
 	public BlackBoxGuiScreen(BlackBoxGuiMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -33,7 +31,11 @@ public class BlackBoxGuiScreen extends AbstractContainerScreen<BlackBoxGuiMenu> 
 		this.imageHeight = 166;
 	}
 
-	private static final ResourceLocation texture = ResourceLocation.parse("blackbox:textures/screens/black_box_gui.png");
+	@Override
+	public void updateMenuState(int elementType, String name, Object elementState) {
+		menuStateUpdateActive = true;
+		menuStateUpdateActive = false;
+	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -42,11 +44,11 @@ public class BlackBoxGuiScreen extends AbstractContainerScreen<BlackBoxGuiMenu> 
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int gx, int gy) {
+	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
 		RenderSystem.disableBlend();
 	}
 
@@ -61,14 +63,11 @@ public class BlackBoxGuiScreen extends AbstractContainerScreen<BlackBoxGuiMenu> 
 
 	@Override
 	protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+		guiGraphics.drawString(this.font, Component.translatable("gui.blackbox.black_box_gui.label_dimension_core"), 42, 7, -12829636, false);
 	}
 
 	@Override
 	public void init() {
 		super.init();
-		button_start = Button.builder(Component.translatable("gui.blackbox.black_box_gui.button_start"), e -> {
-		}).bounds(this.leftPos + 42, this.topPos + 7, 51, 20).build();
-		guistate.put("button:button_start", button_start);
-		this.addRenderableWidget(button_start);
 	}
 }

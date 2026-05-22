@@ -241,37 +241,6 @@
       "path": "~/General"
     },
     {
-      "name": "Itemproduction",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "itemproduction",
-      "metadata": {
-        "files": [
-          "src/main/java/net/mcreator/blackbox/procedures/ItemproductionProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/BlackBoxBlock"
-    },
-    {
       "name": "TeleporttoDimension",
       "type": "procedure",
       "compiles": true,
@@ -347,10 +316,6 @@
           {
             "name": "entity",
             "type": "entity"
-          },
-          {
-            "name": "guistate",
-            "type": "map"
           },
           {
             "name": "x",
@@ -436,6 +401,91 @@
           }
         ]
       }
+    },
+    {
+      "name": "Inputblock",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "inputblock",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/blackbox/blockstates/inputblock.json",
+          "src/main/resources/assets/blackbox/models/block/inputblock.json",
+          "src/main/resources/data/blackbox/loot_table/blocks/inputblock.json",
+          "src/main/java/net/mcreator/blackbox/block/entity/InputblockBlockEntity.java",
+          "src/main/java/net/mcreator/blackbox/block/InputblockBlock.java",
+          "src/main/resources/assets/blackbox/models/item/inputblock.json"
+        ]
+      }
+    },
+    {
+      "name": "RedDimensionCore",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "red_dimension_core",
+      "metadata": {
+        "files": [
+          "src/main/resources/assets/blackbox/models/item/red_dimension_core.json",
+          "src/main/java/net/mcreator/blackbox/item/RedDimensionCoreItem.java"
+        ]
+      },
+      "path": "~/General"
+    },
+    {
+      "name": "ToolTipDimCore",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "tool_tip_dim_core",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "itemstack",
+            "type": "itemstack"
+          },
+          {
+            "name": "tooltip",
+            "type": "tooltip"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/ToolTipDimCoreProcedure.java"
+        ]
+      },
+      "path": "~/General"
+    },
+    {
+      "name": "ItemproductionTick",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "itemproduction_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/ItemproductionTickProcedure.java"
+        ]
+      },
+      "path": "~/BlackBoxBlock"
     }
   ],
   "variable_elements": [
@@ -485,13 +535,19 @@
       "name": "OutputBlock_Y",
       "type": "number",
       "scope": "player_persistent",
-      "value": "0"
+      "value": "0.0"
     },
     {
       "name": "OutputBlock_Z",
       "type": "number",
       "scope": "player_persistent",
-      "value": "0"
+      "value": "0.0"
+    },
+    {
+      "name": "ProduktionTime",
+      "type": "number",
+      "scope": "map",
+      "value": "120.0"
     }
   ],
   "sound_elements": [],
@@ -510,8 +566,8 @@
       "item.blackbox.opferschwert": "Opferschwert",
       "block.blackbox.emerald_bedrock": "Emerald Bedrock",
       "block.blackbox.blackbox_block": "Blackbox Block",
-      "gui.blackbox.dimensional_workbench_gui.button_go_building": "Go Building",
       "item.blackbox.dimension_core": "Dimension Core",
+      "gui.blackbox.dimensional_workbench_gui.button_go_building": "Go Building",
       "gui.blackbox.black_box_gui.button_teleport": "Go Building",
       "gui.blackbox.dimensional_workbench_gui.button_name": "Name",
       "gui.blackbox.emerald_bedrock_gui.button_teleport": "Overworld",
@@ -523,8 +579,26 @@
       "gui.blackbox.dimensional_workbench_gui.button_teleport": "Teleport",
       "gui.blackbox.output_block_gui.button_save_postion": "Save Postion",
       "gui.blackbox.dimensional_workbench_gui.button_end": "End",
-      "gui.blackbox.black_box_gui.button_start": "Start"
+      "gui.blackbox.black_box_gui.button_start": "Start",
+      "block.blackbox.inputblock": "Inputblock",
+      "item.blackbox.red_dimension_core": "Red Dimension Core",
+      "gui.blackbox.black_box_gui.label_dimension_core": "Dimension Core"
     }
+  },
+  "metadata": {
+    "files": [
+      "src/main/java/net/mcreator/blackbox/init/BlackboxModMenus.java",
+      "src/main/java/net/mcreator/blackbox/init/BlackboxModScreens.java",
+      "src/main/java/net/mcreator/blackbox/network/MenuStateUpdateMessage.java",
+      "src/main/java/net/mcreator/blackbox/init/BlackboxModBlocks.java",
+      "src/main/java/net/mcreator/blackbox/init/BlackboxModBlockEntities.java",
+      "src/main/java/net/mcreator/blackbox/init/BlackboxModItems.java",
+      "src/main/java/net/mcreator/blackbox/init/BlackboxModTabs.java",
+      "src/main/java/net/mcreator/blackbox/BlackboxMod.java",
+      "src/main/resources/META-INF/neoforge.mods.toml",
+      "src/main/java/net/mcreator/blackbox/network/BlackboxModVariables.java",
+      "src/main/resources/pack.mcmeta"
+    ]
   },
   "foldersRoot": {
     "name": "~",
@@ -570,5 +644,5 @@
     "currentGenerator": "neoforge-1.21.1",
     "modElementsPackage": "net.mcreator.blackbox"
   },
-  "mcreatorVersion": 202500113416
+  "mcreatorVersion": 202600114619
 }

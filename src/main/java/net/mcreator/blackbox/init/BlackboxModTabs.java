@@ -1,4 +1,3 @@
-
 /*
  *    MCreator note: This file will be REGENERATED on each build.
  */
@@ -18,7 +17,7 @@ import net.minecraft.core.registries.Registries;
 
 import net.mcreator.blackbox.BlackboxMod;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class BlackboxModTabs {
 	public static final DeferredRegister<CreativeModeTab> REGISTRY = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BlackboxMod.MODID);
 	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BLACKBOX_TAB = REGISTRY.register("blackbox_tab",
@@ -28,6 +27,8 @@ public class BlackboxModTabs {
 				tabData.accept(BlackboxModBlocks.DIMENSIONAL_WORKBENCH.get().asItem());
 				tabData.accept(BlackboxModItems.DIMENSION_CORE.get());
 				tabData.accept(BlackboxModBlocks.OUTPUT_BLOCK.get().asItem());
+				tabData.accept(BlackboxModBlocks.INPUTBLOCK.get().asItem());
+				tabData.accept(BlackboxModItems.RED_DIMENSION_CORE.get());
 			}).withSearchBar().build());
 
 	@SubscribeEvent

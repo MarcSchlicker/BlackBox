@@ -15,20 +15,20 @@ import net.minecraft.client.Minecraft;
 
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 import net.mcreator.blackbox.network.DimensionalWorkbenchGUIButtonMessage;
-
-import java.util.HashMap;
+import net.mcreator.blackbox.init.BlackboxModScreens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<DimensionalWorkbenchGUIMenu> {
-	private final static HashMap<String, Object> guistate = DimensionalWorkbenchGUIMenu.guistate;
+public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<DimensionalWorkbenchGUIMenu> implements BlackboxModScreens.ScreenAccessor {
 	private final Level world;
 	private final int x, y, z;
 	private final Player entity;
-	EditBox Worldname;
-	Button button_name;
-	Button button_teleport;
-	Button button_end;
+	private boolean menuStateUpdateActive = false;
+	private EditBox Worldname;
+	private Button button_name;
+	private Button button_teleport;
+	private Button button_end;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/dimensional_workbench_gui.png");
 
 	public DimensionalWorkbenchGUIScreen(DimensionalWorkbenchGUIMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -41,7 +41,15 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 		this.imageHeight = 166;
 	}
 
-	private static final ResourceLocation texture = ResourceLocation.parse("blackbox:textures/screens/dimensional_workbench_gui.png");
+	@Override
+	public void updateMenuState(int elementType, String name, Object elementState) {
+		menuStateUpdateActive = true;
+		if (elementType == 0 && elementState instanceof String stringState) {
+			if (name.equals("Worldname"))
+				Worldname.setValue(stringState);
+		}
+		menuStateUpdateActive = false;
+	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -51,11 +59,11 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int gx, int gy) {
+	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
 		RenderSystem.disableBlend();
 	}
 
@@ -84,52 +92,40 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 	@Override
 	public void init() {
 		super.init();
-		Worldname = new EditBox(this.font, this.leftPos + 41, this.topPos + 12, 118, 18, Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname")) {
-			@Override
-			public void insertText(String text) {
-				super.insertText(text);
-				if (getValue().isEmpty())
-					setSuggestion(Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname").getString());
-				else
-					setSuggestion(null);
-			}
-
-			@Override
-			public void moveCursorTo(int pos, boolean flag) {
-				super.moveCursorTo(pos, flag);
-				if (getValue().isEmpty())
-					setSuggestion(Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname").getString());
-				else
-					setSuggestion(null);
-			}
-		};
-		Worldname.setMaxLength(32767);
-		Worldname.setSuggestion(Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname").getString());
-		guistate.put("text:Worldname", Worldname);
+		Worldname = new EditBox(this.font, this.leftPos + 41, this.topPos + 12, 118, 18, Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname"));
+		Worldname.setMaxLength(8192);
+		Worldname.setResponder(content -> {
+			if (!menuStateUpdateActive)
+				menu.sendMenuStateUpdate(entity, 0, "Worldname", content, false);
+		});
+		Worldname.setHint(Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname"));
 		this.addWidget(this.Worldname);
 		button_name = Button.builder(Component.translatable("gui.blackbox.dimensional_workbench_gui.button_name"), e -> {
+			int x = DimensionalWorkbenchGUIScreen.this.x;
+			int y = DimensionalWorkbenchGUIScreen.this.y;
 			if (true) {
 				PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(0, x, y, z));
 				DimensionalWorkbenchGUIButtonMessage.handleButtonAction(entity, 0, x, y, z);
 			}
 		}).bounds(this.leftPos + 11, this.topPos + 32, 46, 20).build();
-		guistate.put("button:button_name", button_name);
 		this.addRenderableWidget(button_name);
 		button_teleport = Button.builder(Component.translatable("gui.blackbox.dimensional_workbench_gui.button_teleport"), e -> {
+			int x = DimensionalWorkbenchGUIScreen.this.x;
+			int y = DimensionalWorkbenchGUIScreen.this.y;
 			if (true) {
 				PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(1, x, y, z));
 				DimensionalWorkbenchGUIButtonMessage.handleButtonAction(entity, 1, x, y, z);
 			}
 		}).bounds(this.leftPos + 59, this.topPos + 32, 67, 20).build();
-		guistate.put("button:button_teleport", button_teleport);
 		this.addRenderableWidget(button_teleport);
 		button_end = Button.builder(Component.translatable("gui.blackbox.dimensional_workbench_gui.button_end"), e -> {
+			int x = DimensionalWorkbenchGUIScreen.this.x;
+			int y = DimensionalWorkbenchGUIScreen.this.y;
 			if (true) {
 				PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(2, x, y, z));
 				DimensionalWorkbenchGUIButtonMessage.handleButtonAction(entity, 2, x, y, z);
 			}
 		}).bounds(this.leftPos + 129, this.topPos + 32, 40, 20).build();
-		guistate.put("button:button_end", button_end);
 		this.addRenderableWidget(button_end);
 	}
 }

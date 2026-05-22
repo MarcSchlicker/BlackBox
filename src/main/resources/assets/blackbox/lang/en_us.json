@@ -2,8 +2,8 @@
   "item.blackbox.opferschwert": "Opferschwert",
   "block.blackbox.emerald_bedrock": "Emerald Bedrock",
   "block.blackbox.blackbox_block": "Blackbox Block",
-  "gui.blackbox.dimensional_workbench_gui.button_go_building": "Go Building",
   "item.blackbox.dimension_core": "Dimension Core",
+  "gui.blackbox.dimensional_workbench_gui.button_go_building": "Go Building",
   "gui.blackbox.black_box_gui.button_teleport": "Go Building",
   "gui.blackbox.dimensional_workbench_gui.button_name": "Name",
   "gui.blackbox.emerald_bedrock_gui.button_teleport": "Overworld",
@@ -15,5 +15,8 @@
   "gui.blackbox.dimensional_workbench_gui.button_teleport": "Teleport",
   "gui.blackbox.output_block_gui.button_save_postion": "Save Postion",
   "gui.blackbox.dimensional_workbench_gui.button_end": "End",
-  "gui.blackbox.black_box_gui.button_start": "Start"
+  "gui.blackbox.black_box_gui.button_start": "Start",
+  "block.blackbox.inputblock": "Inputblock",
+  "item.blackbox.red_dimension_core": "Red Dimension Core",
+  "gui.blackbox.black_box_gui.label_dimension_core": "Dimension Core"
 }

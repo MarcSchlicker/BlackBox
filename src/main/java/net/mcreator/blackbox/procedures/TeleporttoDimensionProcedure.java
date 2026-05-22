@@ -27,17 +27,9 @@ public class TeleporttoDimensionProcedure {
 		{
 			BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 			_vars.OverworldPositionx = entity.getX();
-			_vars.syncPlayerVariables(entity);
-		}
-		{
-			BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 			_vars.OverworldPositiony = entity.getY();
-			_vars.syncPlayerVariables(entity);
-		}
-		{
-			BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 			_vars.OverworldPositionz = entity.getZ();
-			_vars.syncPlayerVariables(entity);
+			_vars.markSyncDirty();
 		}
 		if (entity instanceof ServerPlayer _player && !_player.level().isClientSide()) {
 			ResourceKey<Level> destinationType = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse("blackbox:farmdimension"));

@@ -13,17 +13,17 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import net.mcreator.blackbox.world.inventory.EmeraldBedrockGUIMenu;
 import net.mcreator.blackbox.network.EmeraldBedrockGUIButtonMessage;
-
-import java.util.HashMap;
+import net.mcreator.blackbox.init.BlackboxModScreens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-public class EmeraldBedrockGUIScreen extends AbstractContainerScreen<EmeraldBedrockGUIMenu> {
-	private final static HashMap<String, Object> guistate = EmeraldBedrockGUIMenu.guistate;
+public class EmeraldBedrockGUIScreen extends AbstractContainerScreen<EmeraldBedrockGUIMenu> implements BlackboxModScreens.ScreenAccessor {
 	private final Level world;
 	private final int x, y, z;
 	private final Player entity;
-	Button button_teleport;
+	private boolean menuStateUpdateActive = false;
+	private Button button_teleport;
+	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/emerald_bedrock_gui.png");
 
 	public EmeraldBedrockGUIScreen(EmeraldBedrockGUIMenu container, Inventory inventory, Component text) {
 		super(container, inventory, text);
@@ -36,7 +36,11 @@ public class EmeraldBedrockGUIScreen extends AbstractContainerScreen<EmeraldBedr
 		this.imageHeight = 166;
 	}
 
-	private static final ResourceLocation texture = ResourceLocation.parse("blackbox:textures/screens/emerald_bedrock_gui.png");
+	@Override
+	public void updateMenuState(int elementType, String name, Object elementState) {
+		menuStateUpdateActive = true;
+		menuStateUpdateActive = false;
+	}
 
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
@@ -45,11 +49,11 @@ public class EmeraldBedrockGUIScreen extends AbstractContainerScreen<EmeraldBedr
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int gx, int gy) {
+	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(texture, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
 		RenderSystem.disableBlend();
 	}
 
@@ -70,12 +74,13 @@ public class EmeraldBedrockGUIScreen extends AbstractContainerScreen<EmeraldBedr
 	public void init() {
 		super.init();
 		button_teleport = Button.builder(Component.translatable("gui.blackbox.emerald_bedrock_gui.button_teleport"), e -> {
+			int x = EmeraldBedrockGUIScreen.this.x;
+			int y = EmeraldBedrockGUIScreen.this.y;
 			if (true) {
 				PacketDistributor.sendToServer(new EmeraldBedrockGUIButtonMessage(0, x, y, z));
 				EmeraldBedrockGUIButtonMessage.handleButtonAction(entity, 0, x, y, z);
 			}
 		}).bounds(this.leftPos + 55, this.topPos + 76, 67, 20).build();
-		guistate.put("button:button_teleport", button_teleport);
 		this.addRenderableWidget(button_teleport);
 	}
 }

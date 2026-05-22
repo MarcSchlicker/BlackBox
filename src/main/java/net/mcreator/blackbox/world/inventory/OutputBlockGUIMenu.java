@@ -1,4 +1,3 @@
-
 package net.mcreator.blackbox.world.inventory;
 
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
@@ -27,9 +26,17 @@ import net.mcreator.blackbox.init.BlackboxModMenus;
 import java.util.function.Supplier;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections;
 
-public class OutputBlockGUIMenu extends AbstractContainerMenu implements Supplier<Map<Integer, Slot>> {
-	public final static HashMap<String, Object> guistate = new HashMap<>();
+public class OutputBlockGUIMenu extends AbstractContainerMenu implements BlackboxModMenus.MenuAccessor {
+	public final Map<String, Object> menuState = new HashMap<>() {
+		@Override
+		public Object put(String key, Object value) {
+			if (!this.containsKey(key) && this.size() >= 11)
+				return null;
+			return super.put(key, value);
+		}
+	};
 	public final Level world;
 	public final Player entity;
 	public int x, y, z;
@@ -82,7 +89,7 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Supplie
 				}
 			}
 		}
-		this.customSlots.put(0, this.addSlot(new SlotItemHandler(internal, 0, -155, 215) {
+		this.customSlots.put(0, this.addSlot(new SlotItemHandler(internal, 0, -164, 206) {
 			private final int slot = 0;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
@@ -223,12 +230,14 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Supplie
 				}
 				return ItemStack.EMPTY;
 			}
-			if (itemstack1.getCount() == 0)
-				slot.set(ItemStack.EMPTY);
-			else
+			if (itemstack1.isEmpty()) {
+				slot.setByPlayer(ItemStack.EMPTY);
+			} else {
 				slot.setChanged();
-			if (itemstack1.getCount() == itemstack.getCount())
+			}
+			if (itemstack1.getCount() == itemstack.getCount()) {
 				return ItemStack.EMPTY;
+			}
 			slot.onTake(playerIn, itemstack1);
 		}
 		return itemstack;
@@ -313,7 +322,13 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Supplie
 		}
 	}
 
-	public Map<Integer, Slot> get() {
-		return customSlots;
+	@Override
+	public Map<Integer, Slot> getSlots() {
+		return Collections.unmodifiableMap(customSlots);
+	}
+
+	@Override
+	public Map<String, Object> getMenuState() {
+		return menuState;
 	}
 }

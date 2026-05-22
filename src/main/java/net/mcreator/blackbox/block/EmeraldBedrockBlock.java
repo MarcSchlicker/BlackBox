@@ -1,4 +1,3 @@
-
 package net.mcreator.blackbox.block;
 
 import net.minecraft.world.phys.BlockHitResult;
@@ -8,7 +7,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,11 +24,6 @@ import io.netty.buffer.Unpooled;
 public class EmeraldBedrockBlock extends Block {
 	public EmeraldBedrockBlock() {
 		super(BlockBehaviour.Properties.of().sound(SoundType.GRAVEL).strength(-1, 3600000).pushReaction(PushReaction.BLOCK));
-	}
-
-	@Override
-	public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos) {
-		return 15;
 	}
 
 	@Override

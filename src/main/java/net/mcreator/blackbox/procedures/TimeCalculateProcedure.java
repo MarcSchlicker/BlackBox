@@ -27,12 +27,11 @@ public class TimeCalculateProcedure {
 	private static void execute(@Nullable Event event, LevelAccessor world) {
 		if (BlackboxModVariables.MapVariables.get(world).global_x != Calendar.getInstance().get(Calendar.SECOND)) {
 			BlackboxModVariables.MapVariables.get(world).TimeinSec = BlackboxModVariables.MapVariables.get(world).TimeinSec + 1;
-			BlackboxModVariables.MapVariables.get(world).syncData(world);
 			BlackboxModVariables.MapVariables.get(world).global_x = Calendar.getInstance().get(Calendar.SECOND);
-			BlackboxModVariables.MapVariables.get(world).syncData(world);
+			BlackboxModVariables.MapVariables.get(world).markSyncDirty();
 			if (BlackboxModVariables.MapVariables.get(world).TimeinSec >= 1000000000) {
 				BlackboxModVariables.MapVariables.get(world).TimeinSec = 0;
-				BlackboxModVariables.MapVariables.get(world).syncData(world);
+				BlackboxModVariables.MapVariables.get(world).markSyncDirty();
 			}
 		}
 	}
