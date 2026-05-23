@@ -15,11 +15,11 @@
         "data": {
           "id": 0,
           "disablePickup": {
-            "fixedValue": false
+            "fixedValue": true
           },
           "dropItemsWhenNotBound": true,
-          "x": -39,
-          "y": 242,
+          "x": 141,
+          "y": 80,
           "locked": false
         }
       },

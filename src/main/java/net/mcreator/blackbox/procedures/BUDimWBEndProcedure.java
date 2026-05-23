@@ -12,6 +12,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.BlockPos;
 
@@ -19,7 +20,7 @@ import net.mcreator.blackbox.network.BlackboxModVariables;
 import net.mcreator.blackbox.init.BlackboxModMenus;
 import net.mcreator.blackbox.init.BlackboxModItems;
 
-public class DimWBEndProcedure {
+public class BUDimWBEndProcedure {
 	public static void execute(LevelAccessor world, double x, double y, double z, Entity entity) {
 		if (entity == null)
 			return;
@@ -38,7 +39,9 @@ public class DimWBEndProcedure {
 					inside = false;
 					Slotcount = 0;
 					for (int index1 = 0; index1 < (int) Slots; index1++) {
-						if ((Core.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getString(("produces" + Slotcount))).equals(GetRegistryNameSlotnProcedure.execute(world, entity, n))) {
+						if ((Core.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getString(("produces" + Slotcount)))
+								.equals(BuiltInRegistries.ITEM.getKey((itemFromBlockInventory(world, BlockPos.containing(entity.getData(BlackboxModVariables.PLAYER_VARIABLES).OutputBlock_X,
+										entity.getData(BlackboxModVariables.PLAYER_VARIABLES).OutputBlock_Y, entity.getData(BlackboxModVariables.PLAYER_VARIABLES).OutputBlock_Z), (int) n).copy()).getItem()).toString())) {
 							{
 								final String _tagName = ("number" + Slotcount);
 								final double _tagValue = (Core.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getDouble(("number" + Slotcount))
@@ -53,7 +56,8 @@ public class DimWBEndProcedure {
 					if (inside == false) {
 						{
 							final String _tagName = ("produces" + Slots);
-							final String _tagValue = GetRegistryNameSlotnProcedure.execute(world, entity, n);
+							final String _tagValue = (BuiltInRegistries.ITEM.getKey((itemFromBlockInventory(world, BlockPos.containing(entity.getData(BlackboxModVariables.PLAYER_VARIABLES).OutputBlock_X,
+									entity.getData(BlackboxModVariables.PLAYER_VARIABLES).OutputBlock_Y, entity.getData(BlackboxModVariables.PLAYER_VARIABLES).OutputBlock_Z), (int) n).copy()).getItem()).toString());
 							CustomData.update(DataComponents.CUSTOM_DATA, Core, tag -> tag.putString(_tagName, _tagValue));
 						}
 						{
@@ -99,6 +103,7 @@ public class DimWBEndProcedure {
 				}
 			}
 		}
+		PlaceBlockUnderProcedure.execute(world, x, y, z);
 	}
 
 	private static ItemStack itemFromBlockInventory(LevelAccessor world, BlockPos pos, int slot) {

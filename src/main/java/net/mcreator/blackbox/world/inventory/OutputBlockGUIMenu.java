@@ -89,10 +89,15 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Blackbo
 				}
 			}
 		}
-		this.customSlots.put(0, this.addSlot(new SlotItemHandler(internal, 0, -164, 206) {
+		this.customSlots.put(0, this.addSlot(new SlotItemHandler(internal, 0, 16, 44) {
 			private final int slot = 0;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
+
+			@Override
+			public boolean mayPickup(Player entity) {
+				return false;
+			}
 
 			@Override
 			public boolean mayPlace(ItemStack stack) {

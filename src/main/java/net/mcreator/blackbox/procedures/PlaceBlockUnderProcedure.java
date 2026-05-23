@@ -1,0 +1,12 @@
+package net.mcreator.blackbox.procedures;
+
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.core.BlockPos;
+
+import net.mcreator.blackbox.init.BlackboxModBlocks;
+
+public class PlaceBlockUnderProcedure {
+	public static void execute(LevelAccessor world, double x, double y, double z) {
+		world.setBlock(BlockPos.containing(x, y - 1, z), BlackboxModBlocks.EMERALD_BEDROCK.get().defaultBlockState(), 3);
+	}
+}

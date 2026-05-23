@@ -17,6 +17,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceLocation;
@@ -80,6 +81,7 @@ public class BlackboxModVariables {
 		clone.OutputBlock_X = original.OutputBlock_X;
 		clone.OutputBlock_Y = original.OutputBlock_Y;
 		clone.OutputBlock_Z = original.OutputBlock_Z;
+		clone.RedDimensionCoreID = original.RedDimensionCoreID;
 		if (!event.isWasDeath()) {
 		}
 		event.getEntity().setData(PLAYER_VARIABLES, clone);
@@ -248,6 +250,7 @@ public class BlackboxModVariables {
 		public double OutputBlock_X = 0.0;
 		public double OutputBlock_Y = 0.0;
 		public double OutputBlock_Z = 0.0;
+		public ItemStack RedDimensionCoreID = ItemStack.EMPTY;
 
 		@Override
 		public CompoundTag serializeNBT(HolderLookup.Provider lookupProvider) {
@@ -259,6 +262,7 @@ public class BlackboxModVariables {
 			nbt.putDouble("OutputBlock_X", OutputBlock_X);
 			nbt.putDouble("OutputBlock_Y", OutputBlock_Y);
 			nbt.putDouble("OutputBlock_Z", OutputBlock_Z);
+			nbt.put("RedDimensionCoreID", RedDimensionCoreID.saveOptional(lookupProvider));
 			return nbt;
 		}
 
@@ -271,6 +275,7 @@ public class BlackboxModVariables {
 			OutputBlock_X = nbt.getDouble("OutputBlock_X");
 			OutputBlock_Y = nbt.getDouble("OutputBlock_Y");
 			OutputBlock_Z = nbt.getDouble("OutputBlock_Z");
+			RedDimensionCoreID = ItemStack.parseOptional(lookupProvider, nbt.getCompound("RedDimensionCoreID"));
 		}
 
 		public void markSyncDirty() {

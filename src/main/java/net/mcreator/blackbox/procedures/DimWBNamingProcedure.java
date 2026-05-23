@@ -44,23 +44,13 @@ public class DimWBNamingProcedure {
 					_setstack.setCount(1);
 					_itemHandlerModifiable.setStackInSlot(0, _setstack);
 				}
-				RedCore = new ItemStack(BlackboxModItems.RED_DIMENSION_CORE.get()).copy();
-				RedCore.set(DataComponents.CUSTOM_NAME, Component.literal(((((entity instanceof Player _entity11 && _entity11.containerMenu instanceof BlackboxModMenus.MenuAccessor _menu11) ? _menu11.getMenuState(0, "Worldname", "") : "") + "#") + ""
-						+ (entity.getDisplayName().getString() + "" + entity.getData(BlackboxModVariables.PLAYER_VARIABLES).FarmCounter))));
-				{
-					final String _tagName = "Name";
-					final String _tagValue = ((((entity instanceof Player _entity14 && _entity14.containerMenu instanceof BlackboxModMenus.MenuAccessor _menu14) ? _menu14.getMenuState(0, "Worldname", "") : "") + "#") + ""
-							+ (entity.getDisplayName().getString() + "" + entity.getData(BlackboxModVariables.PLAYER_VARIABLES).FarmCounter));
-					CustomData.update(DataComponents.CUSTOM_DATA, RedCore, tag -> tag.putString(_tagName, _tagValue));
-				}
-				RedCore.enchant(world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING), 1);
 				{
 					BlackboxModVariables.PlayerVariables _vars = entity.getData(BlackboxModVariables.PLAYER_VARIABLES);
 					_vars.FarmCounter = entity.getData(BlackboxModVariables.PLAYER_VARIABLES).FarmCounter + 1;
 					_vars.markSyncDirty();
 				}
 				if (world instanceof ILevelExtension _ext && _ext.getCapability(Capabilities.ItemHandler.BLOCK, BlockPos.containing(x, y, z), null) instanceof IItemHandlerModifiable _itemHandlerModifiable) {
-					ItemStack _setstack = RedCore.copy();
+					ItemStack _setstack = entity.getData(BlackboxModVariables.PLAYER_VARIABLES).RedDimensionCoreID.copy();
 					_setstack.setCount(1);
 					_itemHandlerModifiable.setStackInSlot(2, _setstack);
 				}

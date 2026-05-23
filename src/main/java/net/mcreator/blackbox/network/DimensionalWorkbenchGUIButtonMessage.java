@@ -17,7 +17,7 @@ import net.minecraft.core.SectionPos;
 
 import net.mcreator.blackbox.procedures.TeleporttoDimensionProcedure;
 import net.mcreator.blackbox.procedures.DimWBNamingProcedure;
-import net.mcreator.blackbox.procedures.DimWBEndProcedure;
+import net.mcreator.blackbox.procedures.CalcDimCoreatEndProcedure;
 import net.mcreator.blackbox.BlackboxMod;
 
 @EventBusSubscriber
@@ -59,7 +59,7 @@ public record DimensionalWorkbenchGUIButtonMessage(int buttonID, int x, int y, i
 		}
 		if (buttonID == 2) {
 
-			DimWBEndProcedure.execute(world, x, y, z, entity);
+			CalcDimCoreatEndProcedure.execute(world, x, y, z, entity);
 		}
 	}
 

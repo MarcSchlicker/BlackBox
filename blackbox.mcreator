@@ -486,6 +486,188 @@
         ]
       },
       "path": "~/BlackBoxBlock"
+    },
+    {
+      "name": "GetRegistryNameSlotn",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "get_registry_name_slotn",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "n",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "return_type": "string",
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/GetRegistryNameSlotnProcedure.java"
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "PlaceBlockUnder",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "place_block_under",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/PlaceBlockUnderProcedure.java"
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "BUDimWBEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "bu_dim_wb_end",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/BUDimWBEndProcedure.java"
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
+    },
+    {
+      "name": "SafeOutput",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "safe_output",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/SafeOutputProcedure.java"
+        ]
+      }
+    },
+    {
+      "name": "ToolTipRedDimCore",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "tool_tip_red_dim_core",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "itemstack",
+            "type": "itemstack"
+          },
+          {
+            "name": "tooltip",
+            "type": "tooltip"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/ToolTipRedDimCoreProcedure.java"
+        ]
+      },
+      "path": "~/General"
+    },
+    {
+      "name": "CalcDimCoreatEnd",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "calc_dim_coreat_end",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "x",
+            "type": "number"
+          },
+          {
+            "name": "y",
+            "type": "number"
+          },
+          {
+            "name": "z",
+            "type": "number"
+          },
+          {
+            "name": "world",
+            "type": "world"
+          }
+        ],
+        "files": [
+          "src/main/java/net/mcreator/blackbox/procedures/CalcDimCoreatEndProcedure.java"
+        ]
+      },
+      "path": "~/DimensionalWorkbench"
     }
   ],
   "variable_elements": [
@@ -548,6 +730,12 @@
       "type": "number",
       "scope": "map",
       "value": "120.0"
+    },
+    {
+      "name": "RedDimensionCoreID",
+      "type": "itemstack",
+      "scope": "player_persistent",
+      "value": "ItemStack.EMPTY"
     }
   ],
   "sound_elements": [],
