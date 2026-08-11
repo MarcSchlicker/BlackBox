@@ -18,13 +18,19 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
+import net.mcreator.blackbox.util.FarmResourcePort;
+import net.mcreator.blackbox.util.FarmResourceStorage;
+import net.mcreator.blackbox.util.MultiFluidTank;
+import net.mcreator.blackbox.util.TrackedEnergyStorage;
 
 import javax.annotation.Nullable;
 
 import java.util.stream.IntStream;
 
-public class InputblockBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
+public class InputblockBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer, FarmResourcePort {
 	private NonNullList<ItemStack> stacks = NonNullList.withSize(9, ItemStack.EMPTY);
+	private final MultiFluidTank fluids = new MultiFluidTank(FarmResourceStorage.FLUID_TANKS, FarmResourceStorage.FLUID_CAPACITY_PER_TANK, this::setChanged);
+	private final TrackedEnergyStorage energy = new TrackedEnergyStorage(FarmResourceStorage.ENERGY_CAPACITY, this::setChanged);
 
 	public InputblockBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.INPUTBLOCK.get(), position, state);
@@ -36,6 +42,8 @@ public class InputblockBlockEntity extends RandomizableContainerBlockEntity impl
 		if (!this.tryLoadLootTable(compound))
 			this.stacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 		ContainerHelper.loadAllItems(compound, this.stacks, lookupProvider);
+		this.fluids.load(lookupProvider, compound.getCompound("Fluids"));
+		this.energy.setEnergyStored(compound.getInt("Energy"));
 	}
 
 	@Override
@@ -44,6 +52,8 @@ public class InputblockBlockEntity extends RandomizableContainerBlockEntity impl
 		if (!this.trySaveLootTable(compound)) {
 			ContainerHelper.saveAllItems(compound, this.stacks, lookupProvider);
 		}
+		compound.put("Fluids", this.fluids.save(lookupProvider));
+		compound.putInt("Energy", this.energy.getEnergyStored());
 	}
 
 	@Override
@@ -112,5 +122,15 @@ public class InputblockBlockEntity extends RandomizableContainerBlockEntity impl
 	@Override
 	public boolean canTakeItemThroughFace(int index, ItemStack itemstack, Direction direction) {
 		return true;
+	}
+
+	@Override
+	public MultiFluidTank fluidStorage() {
+		return this.fluids;
+	}
+
+	@Override
+	public TrackedEnergyStorage energyStorage() {
+		return this.energy;
 	}
 }

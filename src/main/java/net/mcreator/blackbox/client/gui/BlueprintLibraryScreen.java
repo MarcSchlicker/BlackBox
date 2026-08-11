@@ -20,7 +20,7 @@ import java.util.Locale;
 
 public class BlueprintLibraryScreen extends Screen {
 	private static final int PANEL_WIDTH = 280;
-	private static final int PANEL_HEIGHT = 236;
+	private static final int PANEL_HEIGHT = 260;
 	private static final int ROWS_PER_PAGE = 4;
 	private final List<BlueprintSummary> serverEntries;
 	private final List<BlueprintSummary> localEntries;
@@ -33,10 +33,13 @@ public class BlueprintLibraryScreen extends Screen {
 	private Button serverTab;
 	private Button actionButton;
 	private Button transferButton;
+	private Button renameButton;
+	private Button deleteButton;
 	private Button previousButton;
 	private Button nextButton;
 	private StorageScope visibleScope;
 	private int page;
+	private boolean confirmDelete;
 
 	public BlueprintLibraryScreen(List<BlueprintSummary> serverEntries, List<BlueprintSummary> localEntries, String selectedId,
 			StorageScope selectedScope, StorageScope preferredStorage, InteractionHand hand) {
@@ -65,8 +68,8 @@ public class BlueprintLibraryScreen extends Screen {
 			rebuildEntries();
 		});
 		this.addRenderableWidget(this.search);
-		this.previousButton = this.addRenderableWidget(Button.builder(Component.literal("<"), button -> changePage(-1)).bounds(left + 20, top + 210, 30, 18).build());
-		this.nextButton = this.addRenderableWidget(Button.builder(Component.literal(">"), button -> changePage(1)).bounds(left + 230, top + 210, 30, 18).build());
+		this.previousButton = this.addRenderableWidget(Button.builder(Component.literal("<"), button -> changePage(-1)).bounds(left + 20, top + 234, 30, 18).build());
+		this.nextButton = this.addRenderableWidget(Button.builder(Component.literal(">"), button -> changePage(1)).bounds(left + 230, top + 234, 30, 18).build());
 		this.addRenderableWidget(Button.builder(Component.literal("X"), button -> onClose()).bounds(left + 255, top + 5, 18, 18).build());
 		rebuildEntries();
 	}
@@ -95,6 +98,14 @@ public class BlueprintLibraryScreen extends Screen {
 			this.removeWidget(this.transferButton);
 			this.transferButton = null;
 		}
+		if (this.renameButton != null) {
+			this.removeWidget(this.renameButton);
+			this.renameButton = null;
+		}
+		if (this.deleteButton != null) {
+			this.removeWidget(this.deleteButton);
+			this.deleteButton = null;
+		}
 		List<BlueprintSummary> filtered = filteredEntries();
 		this.page = Math.min(this.page, Math.max(0, (filtered.size() - 1) / ROWS_PER_PAGE));
 		int left = (this.width - PANEL_WIDTH) / 2;
@@ -103,15 +114,22 @@ public class BlueprintLibraryScreen extends Screen {
 		for (int row = 0; row < ROWS_PER_PAGE && first + row < filtered.size(); row++) {
 			BlueprintSummary entry = filtered.get(first + row);
 			String marker = entry.id().equals(this.selectedId) && this.visibleScope == this.selectedScope ? "\u2713 " : "";
-			Component label = Component.literal(marker + entry.name() + "  (" + entry.author() + ", " + entry.blockCount() + ")");
+			Component label = Component.literal(marker + entry.name() + "  (v" + entry.revision() + ", " + entry.author() + ", " + entry.blockCount() + ")");
 			Button button = Button.builder(label, ignored -> select(entry)).bounds(left + 20, top + 73 + row * 21, 240, 19).build();
 			this.entryButtons.add(this.addRenderableWidget(button));
 		}
 		this.actionButton = this.addRenderableWidget(Button.builder(Component.translatable("gui.blackbox.blueprint_library.create." + this.visibleScope.id()), ignored -> createNew())
 				.bounds(left + 30, top + 160, 220, 18).build());
 		if (!this.selectedId.isBlank() && this.visibleScope == this.selectedScope) {
+			BlueprintSummary selected = filtered.stream().filter(entry -> entry.id().equals(this.selectedId)).findFirst().orElse(null);
+			if (selected != null) {
+				this.renameButton = this.addRenderableWidget(Button.builder(Component.translatable("gui.blackbox.blueprint_library.rename"), ignored -> renameSelected(selected))
+						.bounds(left + 30, top + 181, 107, 18).build());
+				this.deleteButton = this.addRenderableWidget(Button.builder(Component.translatable(confirmDelete ? "gui.blackbox.blueprint_library.confirm_delete" : "gui.blackbox.blueprint_library.delete"),
+						ignored -> deleteSelected(selected)).bounds(left + 143, top + 181, 107, 18).build());
+			}
 			String key = this.visibleScope == StorageScope.LOCAL ? "gui.blackbox.blueprint_library.publish" : "gui.blackbox.blueprint_library.download";
-			this.transferButton = this.addRenderableWidget(Button.builder(Component.translatable(key), ignored -> transferSelected()).bounds(left + 30, top + 181, 220, 18).build());
+			this.transferButton = this.addRenderableWidget(Button.builder(Component.translatable(key), ignored -> transferSelected()).bounds(left + 30, top + 202, 220, 18).build());
 		}
 		this.localTab.active = this.visibleScope != StorageScope.LOCAL;
 		this.serverTab.active = this.visibleScope != StorageScope.SERVER;
@@ -134,6 +152,22 @@ public class BlueprintLibraryScreen extends Screen {
 		} else {
 			PacketDistributor.sendToServer(BlueprintLibraryMessage.download(this.hand, this.selectedId));
 		}
+		onClose();
+	}
+
+	private void renameSelected(BlueprintSummary selected) {
+		if (this.minecraft != null) {
+			this.minecraft.setScreen(new BlueprintRenameScreen(selected.id(), selected.name(), this.visibleScope, this.hand));
+		}
+	}
+
+	private void deleteSelected(BlueprintSummary selected) {
+		if (!this.confirmDelete) {
+			this.confirmDelete = true;
+			rebuildEntries();
+			return;
+		}
+		BlueprintLibraryClient.delete(selected.id(), selected.name(), this.visibleScope, this.hand);
 		onClose();
 	}
 
@@ -162,7 +196,7 @@ public class BlueprintLibraryScreen extends Screen {
 		if (filteredEntries().isEmpty()) {
 			graphics.drawCenteredString(this.font, Component.translatable("gui.blackbox.blueprint_library.empty." + this.visibleScope.id()), this.width / 2, top + 122, 0xFFB5BEC3);
 		}
-		graphics.drawCenteredString(this.font, Component.literal((this.page + 1) + " / " + (maxPage() + 1)), this.width / 2, top + 215, 0xFFB5BEC3);
+		graphics.drawCenteredString(this.font, Component.literal((this.page + 1) + " / " + (maxPage() + 1)), this.width / 2, top + 239, 0xFFB5BEC3);
 		super.render(graphics, mouseX, mouseY, partialTick);
 	}
 

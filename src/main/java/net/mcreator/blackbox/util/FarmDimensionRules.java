@@ -23,7 +23,9 @@ public final class FarmDimensionRules {
 			return;
 		}
 		ServerPlayer player = event.getEntity() instanceof ServerPlayer serverPlayer ? serverPlayer : null;
-		if (!LimitedFlatLevelSource.isFarmChunk(event.getPos().getX() >> 4, event.getPos().getZ() >> 4)) {
+		FarmCell cell = player == null ? FarmDimensionRuntime.registeredCellAt(level, event.getPos()).orElse(null)
+				: FarmDimensionRuntime.getAssignedCell(player).orElse(null);
+		if (!LimitedFlatLevelSource.isFarmChunk(event.getPos().getX() >> 4, event.getPos().getZ() >> 4) || cell == null || !cell.contains(event.getPos())) {
 			event.setCanceled(true);
 			if (player != null) {
 				player.displayClientMessage(Component.translatable("message.blackbox.farm.outside_cell").withStyle(ChatFormatting.RED), true);
@@ -35,15 +37,6 @@ public final class FarmDimensionRules {
 			if (player != null) {
 				player.displayClientMessage(Component.translatable("message.blackbox.farm.block_denied").withStyle(ChatFormatting.RED), true);
 			}
-			return;
-		}
-		if (player == null) {
-			return;
-		}
-		FarmCell cell = FarmDimensionRuntime.getAssignedCell(player).orElse(null);
-		if (cell == null || !cell.contains(event.getPos())) {
-			event.setCanceled(true);
-			player.displayClientMessage(Component.translatable("message.blackbox.farm.outside_cell").withStyle(ChatFormatting.RED), true);
 			return;
 		}
 	}

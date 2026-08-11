@@ -14,7 +14,7 @@ import net.mcreator.blackbox.world.inventory.HandbookMenu;
 
 public class HandbookScreen extends AbstractContainerScreen<HandbookMenu> {
 	private static final int GUIDE_PAGE_COUNT = 7;
-	private static final int PAGE_COUNT = 14;
+	private static final int PAGE_COUNT = 16;
 	private int page;
 	private Button previousButton;
 	private Button nextButton;
@@ -109,19 +109,26 @@ public class HandbookScreen extends AbstractContainerScreen<HandbookMenu> {
 				shaped("gui.blackbox.handbook.recipe.stability", stack(BlackboxModItems.STABILITY_UPGRADE), null, Items.IRON_INGOT, null, Items.CLOCK, Items.COMPARATOR, Items.CLOCK, null, Items.IRON_INGOT, null)
 			};
 			case 3 -> new RecipeView[]{
+				shaped("gui.blackbox.handbook.recipe.compact", stack(BlackboxModItems.COMPACT_CELL_UPGRADE), null, Items.IRON_INGOT, null, Items.IRON_INGOT, Items.REDSTONE, Items.IRON_INGOT, null, Items.IRON_INGOT, null),
+				shaped("gui.blackbox.handbook.recipe.medium", stack(BlackboxModItems.MEDIUM_CELL_UPGRADE), Items.IRON_INGOT, Items.COPPER_INGOT, Items.IRON_INGOT, Items.COPPER_INGOT, Items.AMETHYST_SHARD, Items.COPPER_INGOT, Items.IRON_INGOT, Items.COPPER_INGOT, Items.IRON_INGOT)
+			};
+			case 4 -> new RecipeView[]{
+				shaped("gui.blackbox.handbook.recipe.large", stack(BlackboxModItems.LARGE_CELL_UPGRADE), Items.IRON_INGOT, Items.GOLD_INGOT, Items.IRON_INGOT, Items.GOLD_INGOT, Items.AMETHYST_SHARD, Items.GOLD_INGOT, Items.IRON_INGOT, Items.GOLD_INGOT, Items.IRON_INGOT),
+				shapeless("gui.blackbox.handbook.recipe.mob_spawn", stack(BlackboxModItems.MOB_SPAWN_UPGRADE), Items.EMERALD, Items.ROTTEN_FLESH, Items.BONE, Items.GUNPOWDER, Items.SPIDER_EYE)
+			};
+			case 5 -> new RecipeView[]{
 				shapeless("gui.blackbox.handbook.recipe.standard", stack(BlackboxModItems.STANDARD_ENVIRONMENT_UPGRADE), Items.COMPASS, Items.DEEPSLATE, Items.EMERALD),
 				shapeless("gui.blackbox.handbook.recipe.overworld", stack(BlackboxModItems.OVERWORLD_ENVIRONMENT_UPGRADE), Items.COMPASS, Items.GRASS_BLOCK, Items.OAK_SAPLING)
 			};
-			case 4 -> new RecipeView[]{
+			case 6 -> new RecipeView[]{
 				shapeless("gui.blackbox.handbook.recipe.nether", stack(BlackboxModItems.NETHER_ENVIRONMENT_UPGRADE), Items.COMPASS, Items.NETHERRACK, Items.FIRE_CHARGE),
 				shapeless("gui.blackbox.handbook.recipe.end", stack(BlackboxModItems.END_ENVIRONMENT_UPGRADE), Items.COMPASS, Items.END_STONE, Items.ENDER_PEARL)
 			};
-			case 5 -> new RecipeView[]{
-				shapeless("gui.blackbox.handbook.recipe.mob_spawn", stack(BlackboxModItems.MOB_SPAWN_UPGRADE), Items.EMERALD, Items.ROTTEN_FLESH, Items.BONE, Items.GUNPOWDER, Items.SPIDER_EYE),
-				shaped("gui.blackbox.handbook.recipe.blueprint", stack(BlackboxModItems.BLUEPRINT), Items.PAPER, Items.PAPER, Items.PAPER, Items.PAPER, Items.INK_SAC, Items.PAPER, Items.PAPER, Items.PAPER, Items.PAPER)
+			case 7 -> new RecipeView[]{
+				shaped("gui.blackbox.handbook.recipe.blueprint", stack(BlackboxModItems.BLUEPRINT), Items.PAPER, Items.PAPER, Items.PAPER, Items.PAPER, Items.INK_SAC, Items.PAPER, Items.PAPER, Items.PAPER, Items.PAPER),
+				shapeless("gui.blackbox.handbook.recipe.handbook", stack(BlackboxModItems.HANDBOOK), Items.BOOK, Items.EMERALD)
 			};
 			default -> new RecipeView[]{
-				shapeless("gui.blackbox.handbook.recipe.handbook", stack(BlackboxModItems.HANDBOOK), Items.BOOK, Items.EMERALD),
 				shaped("gui.blackbox.handbook.recipe.sword", stack(BlackboxModItems.OPFERSCHWERT), Items.EMERALD, Items.IRON_INGOT, Items.EMERALD, Items.EMERALD, Items.IRON_INGOT, Items.EMERALD, Items.EMERALD, Items.STICK, Items.EMERALD)
 			};
 		};

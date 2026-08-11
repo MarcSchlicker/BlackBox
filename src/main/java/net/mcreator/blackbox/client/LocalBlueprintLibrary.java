@@ -38,24 +38,63 @@ public final class LocalBlueprintLibrary {
 		}
 	}
 
-	public static boolean save(byte[] data) {
+	public static BlueprintSummary save(byte[] data) {
 		CompoundTag root = BlueprintLibrary.decode(data);
 		BlueprintSummary summary = BlueprintLibrary.summarize(root);
 		if (summary == null) {
-			return false;
+			return null;
 		}
 		try {
 			Path directory = directory();
 			Files.createDirectories(directory);
 			for (BlueprintSummary existing : list()) {
 				if (!existing.id().equals(summary.id()) && existing.name().equalsIgnoreCase(summary.name()) && existing.author().equalsIgnoreCase(summary.author())) {
-					Files.deleteIfExists(directory.resolve(existing.id() + ".nbt"));
+					root.putString("id", existing.id());
+					root.putInt("revision", existing.revision() + 1);
+					data = BlueprintLibrary.encode(root);
+					summary = BlueprintLibrary.summarize(root);
+					break;
 				}
 			}
 			Files.write(directory.resolve(summary.id() + ".nbt"), data);
-			return true;
+			return summary;
 		} catch (IOException exception) {
 			BlackboxMod.LOGGER.error("Could not save local farm blueprint {}", summary.id(), exception);
+			return null;
+		}
+	}
+
+	public static BlueprintSummary rename(String blueprintId, String requestedName) {
+		String name = requestedName == null ? "" : requestedName.trim();
+		if (name.isEmpty() || name.length() > 48) {
+			return null;
+		}
+		byte[] data = load(blueprintId);
+		CompoundTag root = BlueprintLibrary.decode(data);
+		BlueprintSummary summary = BlueprintLibrary.summarize(root);
+		if (summary == null) {
+			return null;
+		}
+		root.putString("name", name);
+		root.putInt("revision", summary.revision() + 1);
+		byte[] encoded = BlueprintLibrary.encode(root);
+		try {
+			Files.write(directory().resolve(blueprintId + ".nbt"), encoded);
+			return BlueprintLibrary.summarize(root);
+		} catch (IOException exception) {
+			BlackboxMod.LOGGER.error("Could not rename local farm blueprint {}", blueprintId, exception);
+			return null;
+		}
+	}
+
+	public static boolean delete(String blueprintId) {
+		if (blueprintId == null || !blueprintId.matches("[0-9a-fA-F-]{36}")) {
+			return false;
+		}
+		try {
+			return Files.deleteIfExists(directory().resolve(blueprintId + ".nbt"));
+		} catch (IOException exception) {
+			BlackboxMod.LOGGER.error("Could not delete local farm blueprint {}", blueprintId, exception);
 			return false;
 		}
 	}

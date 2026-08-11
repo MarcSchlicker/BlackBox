@@ -31,6 +31,9 @@ public class BlackboxModTabs {
 				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.OVERWORLD));
 				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.NETHER));
 				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.END));
+				tabData.accept(FarmCoreData.createCellSizeCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), 1));
+				tabData.accept(FarmCoreData.createCellSizeCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), 2));
+				tabData.accept(FarmCoreData.createCellSizeCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), 3));
 				tabData.accept(BlackboxModBlocks.OUTPUT_BLOCK.get().asItem());
 				tabData.accept(BlackboxModBlocks.INPUTBLOCK.get().asItem());
 				tabData.accept(BlackboxModItems.HANDBOOK.get());
@@ -41,6 +44,9 @@ public class BlackboxModTabs {
 				tabData.accept(BlackboxModItems.END_ENVIRONMENT_UPGRADE.get());
 				tabData.accept(BlackboxModItems.STABILITY_UPGRADE.get());
 				tabData.accept(BlackboxModItems.MOB_SPAWN_UPGRADE.get());
+				tabData.accept(BlackboxModItems.COMPACT_CELL_UPGRADE.get());
+				tabData.accept(BlackboxModItems.MEDIUM_CELL_UPGRADE.get());
+				tabData.accept(BlackboxModItems.LARGE_CELL_UPGRADE.get());
 				tabData.accept(BlackboxModItems.BLUEPRINT.get());
 				tabData.accept(FarmCoreData.createExampleIronFarmCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get())));
 			}).withSearchBar().build());

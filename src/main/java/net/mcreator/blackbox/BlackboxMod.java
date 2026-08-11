@@ -27,6 +27,7 @@ import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.init.BlackboxModBlocks;
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.init.BlackboxModChunkGenerators;
+import net.mcreator.blackbox.init.BlackboxModCapabilities;
 import net.mcreator.blackbox.config.BlackboxConfig;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -49,6 +50,7 @@ public class BlackboxMod {
 		// End of user code block mod constructor
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);
+		modEventBus.addListener(BlackboxModCapabilities::register);
 		BlackboxModBlocks.REGISTRY.register(modEventBus);
 		BlackboxModBlockEntities.REGISTRY.register(modEventBus);
 		BlackboxModChunkGenerators.REGISTRY.register(modEventBus);

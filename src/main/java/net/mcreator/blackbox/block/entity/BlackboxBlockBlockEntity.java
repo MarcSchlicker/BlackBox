@@ -19,6 +19,7 @@ import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.world.inventory.BlackBoxGuiMenu;
 import net.mcreator.blackbox.util.FarmSimulationMachine;
+import net.mcreator.blackbox.util.FarmResourceStorage;
 
 import io.netty.buffer.Unpooled;
 
@@ -37,6 +38,7 @@ public class BlackboxBlockBlockEntity extends RandomizableContainerBlockEntity i
 	private int simulationTicks;
 	private String activeCoreId = "";
 	private boolean stableCycleFunded;
+	private final FarmResourceStorage resources = new FarmResourceStorage(this::setChanged);
 
 	public BlackboxBlockBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.BLACKBOX_BLOCK.get(), position, state);
@@ -50,6 +52,7 @@ public class BlackboxBlockBlockEntity extends RandomizableContainerBlockEntity i
 		this.simulationTicks = tag.getInt("SimulationTicks");
 		this.activeCoreId = tag.getString("ActiveCoreId");
 		this.stableCycleFunded = tag.getBoolean("StableCycleFunded");
+		this.resources.load(tag, lookupProvider);
 	}
 
 	@Override
@@ -59,6 +62,7 @@ public class BlackboxBlockBlockEntity extends RandomizableContainerBlockEntity i
 		tag.putInt("SimulationTicks", this.simulationTicks);
 		tag.putString("ActiveCoreId", this.activeCoreId);
 		tag.putBoolean("StableCycleFunded", this.stableCycleFunded);
+		this.resources.save(tag, lookupProvider);
 	}
 
 	@Override
@@ -145,5 +149,10 @@ public class BlackboxBlockBlockEntity extends RandomizableContainerBlockEntity i
 			this.stableCycleFunded = funded;
 			this.setChanged();
 		}
+	}
+
+	@Override
+	public FarmResourceStorage resources() {
+		return this.resources;
 	}
 }

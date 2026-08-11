@@ -57,7 +57,7 @@ public final class LimitedFlatLevelSource extends FlatLevelSource {
 
 	@Override
 	public void addDebugScreenInfo(java.util.List<String> info, RandomState randomState, BlockPos pos) {
-		info.add("Blackbox farm cell: 3x3 chunks per core");
+		info.add("Blackbox farm cells: selectable 1x1, 2x2 or 3x3 chunks");
 	}
 
 	public static boolean isFarmChunk(int chunkX, int chunkZ) {

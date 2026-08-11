@@ -35,7 +35,9 @@ public record BlueprintLibraryMessage(int action, InteractionHand hand, String b
 	private static final int SELECT = 2;
 	private static final int SET_SCOPE = 3;
 	private static final int DOWNLOAD = 4;
-	private static final int MAX_ENTRIES = 256;
+	private static final int RENAME = 5;
+	private static final int DELETE = 6;
+	private static final int MAX_ENTRIES = 2048;
 	public static final Type<BlueprintLibraryMessage> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(BlackboxMod.MODID, "blueprint_library"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintLibraryMessage> STREAM_CODEC = StreamCodec.of((buffer, message) -> {
 		buffer.writeVarInt(message.action);
@@ -50,6 +52,7 @@ public record BlueprintLibraryMessage(int action, InteractionHand hand, String b
 			buffer.writeUtf(entry.name(), 64);
 			buffer.writeUtf(entry.author(), 32);
 			buffer.writeVarInt(entry.blockCount());
+			buffer.writeVarInt(entry.revision());
 		}
 	}, buffer -> {
 		int action = buffer.readVarInt();
@@ -64,7 +67,7 @@ public record BlueprintLibraryMessage(int action, InteractionHand hand, String b
 		}
 		List<BlueprintSummary> entries = new ArrayList<>(count);
 		for (int index = 0; index < count; index++) {
-			entries.add(new BlueprintSummary(buffer.readUtf(36), buffer.readUtf(64), buffer.readUtf(32), buffer.readVarInt()));
+			entries.add(new BlueprintSummary(buffer.readUtf(36), buffer.readUtf(64), buffer.readUtf(32), buffer.readVarInt(), buffer.readVarInt()));
 		}
 		return new BlueprintLibraryMessage(action, hand, blueprintId, blueprintName, scope, preferredScope, List.copyOf(entries));
 	});
@@ -92,6 +95,14 @@ public record BlueprintLibraryMessage(int action, InteractionHand hand, String b
 
 	public static BlueprintLibraryMessage download(InteractionHand hand, String blueprintId) {
 		return new BlueprintLibraryMessage(DOWNLOAD, hand, blueprintId, "", StorageScope.SERVER, StorageScope.LOCAL, List.of());
+	}
+
+	public static BlueprintLibraryMessage rename(InteractionHand hand, String blueprintId, String name, StorageScope scope) {
+		return new BlueprintLibraryMessage(RENAME, hand, blueprintId, name, scope, StorageScope.LOCAL, List.of());
+	}
+
+	public static BlueprintLibraryMessage delete(InteractionHand hand, String blueprintId, StorageScope scope) {
+		return new BlueprintLibraryMessage(DELETE, hand, blueprintId, "", scope, StorageScope.LOCAL, List.of());
 	}
 
 	public static void handleData(BlueprintLibraryMessage message, IPayloadContext context) {
@@ -127,6 +138,26 @@ public record BlueprintLibraryMessage(int action, InteractionHand hand, String b
 			if (summary != null && data.length > 0) {
 				BlueprintTransferMessage.sendLocalSave(player, summary.id(), summary.name(), data);
 			}
+			return;
+		}
+		if (message.action == RENAME) {
+			if (message.scope == StorageScope.SERVER) {
+				BlueprintLibrary.rename(player, message.blueprintId, message.blueprintName);
+			}
+			if (variables.BlueprintSelectionId.equals(message.blueprintId) && message.blueprintName != null && !message.blueprintName.isBlank()) {
+				setSelection(variables, message.blueprintId, message.blueprintName.trim(), message.scope);
+			}
+			sendLibrary(player, message.hand);
+			return;
+		}
+		if (message.action == DELETE) {
+			if (message.scope == StorageScope.SERVER) {
+				BlueprintLibrary.delete(player, message.blueprintId);
+			}
+			if (variables.BlueprintSelectionId.equals(message.blueprintId)) {
+				setSelection(variables, "", "", StorageScope.LOCAL);
+			}
+			sendLibrary(player, message.hand);
 			return;
 		}
 		if (message.action != SELECT) {

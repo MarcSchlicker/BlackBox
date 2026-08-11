@@ -1,170 +1,192 @@
 # BlackBox
 
-BlackBox ist eine experimentelle NeoForge-Mod, die automatisierte Minecraft-Farmen nur kurzzeitig in isolierten Farmdimensionen ausführt. Nach einer Messung reproduziert eine kompakte Blackbox den gemessenen Netto-Input und -Output, ohne dass die ursprüngliche Farm dauerhaft geladen und getickt werden muss.
+BlackBox is an experimental NeoForge mod for moving automated farms out of permanently loaded server areas. A farm is built and observed inside an isolated farm cell. Its measured net resource balance is then replayed by a compact Blackbox while the original farm remains unloaded.
 
-> **Projektstatus:** Work in Progress / spielbarer Prototyp. Die Kernschleife ist implementiert, benötigt aber noch ausgiebige Tests mit Multiplayer-Servern und großen Modpacks.
+> **Status:** Work in progress and playable prototype. The complete build-measure-simulate loop is implemented, but large modpacks and multiplayer servers still need broader compatibility and performance testing.
 
-## Kompatibilität
+## Compatibility
 
-| Komponente | Version |
+| Component | Version |
 | --- | --- |
 | Minecraft | 1.21.1 |
-| Modloader | NeoForge 21.1.190 oder neuer |
+| Mod loader | NeoForge 21.1.190 or newer |
 | Java | 21 |
-| Seiten | Client und Server |
+| Sides | Client and dedicated server |
 
-## Grundidee
+## How It Works
 
-Eine große Farm verursacht normalerweise auch dann Serverlast, wenn ihr Aufbau längst abgeschlossen ist. BlackBox trennt Aufbau, Messung und späteren Betrieb:
+1. Place a Dimensional Workbench and insert a Dimension Core.
+2. Choose a 1x1, 2x2 or 3x3 chunk cell before the core's first visit.
+3. Build the farm in the isolated cell and connect its resources through the Farm Input and Farm Output.
+4. Leave the cell when the farm is ready. Building time is never measured.
+5. After a hidden warmup period, the configured measurement window records the cell's net item, fluid and energy balance.
+6. The programmed core replays that profile inside the workbench or a separate Blackbox without loading the original farm.
 
-1. Eine Dimensionswerkbank wird aufgestellt und mit einem Dimensionskern bestückt.
-2. Der Kern erhält eine eigene, dauerhafte Farm-ID und damit eine isolierte 3x3-Chunk-Zelle.
-3. Die Farm wird in dieser Zelle gebaut und über den Input- und Outputblock angeschlossen.
-4. Erst beim Verlassen der Zelle beginnt die automatische Analyse.
-5. Nach einer internen Vorbereitungsphase werden 60 Sekunden Produktion gemessen.
-6. Der programmierte Kern simuliert diese Produktion anschließend in der Werkbank oder in einer Blackbox.
+Moving a pre-filled chest through hoppers does not create free resources: BlackBox compares the complete cell at the start and end and subtracts imported resources while adding exported resources.
 
-## Implementierte Features
+## Features
 
-### Isolierte Farmzellen
+### Isolated Farm Cells
 
-- Jeder Dimensionskern besitzt eine UUID und eine eigene 3x3-Chunk-Zelle.
-- Zellen liegen weit voneinander entfernt, damit Farmen sich nicht gegenseitig beeinflussen.
-- Die Zelle besteht aus einer einzigen Ebene Dimensionsgrundgestein auf Y=0.
-- Außerhalb der Farmzellen wird kein Boden generiert.
-- Bauen und Abbauen ist auf die dem Spieler zugewiesene Zelle begrenzt.
-- Input- und Outputblock werden beim ersten Betreten automatisch bereitgestellt.
-- Ein Rechtsklick auf das Dimensionsgrundgestein öffnet den Rückweg.
+- Every assigned Dimension Core receives a persistent UUID and a separate farm cell.
+- Selectable 1x1, 2x2 and 3x3 chunk sizes use increasingly expensive, but deliberately affordable, upgrades.
+- A cell has one Dimensional Bedrock layer at Y=0. Unselected surrounding chunks have no floor.
+- Placement and breaking are restricted to the core's exact cell.
+- Farm Input and Farm Output ports are created automatically.
+- Right-clicking Dimensional Bedrock opens the safe return interface in every farm environment.
+- Registered cells can be inspected and permanently removed through the operator-only Admin Book.
 
-### Vier Farmumgebungen
+### Farm Environments
 
-Ein Dimensionskern kann auf vier Umgebungen eingestellt werden. Die Farbe des Kerns zeigt die Auswahl direkt an:
-
-| Umgebung | Kernfarbe | Eigenschaften |
+| Environment | Core color | Dimension behavior |
 | --- | --- | --- |
-| Standard | Gelb | Neutrale BlackBox-Umgebung |
-| Oberwelt | Grün | Oberwelt-Dimensionstyp und Plains-Biom |
-| Nether | Rot | Nether-Eigenschaften und Nether-Wastes-Biom |
-| End | Lila | End-Eigenschaften und End-Biom |
+| Standard | Yellow | Neutral BlackBox environment |
+| Overworld | Green | Overworld dimension properties and plains biome |
+| Nether | Red | Nether properties and nether-wastes biome |
+| End | Purple | End properties and End biome |
 
-Die Umgebungen bleiben absichtlich flach und erzeugen keine normale Landschaft, Strukturen oder Erze.
+All environments stay flat and intentionally omit normal terrain, ores and structures. Natural mob spawning is disabled per core unless the Mob Spawn Upgrade is applied.
 
-### Messung von Input und Output
+### Persistent Measurement
 
-- Die Messung startet erst, nachdem der Spieler die fertig gebaute Farm verlassen hat.
-- Während der internen Vorbereitung läuft die Farm bereits, diese Zeit zählt jedoch nicht zum Profil.
-- Danach werden 60 Sekunden lang Inventare und Item-Handler in allen neun Chunks beobachtet.
-- Der Inputblock erhält Items direkt aus den Eingangsslots der Dimensionswerkbank.
-- Der Outputblock überträgt produzierte Items direkt in die Ausgangsslots der Werkbank.
-- Gespeichert wird die Nettoänderung der gesamten Zelle. Das reine Verschieben einer vorhandenen Diamantkiste zählt daher nicht als Produktion.
-- Produktionszeitpunkte werden mitgespeichert, damit Spitzen und Pausen später wiedergegeben werden können.
-- Erneutes Betreten stoppt eine laufende Messung und löscht das bisherige Farmprofil, damit die Farm bearbeitet und neu vermessen werden kann.
+- Measurement begins only after the builder leaves the cell.
+- Warmup activity is ignored; only the following configured window becomes the farm profile.
+- Vanilla containers and NeoForge item handlers are included in the inventory balance.
+- NeoForge fluid and energy capabilities are included in the resource balance.
+- The Farm Input imports items, fluids and FE from the workbench; the Farm Output exports all three resource types back to it.
+- Item production timestamps are stored so a normal Blackbox can replay peaks and quiet periods.
+- Active measurements and their snapshots survive server restarts.
+- Farm and workbench chunks stay ticketed only while a measurement is active.
+- Removing the core, destroying the workbench or losing a required dimension aborts safely without generating output.
+- Re-entering a measuring farm cancels the measurement and clears its profile so it can be edited and measured again.
 
-### Dimensionskern
+### Dimension Cores
 
-- Speichert Farm-ID, Farmname, Umgebung, Mobspawn-Einstellung und das gemessene Produktionsprofil.
-- Ändert seine Farbe passend zur ausgewählten Umgebung.
-- Erhält einen Verzauberungsschimmer, sobald ein gültiges Produktionsprofil gespeichert ist.
-- Zeigt bei gedrückter Umschalttaste Input und Output pro Minute an.
-- Ein vorbereiteter Eisenfarm-Beispielkern ist im Kreativinventar enthalten.
+- Store the farm ID, name, owner, access mode, cell size, environment, mob-spawn setting and measured profile.
+- Support private, scoreboard-team and public access. Operators retain administrative access.
+- Change color for Standard, Overworld, Nether and End environments.
+- Gain an enchantment glint after a valid profile is stored.
+- Show item, fluid and energy rates per minute while Shift is held.
+- Include a pre-programmed example iron farm core in the creative tab.
 
-### Dimensionswerkbank und Blackbox
+### Workbench and Blackbox
 
-- Beide Maschinen besitzen einen Kernslot, neun Inputslots und achtzehn Outputslots.
-- Die Dimensionswerkbank dient gleichzeitig zum Erstellen, Messen und späteren Simulieren einer Farm.
-- Eine separate Blackbox startet automatisch, sobald ein programmierter Kern eingesetzt wird.
-- Inputs werden nur verbraucht, wenn ein vollständiger Simulationszyklus finanziert werden kann.
-- Bei vollem Outputinventar pausiert die Simulation, statt Items zu löschen.
-- Hopper und andere Item-Transportsysteme können die Maschinen befüllen und leeren.
-- Farmen können in der Werkbank benannt werden; der Haken speichert den Namen, der Pfeil betritt die Farmzelle.
+- Both machines provide one core slot, nine item input slots, eighteen item output slots, four input fluid tanks, four output fluid tanks and separate FE buffers.
+- The Dimensional Workbench builds, measures and simulates farms in one block.
+- A Blackbox starts automatically when a programmed core is inserted.
+- A cycle only starts when every measured item, fluid and energy input is available.
+- Output capacity is checked before production, so resources are never silently deleted.
+- Without a Stability Upgrade, measured item peaks and pauses are replayed.
+- With a reusable Stability Upgrade, item, fluid and energy output is distributed evenly across the cycle.
+- Automation can insert resources from the sides and extract simulated fluid or energy output from the bottom.
 
 ### Upgrades
 
-Alle Upgrades besitzen eigene, zusammengehörige Symbole und erklären ihre Funktion im Tooltip. Verbrauchbare Kern-Upgrades haben eine sechseckige Kernfassung. Wiederverwendbare Blackbox-Upgrades verwenden eine breite Modulform mit seitlichen Anschlüssen.
+Core upgrades and machine upgrades have separate visual forms and tooltip categories.
 
-| Upgrade | Verwendung | Verhalten |
+| Upgrade | Target | Effect |
 | --- | --- | --- |
-| Standard-Umgebung | Kern / Dimensionswerkbank | Setzt den Kern auf die neutrale Umgebung |
-| Oberwelt-Umgebung | Kern / Dimensionswerkbank | Setzt Oberwelt-Eigenschaften und -Biom |
-| Nether-Umgebung | Kern / Dimensionswerkbank | Setzt Nether-Eigenschaften und -Biom |
-| End-Umgebung | Kern / Dimensionswerkbank | Setzt End-Eigenschaften und -Biom |
-| Mobspawn | Kern / Dimensionswerkbank | Erlaubt natürliche Mobspawns für diese Farmzelle |
-| Stabilität | Blackbox / Werkbank | Verteilt den gemessenen Output gleichmäßig statt in gemessenen Schüben |
+| Compact Cell | New core | Selects a 1x1 chunk cell |
+| Medium Cell | New core | Selects a 2x2 chunk cell |
+| Large Cell | New core | Selects a 3x3 chunk cell |
+| Standard Environment | New core | Selects the neutral environment |
+| Overworld Environment | New core | Selects Overworld properties |
+| Nether Environment | New core | Selects Nether properties |
+| End Environment | New core | Selects End properties |
+| Mob Spawn | New core | Enables natural spawning for that cell |
+| Stability | Workbench or Blackbox | Smooths simulated resource output |
 
-Umgebungs- und Mobspawn-Upgrades werden angewendet und verbraucht. Dabei wird ein bestehendes Messprofil gelöscht, weil die Farm unter den neuen Bedingungen erneut gemessen werden muss. Das Stabilitätsupgrade bleibt im Maschinenslot und ist wiederverwendbar.
+Core setup upgrades are consumed in the Dimensional Workbench and must be applied before the core creates its first cell. The Stability Upgrade remains in the machine and is reusable.
 
-### Blueprint-Bibliothek
+### Blueprint Library
 
-- Das blaue Blueprint-Werkzeug ist wiederverwendbar und speichert selbst keine Farmdaten.
-- Rechtsklick in die Luft öffnet eine durchsuchbare Bibliothek.
-- Umschalt + Rechtsklick auf den Dimensionsboden erstellt immer eine neue Vorlage und fragt zuerst nach einem Namen.
-- Ein normaler Rechtsklick auf den Boden wendet die aktuell ausgewählte Vorlage an.
-- Lokale Blueprints sind der Standard und stehen auf demselben Client auch in anderen Welten und auf anderen Servern zur Verfügung.
-- Server-Blueprints können zentral für alle Spieler bereitgestellt werden.
-- Spieler können Servervorlagen lokal herunterladen.
-- Operatoren können lokale Vorlagen in die Serverbibliothek veröffentlichen.
-- Im Survival-Modus werden beim Anwenden die benötigten Baublöcke aus dem Spielerinventar verbraucht.
-- Vorhandene Blöcke werden nicht überschrieben, sondern als Konflikte übersprungen.
+- The blue vanilla-paper-style Blueprint Tool is reusable and contains no farm data itself.
+- Right-click in the air to open the searchable library.
+- Shift-right-click Dimensional Bedrock to capture a new named template.
+- Local storage is the default and works across worlds and servers on the same client.
+- Server storage provides shared templates for that world.
+- Templates carry revisions and can be renamed or deleted from the library.
+- Players can download server templates; operators can publish local templates.
+- Survival placement consumes required blocks and leaves occupied positions untouched.
 
-### Handbuch und Serververwaltung
+Blueprints currently store block states, not block-entity NBT, inventories, entities or fluids.
 
-- Ein Survival-Handbuch erklärt den vollständigen Ablauf und zeigt die Crafting-Rezepte.
-- Ein Adminbuch verwaltet per Drag-and-drop eine Liste verbotener Blöcke für Farmzellen.
-- Enderkisten, Blackboxes und Dimensionswerkbänke sind standardmäßig in Farmzellen gesperrt.
-- Änderungen am Adminbuch werden in der Serverkonfiguration gespeichert.
-- Das Adminbuch erfordert Operator-Berechtigung.
+### Handbook and Administration
 
-## Bedienung in Kurzform
+- The survival Handbook explains the workflow and renders every crafting recipe, including cell-size upgrades.
+- The Admin Book uses ghost slots to maintain the server's denied-block list.
+- Ender Chests, Blackboxes and Dimensional Workbenches are denied in farm cells by default.
+- A second Admin Book view lists registered cells and deletes abandoned cells with confirmation.
+- Farm ownership can be private, shared with the owner's scoreboard team, or public when allowed by server config.
 
-1. Dimensionswerkbank, Dimensionskern, Inputblock, Outputblock und Handbuch herstellen.
-2. Kern in die Werkbank einsetzen, Farmnamen eingeben und mit dem Haken speichern.
-3. Optional ein Umgebungs- oder Mobspawn-Upgrade einsetzen.
-4. Mit dem Pfeil die Farmzelle betreten und die Farm bauen.
-5. Rohstoffe über den blauen Inputblock zuführen und Produkte in den grünen Outputblock leiten.
-6. Über das Dimensionsgrundgestein zurückkehren und die Messung abwarten.
-7. Den programmierten Kern in der Werkbank lassen oder in eine Blackbox einsetzen.
+## Configuration
 
-## Aktuelle Einschränkungen
+BlackBox uses a per-world NeoForge server configuration. Current options are:
 
-- Es werden derzeit nur Items gemessen und simuliert. Flüssigkeiten, Energie, Erfahrungspunkte und andere mod-spezifische Ressourcen fehlen noch.
-- Die Kompatibilität hängt davon ab, ob eine Maschine ihr Inventar als NeoForge-Item-Handler oder Vanilla-Container bereitstellt.
-- Blueprints speichern Blockzustände, aber noch keine Block-Entity-Daten wie Maschinenkonfigurationen, Filter oder Inventarinhalte.
-- Blueprints speichern keine Entities, Flüssigkeiten oder Redstone-Zustände außerhalb des normalen Blockzustands.
-- Laufende Messungen werden noch nicht über einen Serverneustart hinweg fortgesetzt.
-- Die Bibliothek besitzt noch keine Oberfläche zum Umbenennen, Löschen, Sortieren oder Versionieren von Vorlagen.
-- Messdauer, Slotanzahl und Zellgröße sind noch nicht konfigurierbar.
-- Automatisierte Kompatibilitäts- und Lasttests für große Modpacks fehlen noch.
-- Die Benutzeroberflächen und Texturen befinden sich weiterhin im Ausbau.
+| Setting | Default | Purpose |
+| --- | ---: | --- |
+| `measurementSeconds` | 60 | Duration of the recorded production window |
+| `warmupSeconds` | 30 | Hidden preparation time before measurement |
+| `maxBlueprintBlocks` | 20,000 | Maximum blocks in one template |
+| `maxServerBlueprints` | 256 | Maximum shared templates listed by the server |
+| `allowPublicFarms` | `true` | Allows owners to select public access |
+| `deniedFarmBlocks` | See Admin Book | Blocks that cannot be placed in farm cells |
 
-## Installation
+Useful future configuration candidates include resource-buffer sizes, measurement chunk-ticket limits, maximum cells per owner, public-farm policy by permission level, and a server-wide cap on simultaneous measurements.
 
-Es gibt noch keine stabile Release-Version. Für Tests muss die Mod aktuell aus dem Quellcode gebaut werden.
+## JEI and EMI
 
-1. Java 21 installieren.
-2. Repository klonen und den Ordner in VS Code öffnen.
-3. Die empfohlenen Java- und Gradle-Erweiterungen installieren.
-4. In VS Code die Aufgabe `Minecraft-Client starten (NeoForge)` ausführen.
+All craftable BlackBox content uses standard Minecraft JSON recipes, so JEI and EMI index those recipes automatically when installed. Dynamic farm profiles are unique NBT data rather than global recipes; their measured per-minute item, fluid and energy values are shown in the Dimension Core's Shift tooltip instead of being added to the global recipe list.
 
-Ein normaler Build kann unter Windows mit folgendem Befehl erstellt werden:
+## Quick Start
+
+1. Craft a Dimensional Workbench, Dimension Core, both farm ports and the Handbook.
+2. Insert the core, enter a farm name and choose its access mode.
+3. Optionally apply cell-size, environment and mob-spawn upgrades before the first visit.
+4. Enter the cell and build the farm.
+5. Feed external resources through the blue Farm Input and route products into the green Farm Output.
+6. Leave through Dimensional Bedrock and wait for measurement to finish.
+7. Keep the programmed core in the workbench or move it into a Blackbox.
+
+## Current Limitations
+
+- Compatibility depends on machines exposing inventories, fluids and energy through Vanilla containers or NeoForge capabilities.
+- Experience, gases, source-specific chemical systems and other mod-specific resource APIs are not measured yet.
+- Direction-specific machine wrappers may not expose every internal tank through their unsided capability.
+- Blueprint templates do not preserve block-entity data, inventories, entities, fluids or live redstone state.
+- Fluid and FE profiles store totals; only item outputs currently retain a measured peak timeline.
+- Automated compatibility, migration and load testing for large modpacks is still incomplete.
+- Interfaces, textures and balance remain work in progress.
+
+## Building From Source
+
+There is no stable release build yet.
+
+1. Install Java 21.
+2. Clone the repository and open its root folder in VS Code.
+3. Install the recommended Java and Gradle extensions.
+4. Run the VS Code task `Minecraft-Client starten (NeoForge)` to start the development client.
+
+Windows build:
 
 ```powershell
 .\gradlew.bat --no-problems-report build
 ```
 
-Unter Linux oder macOS:
+Linux or macOS build:
 
 ```bash
 ./gradlew --no-problems-report build
 ```
 
-Die erzeugte JAR liegt anschließend in `build/libs/`.
+The generated JAR is written to `build/libs/`.
 
-## Entwicklung
+## Development
 
-Der Workspace wurde ursprünglich mit MCreator angelegt. Die zentrale Farm-, Mess-, Simulations-, Netzwerk- und Blueprint-Logik wird inzwischen als normaler Java-Code gepflegt. Die betroffenen MCreator-Elemente sind gesperrt, damit MCreator diese Dateien nicht versehentlich neu generiert.
+The workspace was originally created with MCreator. Core farm, measurement, simulation, networking, capability and Blueprint logic is now maintained as regular Java code. Relevant MCreator elements are locked where needed to prevent accidental regeneration.
 
-Für Beiträge sind besonders Tests mit modifizierten Maschinen, Multiplayer-Szenarien und ungewöhnlichen Farmtypen hilfreich. Fehlerberichte und Pull Requests sind willkommen.
+Testing with modded machines, multiplayer ownership, server restarts, unusual farms and high-throughput resource networks is especially valuable. Issues and pull requests are welcome.
 
-## Lizenz
+## License
 
-Im Projekt ist derzeit noch keine Lizenz festgelegt. Vor einer Weiterverwendung oder Veröffentlichung sollte eine passende Open-Source-Lizenz ergänzt werden.
+No project license has been selected yet. Add an explicit open-source license before redistribution or release.

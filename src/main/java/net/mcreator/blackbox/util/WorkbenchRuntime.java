@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.mcreator.blackbox.block.entity.DimensionalWorkbenchBlockEntity;
 import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.item.CoreEnvironmentUpgradeItem;
+import net.mcreator.blackbox.item.CoreCellSizeUpgradeItem;
 
 public final class WorkbenchRuntime {
 	private WorkbenchRuntime() {
@@ -22,8 +23,20 @@ public final class WorkbenchRuntime {
 		}
 
 		ItemStack upgrade = workbench.getItem(FarmSimulationMachine.UPGRADE_SLOT);
-		if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && upgrade.getItem() instanceof CoreEnvironmentUpgradeItem environmentUpgrade) {
+		if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && FarmCoreData.getCoreId(core).isEmpty()
+				&& upgrade.getItem() instanceof CoreEnvironmentUpgradeItem environmentUpgrade) {
 			FarmCoreData.setEnvironment(core, environmentUpgrade.environment());
+			FarmCoreData.clearProfile(core, level.registryAccess());
+			upgrade.shrink(1);
+			if (upgrade.isEmpty()) {
+				workbench.setItem(FarmSimulationMachine.UPGRADE_SLOT, ItemStack.EMPTY);
+			}
+			workbench.setActiveCoreId("");
+			workbench.setSimulationTicks(0);
+			workbench.setChanged();
+		} else if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && FarmCoreData.getCoreId(core).isEmpty()
+				&& upgrade.getItem() instanceof CoreCellSizeUpgradeItem sizeUpgrade) {
+			FarmCoreData.setCellSizeChunks(core, sizeUpgrade.sizeChunks());
 			FarmCoreData.clearProfile(core, level.registryAccess());
 			upgrade.shrink(1);
 			if (upgrade.isEmpty()) {

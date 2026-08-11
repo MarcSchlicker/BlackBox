@@ -21,7 +21,7 @@ public final class FarmMobSpawnRules {
 	}
 
 	public static void setCellEnabled(ServerLevel level, FarmCell cell, boolean enabled) {
-		CellKey key = new CellKey(level.dimension(), cell.centerChunkX(), cell.centerChunkZ());
+		CellKey key = new CellKey(level.dimension(), cell.centerChunkX(), cell.centerChunkZ(), cell.sizeChunks());
 		if (enabled) {
 			ENABLED_CELLS.add(key);
 		} else {
@@ -30,7 +30,7 @@ public final class FarmMobSpawnRules {
 	}
 
 	public static void clearCell(ServerLevel level, FarmCell cell) {
-		ENABLED_CELLS.remove(new CellKey(level.dimension(), cell.centerChunkX(), cell.centerChunkZ()));
+		ENABLED_CELLS.removeIf(key -> key.dimension.equals(level.dimension()) && key.centerChunkX == cell.centerChunkX() && key.centerChunkZ == cell.centerChunkZ());
 	}
 
 	@SubscribeEvent
@@ -48,7 +48,9 @@ public final class FarmMobSpawnRules {
 		int chunkX = pos.getX() >> 4;
 		int chunkZ = pos.getZ() >> 4;
 		for (CellKey key : ENABLED_CELLS) {
-			if (key.dimension.equals(level.dimension()) && Math.abs(chunkX - key.centerChunkX) <= 1 && Math.abs(chunkZ - key.centerChunkZ) <= 1) {
+			FarmCell cell = new FarmCell(new java.util.UUID(0, 0), key.centerChunkX, key.centerChunkZ, key.sizeChunks);
+			if (key.dimension.equals(level.dimension()) && chunkX >= cell.minChunkX() && chunkX <= cell.maxChunkX()
+					&& chunkZ >= cell.minChunkZ() && chunkZ <= cell.maxChunkZ()) {
 				return true;
 			}
 		}
@@ -59,6 +61,6 @@ public final class FarmMobSpawnRules {
 		return spawnType == MobSpawnType.NATURAL || spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.STRUCTURE || spawnType == MobSpawnType.PATROL;
 	}
 
-	private record CellKey(ResourceKey<Level> dimension, int centerChunkX, int centerChunkZ) {
+	private record CellKey(ResourceKey<Level> dimension, int centerChunkX, int centerChunkZ, int sizeChunks) {
 	}
 }

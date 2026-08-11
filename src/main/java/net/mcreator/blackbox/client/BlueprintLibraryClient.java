@@ -51,10 +51,35 @@ public final class BlueprintLibraryClient {
 	}
 
 	public static void saveLocal(String name, byte[] data) {
-		boolean saved = LocalBlueprintLibrary.save(data);
+		BlueprintSummary saved = LocalBlueprintLibrary.save(data);
 		if (Minecraft.getInstance().player != null) {
-			Minecraft.getInstance().player.displayClientMessage(Component.translatable(saved ? "message.blackbox.blueprint.saved_local" : "message.blackbox.blueprint.save_failed", name), true);
+			Minecraft.getInstance().player.displayClientMessage(Component.translatable(saved != null ? "message.blackbox.blueprint.saved_local" : "message.blackbox.blueprint.save_failed", name), true);
+			if (saved != null) {
+				setClientSelection(saved.id(), saved.name(), StorageScope.LOCAL);
+				PacketDistributor.sendToServer(BlueprintLibraryMessage.select(InteractionHand.MAIN_HAND, saved.id(), saved.name(), StorageScope.LOCAL));
+			}
 		}
+	}
+
+	public static void rename(String id, String currentName, String newName, StorageScope scope, InteractionHand hand) {
+		if (scope == StorageScope.LOCAL) {
+			BlueprintSummary renamed = LocalBlueprintLibrary.rename(id, newName);
+			if (renamed == null) {
+				showMessage("message.blackbox.blueprint.manage_failed", currentName);
+				return;
+			}
+			setClientSelection(renamed.id(), renamed.name(), StorageScope.LOCAL);
+		}
+		PacketDistributor.sendToServer(BlueprintLibraryMessage.rename(hand, id, newName, scope));
+	}
+
+	public static void delete(String id, String name, StorageScope scope, InteractionHand hand) {
+		if (scope == StorageScope.LOCAL && !LocalBlueprintLibrary.delete(id)) {
+			showMessage("message.blackbox.blueprint.manage_failed", name);
+			return;
+		}
+		PacketDistributor.sendToServer(BlueprintLibraryMessage.delete(hand, id, scope));
+		setClientSelection("", "", StorageScope.LOCAL);
 	}
 
 	public static void applyLocal(String blueprintId, InteractionHand hand) {
@@ -78,6 +103,12 @@ public final class BlueprintLibraryClient {
 	private static void showMissingLocal() {
 		if (Minecraft.getInstance().player != null) {
 			Minecraft.getInstance().player.displayClientMessage(Component.translatable("message.blackbox.blueprint.not_local"), true);
+		}
+	}
+
+	private static void showMessage(String key, String name) {
+		if (Minecraft.getInstance().player != null) {
+			Minecraft.getInstance().player.displayClientMessage(Component.translatable(key, name), true);
 		}
 	}
 

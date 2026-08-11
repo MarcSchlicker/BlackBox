@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.util.FarmSimulationMachine;
+import net.mcreator.blackbox.util.FarmResourceStorage;
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 
 import io.netty.buffer.Unpooled;
@@ -32,6 +33,7 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 	private boolean stableCycleFunded;
 	private int calculationPhase;
 	private int calculationTicksRemaining;
+	private final FarmResourceStorage resources = new FarmResourceStorage(this::setChanged);
 
 	public DimensionalWorkbenchBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.DIMENSIONAL_WORKBENCH.get(), position, state);
@@ -47,6 +49,7 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		this.stableCycleFunded = tag.getBoolean("StableCycleFunded");
 		this.calculationPhase = tag.getInt("CalculationPhase");
 		this.calculationTicksRemaining = tag.getInt("CalculationTicksRemaining");
+		this.resources.load(tag, lookupProvider);
 	}
 
 	@Override
@@ -58,6 +61,7 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		tag.putBoolean("StableCycleFunded", this.stableCycleFunded);
 		tag.putInt("CalculationPhase", this.calculationPhase);
 		tag.putInt("CalculationTicksRemaining", this.calculationTicksRemaining);
+		this.resources.save(tag, lookupProvider);
 	}
 
 	@Override
@@ -91,7 +95,9 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 			return stack.is(BlackboxModItems.DIMENSION_CORE.get());
 		}
 		if (slot == UPGRADE_SLOT) {
-			return stack.is(BlackboxModItems.STABILITY_UPGRADE.get()) || stack.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get()) || stack.getItem() instanceof net.mcreator.blackbox.item.CoreEnvironmentUpgradeItem;
+			return stack.is(BlackboxModItems.STABILITY_UPGRADE.get()) || stack.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get())
+					|| stack.getItem() instanceof net.mcreator.blackbox.item.CoreEnvironmentUpgradeItem
+					|| stack.getItem() instanceof net.mcreator.blackbox.item.CoreCellSizeUpgradeItem;
 		}
 		return slot >= INPUT_START && slot < INPUT_END;
 	}
@@ -164,5 +170,10 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 			this.calculationTicksRemaining = ticksRemaining;
 			this.setChanged();
 		}
+	}
+
+	@Override
+	public FarmResourceStorage resources() {
+		return this.resources;
 	}
 }

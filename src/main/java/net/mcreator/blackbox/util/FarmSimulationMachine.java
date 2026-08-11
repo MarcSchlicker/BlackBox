@@ -22,4 +22,6 @@ public interface FarmSimulationMachine extends Container {
 	boolean isStableCycleFunded();
 
 	void setStableCycleFunded(boolean funded);
+
+	FarmResourceStorage resources();
 }

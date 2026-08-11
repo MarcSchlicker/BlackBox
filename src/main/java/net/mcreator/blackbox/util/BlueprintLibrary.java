@@ -42,8 +42,6 @@ import java.util.stream.Stream;
 
 public final class BlueprintLibrary {
 	private static final int DATA_VERSION = 1;
-	private static final int MAX_BLOCKS = 20_000;
-	private static final int MAX_LIBRARY_ENTRIES = 256;
 	public static final int MAX_TRANSFER_BYTES = 2_000_000;
 
 	private BlueprintLibrary() {
@@ -64,8 +62,8 @@ public final class BlueprintLibrary {
 					if (!canStore(state, pos, cell)) {
 						continue;
 					}
-					if (blocks.size() >= MAX_BLOCKS) {
-						player.sendSystemMessage(Component.translatable("message.blackbox.blueprint.too_large", MAX_BLOCKS).withStyle(ChatFormatting.RED));
+					if (blocks.size() >= BlackboxConfig.MAX_BLUEPRINT_BLOCKS.get()) {
+						player.sendSystemMessage(Component.translatable("message.blackbox.blueprint.too_large", BlackboxConfig.MAX_BLUEPRINT_BLOCKS.get()).withStyle(ChatFormatting.RED));
 						return false;
 					}
 					CompoundTag block = new CompoundTag();
@@ -89,13 +87,14 @@ public final class BlueprintLibrary {
 		}
 		String name = cleanName;
 		String author = player.getGameProfile().getName();
-		String id = storageScope == StorageScope.SERVER ? list(player.server).stream()
+		BlueprintSummary existing = storageScope == StorageScope.SERVER ? list(player.server).stream()
 					.filter(summary -> summary.name().equalsIgnoreCase(name) && summary.author().equalsIgnoreCase(author))
-					.map(BlueprintSummary::id)
 					.findFirst()
-					.orElse(fallbackId) : fallbackId;
+					.orElse(null) : null;
+		String id = existing == null ? fallbackId : existing.id();
 		CompoundTag root = new CompoundTag();
 		root.putInt("version", DATA_VERSION);
+		root.putInt("revision", existing == null ? 1 : existing.revision() + 1);
 		root.putString("id", id);
 		root.putString("name", name);
 		root.putString("author", author);
@@ -143,7 +142,8 @@ public final class BlueprintLibrary {
 		}
 		CompoundTag root = decode(data);
 		BlueprintSummary summary = summarize(root);
-		if (summary == null || root.getList("blocks", Tag.TAG_COMPOUND).size() > MAX_BLOCKS) {
+		if (summary == null || root.getList("blocks", Tag.TAG_COMPOUND).size() > BlackboxConfig.MAX_BLUEPRINT_BLOCKS.get()
+				|| list(player.server).size() >= BlackboxConfig.MAX_SERVER_BLUEPRINTS.get() && find(player.server, summary.id()) == null) {
 			player.displayClientMessage(Component.translatable("message.blackbox.blueprint.load_failed").withStyle(ChatFormatting.RED), true);
 			return false;
 		}
@@ -166,7 +166,7 @@ public final class BlueprintLibrary {
 		}
 		try (Stream<Path> paths = Files.list(directory)) {
 			return paths.filter(path -> path.getFileName().toString().endsWith(".nbt"))
-					.limit(MAX_LIBRARY_ENTRIES)
+					.limit(BlackboxConfig.MAX_SERVER_BLUEPRINTS.get())
 					.map(BlueprintLibrary::readSummary)
 					.filter(Objects::nonNull)
 					.sorted((left, right) -> left.name().compareToIgnoreCase(right.name()))
@@ -183,6 +183,43 @@ public final class BlueprintLibrary {
 		}
 		Path file = blueprintDirectory(server).resolve(blueprintId + ".nbt");
 		return Files.isRegularFile(file) ? readSummary(file) : null;
+	}
+
+	public static boolean rename(ServerPlayer player, String blueprintId, String requestedName) {
+		BlueprintSummary summary = find(player.server, blueprintId);
+		String name = cleanName(requestedName);
+		if (summary == null || name.isEmpty() || !canManage(player, summary)) {
+			return false;
+		}
+		Path file = blueprintDirectory(player.server).resolve(blueprintId + ".nbt");
+		try {
+			CompoundTag root = NbtIo.readCompressed(file, NbtAccounter.create(16L * 1024L * 1024L));
+			root.putString("name", name);
+			root.putInt("revision", Math.max(1, summary.revision() + 1));
+			NbtIo.writeCompressed(root, file);
+			player.displayClientMessage(Component.translatable("message.blackbox.blueprint.renamed", name), true);
+			return true;
+		} catch (IOException exception) {
+			BlackboxMod.LOGGER.error("Could not rename farm blueprint {}", blueprintId, exception);
+			return false;
+		}
+	}
+
+	public static boolean delete(ServerPlayer player, String blueprintId) {
+		BlueprintSummary summary = find(player.server, blueprintId);
+		if (summary == null || !canManage(player, summary)) {
+			return false;
+		}
+		try {
+			boolean removed = Files.deleteIfExists(blueprintDirectory(player.server).resolve(blueprintId + ".nbt"));
+			if (removed) {
+				player.displayClientMessage(Component.translatable("message.blackbox.blueprint.deleted", summary.name()), true);
+			}
+			return removed;
+		} catch (IOException exception) {
+			BlackboxMod.LOGGER.error("Could not delete farm blueprint {}", blueprintId, exception);
+			return false;
+		}
 	}
 
 	private static BlueprintSummary readSummary(Path file) {
@@ -228,13 +265,13 @@ public final class BlueprintLibrary {
 
 	private static boolean applyRoot(ServerPlayer player, ServerLevel level, CompoundTag root) {
 		FarmCell cell = FarmDimensionRuntime.getAssignedCell(player).orElse(null);
-		if (cell == null || root.getList("blocks", Tag.TAG_COMPOUND).size() > MAX_BLOCKS) {
+		if (cell == null || root.getList("blocks", Tag.TAG_COMPOUND).size() > BlackboxConfig.MAX_BLUEPRINT_BLOCKS.get()) {
 			return false;
 		}
 		List<Placement> placements = new ArrayList<>();
 		int conflicts = 0;
 		ListTag blocks = root.getList("blocks", Tag.TAG_COMPOUND);
-		for (int index = 0; index < blocks.size() && placements.size() < MAX_BLOCKS; index++) {
+		for (int index = 0; index < blocks.size() && placements.size() < BlackboxConfig.MAX_BLUEPRINT_BLOCKS.get(); index++) {
 			CompoundTag block = blocks.getCompound(index);
 			BlockPos target = new BlockPos(cell.minBlockX() + block.getInt("x"), block.getInt("y"), cell.minBlockZ() + block.getInt("z"));
 			if (!cell.contains(target) || target.getY() <= 0 || target.equals(cell.inputPos()) || target.equals(cell.outputPos())) {
@@ -279,10 +316,12 @@ public final class BlueprintLibrary {
 		String name = root.getString("name").trim();
 		String author = root.getString("author").trim();
 		int blockCount = root.getInt("block_count");
-		if (!id.matches("[0-9a-fA-F-]{36}") || name.isEmpty() || name.length() > 64 || author.length() > 32 || blockCount < 0 || blockCount > MAX_BLOCKS) {
+		int revision = Math.max(1, root.getInt("revision"));
+		if (!id.matches("[0-9a-fA-F-]{36}") || name.isEmpty() || name.length() > 64 || author.length() > 32 || blockCount < 0
+				|| blockCount > BlackboxConfig.MAX_BLUEPRINT_BLOCKS.get()) {
 			return null;
 		}
-		return new BlueprintSummary(id, name, author, blockCount);
+		return new BlueprintSummary(id, name, author, blockCount, revision);
 	}
 
 	public static byte[] encode(CompoundTag root) {
@@ -356,9 +395,21 @@ public final class BlueprintLibrary {
 		return server.getWorldPath(LevelResource.ROOT).resolve("blackbox_blueprints");
 	}
 
+	private static String cleanName(String requestedName) {
+		String clean = requestedName == null ? "" : requestedName.trim();
+		return clean.length() > 48 ? clean.substring(0, 48).trim() : clean;
+	}
+
+	private static boolean canManage(ServerPlayer player, BlueprintSummary summary) {
+		return player.hasPermissions(2) || summary.author().equalsIgnoreCase(player.getGameProfile().getName());
+	}
+
 	private record Placement(BlockPos pos, BlockState state) {
 	}
 
-	public record BlueprintSummary(String id, String name, String author, int blockCount) {
+	public record BlueprintSummary(String id, String name, String author, int blockCount, int revision) {
+		public BlueprintSummary {
+			revision = Math.max(1, revision);
+		}
 	}
 }

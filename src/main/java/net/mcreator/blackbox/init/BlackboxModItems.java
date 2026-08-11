@@ -16,6 +16,7 @@ import net.mcreator.blackbox.item.DimensionCoreItem;
 import net.mcreator.blackbox.item.HandbookItem;
 import net.mcreator.blackbox.item.AdminBookItem;
 import net.mcreator.blackbox.item.CoreEnvironmentUpgradeItem;
+import net.mcreator.blackbox.item.CoreCellSizeUpgradeItem;
 import net.mcreator.blackbox.item.StabilityUpgradeItem;
 import net.mcreator.blackbox.item.MobSpawnUpgradeItem;
 import net.mcreator.blackbox.item.BlueprintItem;
@@ -39,6 +40,9 @@ public class BlackboxModItems {
 	public static final DeferredItem<Item> END_ENVIRONMENT_UPGRADE;
 	public static final DeferredItem<Item> STABILITY_UPGRADE;
 	public static final DeferredItem<Item> MOB_SPAWN_UPGRADE;
+	public static final DeferredItem<Item> COMPACT_CELL_UPGRADE;
+	public static final DeferredItem<Item> MEDIUM_CELL_UPGRADE;
+	public static final DeferredItem<Item> LARGE_CELL_UPGRADE;
 	public static final DeferredItem<Item> BLUEPRINT;
 	static {
 		OPFERSCHWERT = REGISTRY.register("opferschwert", OpferschwertItem::new);
@@ -56,6 +60,9 @@ public class BlackboxModItems {
 		END_ENVIRONMENT_UPGRADE = REGISTRY.register("end_environment_upgrade", () -> new CoreEnvironmentUpgradeItem(FarmEnvironment.END));
 		STABILITY_UPGRADE = REGISTRY.register("stability_upgrade", StabilityUpgradeItem::new);
 		MOB_SPAWN_UPGRADE = REGISTRY.register("mob_spawn_upgrade", MobSpawnUpgradeItem::new);
+		COMPACT_CELL_UPGRADE = REGISTRY.register("compact_cell_upgrade", () -> new CoreCellSizeUpgradeItem(1));
+		MEDIUM_CELL_UPGRADE = REGISTRY.register("medium_cell_upgrade", () -> new CoreCellSizeUpgradeItem(2));
+		LARGE_CELL_UPGRADE = REGISTRY.register("large_cell_upgrade", () -> new CoreCellSizeUpgradeItem(3));
 		BLUEPRINT = REGISTRY.register("blueprint", BlueprintItem::new);
 	}
 

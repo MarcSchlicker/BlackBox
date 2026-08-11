@@ -17,11 +17,13 @@ import net.mcreator.blackbox.init.BlackboxModScreens;
 import net.mcreator.blackbox.network.DimensionalWorkbenchGUIButtonMessage;
 import net.mcreator.blackbox.network.FarmNameUpdateMessage;
 import net.mcreator.blackbox.util.FarmCoreData;
+import net.mcreator.blackbox.util.FarmAccessMode;
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 
 public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<DimensionalWorkbenchGUIMenu> implements BlackboxModScreens.ScreenAccessor {
 	private Button enterButton;
 	private Button saveNameButton;
+	private Button accessButton;
 	private EditBox farmName;
 	private boolean nameInitialized;
 
@@ -49,6 +51,10 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 			PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(0, this.menu.x, this.menu.y, this.menu.z));
 		}).bounds(this.leftPos + 158, this.topPos + 21, 30, 20).build());
 		this.enterButton.setTooltip(Tooltip.create(Component.translatable("gui.blackbox.workbench.start")));
+		this.accessButton = this.addRenderableWidget(Button.builder(Component.empty(), button -> {
+			PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(1, this.menu.x, this.menu.y, this.menu.z));
+		}).bounds(this.leftPos + 8, this.topPos + 47, 58, 18).build());
+		this.accessButton.setTooltip(Tooltip.create(Component.translatable("gui.blackbox.workbench.access_tooltip")));
 	}
 
 	private void saveName() {
@@ -75,6 +81,9 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 		this.enterButton.active = hasCore;
 		this.saveNameButton.active = hasCore;
 		this.farmName.setEditable(hasCore);
+		this.accessButton.active = hasCore;
+		FarmAccessMode access = hasCore ? FarmCoreData.getAccessMode(core) : FarmAccessMode.PRIVATE;
+		this.accessButton.setMessage(Component.translatable("gui.blackbox.access." + access.id()));
 		if (hasCore && !this.nameInitialized) {
 			this.farmName.setValue(FarmCoreData.getFarmName(core));
 			this.nameInitialized = true;
@@ -113,7 +122,7 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
 		graphics.drawString(this.font, Component.translatable("gui.blackbox.workbench.title"), 8, 6, 0xFFE8EDF2, false);
 		graphics.drawString(this.font, Component.translatable("gui.blackbox.workbench.upgrade_short"), 169, 42, 0xFFD8C37A, false);
-		graphics.drawString(this.font, Component.translatable("gui.blackbox.machine.inputs"), 8, 64, 0xFF83BCE6, false);
+		graphics.drawString(this.font, Component.translatable("gui.blackbox.machine.inputs"), 70, 64, 0xFF83BCE6, false);
 		graphics.drawString(this.font, Component.translatable("gui.blackbox.machine.outputs"), 8, 93, 0xFF8DDB9B, false);
 		graphics.drawString(this.font, Component.translatable("container.inventory"), 8, 150, 0xFFAAB4C0, false);
 
@@ -140,7 +149,12 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 			status = Component.translatable("gui.blackbox.workbench.ready");
 			color = 0xFFB8C2CC;
 		}
-		graphics.drawString(this.font, status, 8, 51, color, false);
+		graphics.drawString(this.font, status, 70, 51, color, false);
+		ItemStack core = this.menu.getSlot(0).getItem();
+		if (core.is(BlackboxModItems.DIMENSION_CORE.get())) {
+			int size = FarmCoreData.getCellSizeChunks(core);
+			graphics.drawString(this.font, Component.translatable("gui.blackbox.workbench.cell_size", size, size), 130, 7, 0xFFA8B2BD, false);
+		}
 	}
 
 	private void drawPanel(GuiGraphics graphics) {

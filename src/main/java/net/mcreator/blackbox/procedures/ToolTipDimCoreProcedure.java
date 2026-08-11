@@ -40,6 +40,12 @@ public class ToolTipDimCoreProcedure {
 		}
 		FarmCoreData.getCoreId(core).ifPresent(id -> tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.id", id.toString().substring(0, 8)).withStyle(ChatFormatting.DARK_GRAY)));
 		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.environment." + FarmCoreData.getEnvironment(core).id()).withStyle(ChatFormatting.GRAY));
+		int size = FarmCoreData.getCellSizeChunks(core);
+		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.cell_size", size, size).withStyle(ChatFormatting.AQUA));
+		if (!FarmCoreData.getOwnerName(core).isBlank()) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.owner", FarmCoreData.getOwnerName(core)).withStyle(ChatFormatting.DARK_GRAY));
+		}
+		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.access", Component.translatable("gui.blackbox.access." + FarmCoreData.getAccessMode(core).id())).withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.translatable(FarmCoreData.isMobSpawningEnabled(core) ? "tooltip.blackbox.dimension_core.mob_spawning.enabled" : "tooltip.blackbox.dimension_core.mob_spawning.disabled")
 				.withStyle(FarmCoreData.isMobSpawningEnabled(core) ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY));
 		FarmCoreData.Recipe recipe = FarmCoreData.read(core, lookupProvider);
@@ -48,7 +54,7 @@ public class ToolTipDimCoreProcedure {
 			return;
 		}
 
-		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.summary", recipe.inputs().size(), recipe.outputs().size()).withStyle(ChatFormatting.GREEN));
+		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.summary", recipe.inputs().size(), recipe.outputs().size(), recipe.fluidInputs().size(), recipe.fluidOutputs().size()).withStyle(ChatFormatting.GREEN));
 		if (!Screen.hasShiftDown()) {
 			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.hold_shift").withStyle(ChatFormatting.DARK_GRAY));
 			return;
@@ -61,14 +67,40 @@ public class ToolTipDimCoreProcedure {
 			addEntries(tooltip, recipe.inputs(), recipe.sampleTicks());
 		}
 		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.outputs_per_minute").withStyle(ChatFormatting.AQUA));
-		addEntries(tooltip, recipe.outputs(), recipe.sampleTicks());
+		if (recipe.outputs().isEmpty()) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.none_output").withStyle(ChatFormatting.GRAY));
+		} else {
+			addEntries(tooltip, recipe.outputs(), recipe.sampleTicks());
+		}
+		if (!recipe.fluidInputs().isEmpty()) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.fluid_inputs_per_minute").withStyle(ChatFormatting.YELLOW));
+			addFluidEntries(tooltip, recipe.fluidInputs(), recipe.sampleTicks());
+		}
+		if (!recipe.fluidOutputs().isEmpty()) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.fluid_outputs_per_minute").withStyle(ChatFormatting.AQUA));
+			addFluidEntries(tooltip, recipe.fluidOutputs(), recipe.sampleTicks());
+		}
+		if (recipe.energyInput() > 0 || recipe.energyOutput() > 0) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.energy_per_minute",
+					formatRate(recipe.energyInput(), recipe.sampleTicks()), formatRate(recipe.energyOutput(), recipe.sampleTicks())).withStyle(ChatFormatting.GOLD));
+		}
 	}
 
 	private static void addEntries(List<Component> tooltip, List<FarmCoreData.StackAmount> entries, int sampleTicks) {
 		for (FarmCoreData.StackAmount entry : entries) {
-			double perMinute = entry.amount() * 1200.0D / sampleTicks;
-			String amount = Math.abs(perMinute - Math.rint(perMinute)) < 0.0001D ? Long.toString(Math.round(perMinute)) : String.format(Locale.ROOT, "%.2f", perMinute);
+			String amount = formatRate(entry.amount(), sampleTicks);
 			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.entry", amount, entry.stack().getHoverName()).withStyle(ChatFormatting.GRAY));
 		}
+	}
+
+	private static void addFluidEntries(List<Component> tooltip, List<FarmCoreData.FluidAmount> entries, int sampleTicks) {
+		for (FarmCoreData.FluidAmount entry : entries) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.fluid_entry", formatRate(entry.amount(), sampleTicks), entry.stack().getHoverName()).withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	private static String formatRate(long measuredAmount, int sampleTicks) {
+		double perMinute = measuredAmount * 1200.0D / sampleTicks;
+		return Math.abs(perMinute - Math.rint(perMinute)) < 0.0001D ? Long.toString(Math.round(perMinute)) : String.format(Locale.ROOT, "%.2f", perMinute);
 	}
 }

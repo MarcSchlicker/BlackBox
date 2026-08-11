@@ -24,6 +24,7 @@ import net.mcreator.blackbox.block.entity.DimensionalWorkbenchBlockEntity;
 import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.init.BlackboxModMenus;
 import net.mcreator.blackbox.item.CoreEnvironmentUpgradeItem;
+import net.mcreator.blackbox.item.CoreCellSizeUpgradeItem;
 import net.mcreator.blackbox.util.FarmSimulationMachine;
 
 import java.util.Collections;
@@ -105,7 +106,8 @@ public class DimensionalWorkbenchGUIMenu extends AbstractContainerMenu implement
 		this.customSlots.put(FarmSimulationMachine.UPGRADE_SLOT, this.addSlot(new SlotItemHandler(internal, FarmSimulationMachine.UPGRADE_SLOT, 170, 51) {
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return stack.is(BlackboxModItems.STABILITY_UPGRADE.get()) || stack.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get()) || stack.getItem() instanceof CoreEnvironmentUpgradeItem;
+				return stack.is(BlackboxModItems.STABILITY_UPGRADE.get()) || stack.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get())
+						|| stack.getItem() instanceof CoreEnvironmentUpgradeItem || stack.getItem() instanceof CoreCellSizeUpgradeItem;
 			}
 		}));
 		for (int row = 0; row < 3; row++) {
@@ -147,7 +149,8 @@ public class DimensionalWorkbenchGUIMenu extends AbstractContainerMenu implement
 			if (!this.moveItemStackTo(source, 0, 1, false)) {
 				return ItemStack.EMPTY;
 			}
-		} else if (source.is(BlackboxModItems.STABILITY_UPGRADE.get()) || source.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get()) || source.getItem() instanceof CoreEnvironmentUpgradeItem) {
+		} else if (source.is(BlackboxModItems.STABILITY_UPGRADE.get()) || source.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get())
+				|| source.getItem() instanceof CoreEnvironmentUpgradeItem || source.getItem() instanceof CoreCellSizeUpgradeItem) {
 			if (!this.moveItemStackTo(source, FarmSimulationMachine.UPGRADE_SLOT, FarmSimulationMachine.UPGRADE_SLOT + 1, false)) {
 				return ItemStack.EMPTY;
 			}

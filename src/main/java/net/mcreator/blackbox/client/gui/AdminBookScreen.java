@@ -1,17 +1,27 @@
 package net.mcreator.blackbox.client.gui;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 import net.mcreator.blackbox.world.inventory.AdminBookMenu;
+import net.mcreator.blackbox.network.AdminFarmRegistryMessage;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class AdminBookScreen extends AbstractContainerScreen<AdminBookMenu> {
 	public AdminBookScreen(AdminBookMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);
 		this.imageWidth = 176;
 		this.imageHeight = 170;
+	}
+
+	@Override
+	protected void init() {
+		super.init();
+		this.addRenderableWidget(Button.builder(Component.translatable("gui.blackbox.admin.farms_short"), button ->
+				PacketDistributor.sendToServer(AdminFarmRegistryMessage.request())).bounds(this.leftPos + 112, this.topPos + 5, 56, 18).build());
 	}
 
 	@Override
