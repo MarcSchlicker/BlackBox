@@ -1,0 +1,15 @@
+{
+  "type": "blackbox:farm_nether",
+  "generator": {
+    "type": "blackbox:limited_flat",
+    "settings": {
+      "biome": "minecraft:nether_wastes",
+      "features": false,
+      "lakes": false,
+      "layers": [
+        { "height": 1, "block": "blackbox:emerald_bedrock" }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

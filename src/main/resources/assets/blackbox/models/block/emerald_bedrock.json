@@ -1,13 +1,13 @@
 {
   "parent": "block/cube",
   "textures": {
-    "down": "minecraft:block/bedrock",
-    "up": "minecraft:block/bedrock",
-    "north": "minecraft:block/bedrock",
-    "east": "minecraft:block/bedrock",
-    "south": "minecraft:block/bedrock",
-    "west": "minecraft:block/bedrock",
-    "particle": "minecraft:block/bedrock"
+    "down": "blackbox:block/emerald_bedrock",
+    "up": "blackbox:block/emerald_bedrock",
+    "north": "blackbox:block/emerald_bedrock",
+    "east": "blackbox:block/emerald_bedrock",
+    "south": "blackbox:block/emerald_bedrock",
+    "west": "blackbox:block/emerald_bedrock",
+    "particle": "blackbox:block/emerald_bedrock"
   },
   "render_type": "solid"
 }

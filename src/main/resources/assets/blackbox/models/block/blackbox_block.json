@@ -1,13 +1,13 @@
 {
   "parent": "block/cube",
   "textures": {
-    "down": "minecraft:block/black_concrete",
-    "up": "minecraft:block/black_concrete",
-    "north": "minecraft:block/black_concrete",
-    "east": "minecraft:block/black_concrete",
-    "south": "minecraft:block/black_concrete",
-    "west": "minecraft:block/black_concrete",
-    "particle": "minecraft:block/black_concrete"
+    "down": "blackbox:block/blackbox_block_side",
+    "up": "blackbox:block/blackbox_block_top",
+    "north": "blackbox:block/blackbox_block_side",
+    "east": "blackbox:block/blackbox_block_side",
+    "south": "blackbox:block/blackbox_block_side",
+    "west": "blackbox:block/blackbox_block_side",
+    "particle": "blackbox:block/blackbox_block_side"
   },
   "render_type": "solid"
 }

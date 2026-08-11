@@ -8,12 +8,18 @@ build/
 .settings/
 .classpath
 .project
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
 
 # MCreator workspace
 .mcreator/
 
 # Minecraft client/server files
 run/
+
+# Generated artwork previews and source renders
+artwork/*.png
 
 # MacOS system files
 .DS_STORE

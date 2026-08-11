@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:emerald" },
+    { "item": "minecraft:rotten_flesh" },
+    { "item": "minecraft:bone" },
+    { "item": "minecraft:gunpowder" },
+    { "item": "minecraft:spider_eye" }
+  ],
+  "result": { "id": "blackbox:mob_spawn_upgrade", "count": 1 }
+}

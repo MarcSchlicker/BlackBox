@@ -1,13 +1,13 @@
 {
   "parent": "block/cube",
   "textures": {
-    "down": "minecraft:block/bamboo_block",
-    "up": "minecraft:block/bamboo_block",
-    "north": "minecraft:block/bamboo_block",
-    "east": "minecraft:block/bamboo_block",
-    "south": "minecraft:block/bamboo_block",
-    "west": "minecraft:block/bamboo_block",
-    "particle": "minecraft:block/bamboo_block"
+    "down": "blackbox:block/inputblock_side",
+    "up": "minecraft:block/hopper_inside",
+    "north": "blackbox:block/inputblock_side",
+    "east": "blackbox:block/inputblock_side",
+    "south": "blackbox:block/inputblock_side",
+    "west": "blackbox:block/inputblock_side",
+    "particle": "blackbox:block/inputblock_side"
   },
   "render_type": "solid"
 }

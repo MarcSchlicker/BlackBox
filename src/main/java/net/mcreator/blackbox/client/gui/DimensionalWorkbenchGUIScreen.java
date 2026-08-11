@@ -2,130 +2,156 @@ package net.mcreator.blackbox.client.gui;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import net.minecraft.world.level.Level;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
-import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
-import net.mcreator.blackbox.network.DimensionalWorkbenchGUIButtonMessage;
+import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.init.BlackboxModScreens;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.mcreator.blackbox.network.DimensionalWorkbenchGUIButtonMessage;
+import net.mcreator.blackbox.network.FarmNameUpdateMessage;
+import net.mcreator.blackbox.util.FarmCoreData;
+import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 
 public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<DimensionalWorkbenchGUIMenu> implements BlackboxModScreens.ScreenAccessor {
-	private final Level world;
-	private final int x, y, z;
-	private final Player entity;
-	private boolean menuStateUpdateActive = false;
-	private EditBox Worldname;
-	private Button button_name;
-	private Button button_teleport;
-	private Button button_end;
-	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/dimensional_workbench_gui.png");
+	private Button enterButton;
+	private Button saveNameButton;
+	private EditBox farmName;
+	private boolean nameInitialized;
 
-	public DimensionalWorkbenchGUIScreen(DimensionalWorkbenchGUIMenu container, Inventory inventory, Component text) {
-		super(container, inventory, text);
-		this.world = container.world;
-		this.x = container.x;
-		this.y = container.y;
-		this.z = container.z;
-		this.entity = container.entity;
-		this.imageWidth = 176;
-		this.imageHeight = 166;
+	public DimensionalWorkbenchGUIScreen(DimensionalWorkbenchGUIMenu menu, Inventory inventory, Component title) {
+		super(menu, inventory, title);
+		this.imageWidth = 196;
+		this.imageHeight = 243;
 	}
 
 	@Override
 	public void updateMenuState(int elementType, String name, Object elementState) {
-		menuStateUpdateActive = true;
-		if (elementType == 0 && elementState instanceof String stringState) {
-			if (name.equals("Worldname"))
-				Worldname.setValue(stringState);
-		}
-		menuStateUpdateActive = false;
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
-		Worldname.render(guiGraphics, mouseX, mouseY, partialTicks);
-		this.renderTooltip(guiGraphics, mouseX, mouseY);
-	}
-
-	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-		RenderSystem.disableBlend();
-	}
-
-	@Override
-	public boolean keyPressed(int key, int b, int c) {
-		if (key == 256) {
-			this.minecraft.player.closeContainer();
-			return true;
-		}
-		if (Worldname.isFocused())
-			return Worldname.keyPressed(key, b, c);
-		return super.keyPressed(key, b, c);
-	}
-
-	@Override
-	public void resize(Minecraft minecraft, int width, int height) {
-		String WorldnameValue = Worldname.getValue();
-		super.resize(minecraft, width, height);
-		Worldname.setValue(WorldnameValue);
-	}
-
-	@Override
-	protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-	}
-
-	@Override
-	public void init() {
+	protected void init() {
 		super.init();
-		Worldname = new EditBox(this.font, this.leftPos + 41, this.topPos + 12, 118, 18, Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname"));
-		Worldname.setMaxLength(8192);
-		Worldname.setResponder(content -> {
-			if (!menuStateUpdateActive)
-				menu.sendMenuStateUpdate(entity, 0, "Worldname", content, false);
-		});
-		Worldname.setHint(Component.translatable("gui.blackbox.dimensional_workbench_gui.Worldname"));
-		this.addWidget(this.Worldname);
-		button_name = Button.builder(Component.translatable("gui.blackbox.dimensional_workbench_gui.button_name"), e -> {
-			int x = DimensionalWorkbenchGUIScreen.this.x;
-			int y = DimensionalWorkbenchGUIScreen.this.y;
-			if (true) {
-				PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(0, x, y, z));
-				DimensionalWorkbenchGUIButtonMessage.handleButtonAction(entity, 0, x, y, z);
+		this.farmName = new EditBox(this.font, this.leftPos + 30, this.topPos + 21, 95, 20, Component.translatable("gui.blackbox.workbench.name"));
+		this.farmName.setMaxLength(32);
+		this.farmName.setHint(Component.translatable("gui.blackbox.workbench.name"));
+		this.addRenderableWidget(this.farmName);
+		this.saveNameButton = this.addRenderableWidget(Button.builder(Component.literal("\u2713"), button -> saveName()).bounds(this.leftPos + 129, this.topPos + 21, 25, 20).build());
+		this.saveNameButton.setTooltip(Tooltip.create(Component.translatable("gui.blackbox.workbench.save_name")));
+		this.enterButton = this.addRenderableWidget(Button.builder(Component.translatable("gui.blackbox.workbench.enter_short"), button -> {
+			saveName();
+			PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(0, this.menu.x, this.menu.y, this.menu.z));
+		}).bounds(this.leftPos + 158, this.topPos + 21, 30, 20).build());
+		this.enterButton.setTooltip(Tooltip.create(Component.translatable("gui.blackbox.workbench.start")));
+	}
+
+	private void saveName() {
+		PacketDistributor.sendToServer(new FarmNameUpdateMessage(this.menu.x, this.menu.y, this.menu.z, this.farmName.getValue()));
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (this.farmName != null && this.farmName.isFocused()) {
+			if (this.farmName.keyPressed(keyCode, scanCode, modifiers)) {
+				return true;
 			}
-		}).bounds(this.leftPos + 11, this.topPos + 32, 46, 20).build();
-		this.addRenderableWidget(button_name);
-		button_teleport = Button.builder(Component.translatable("gui.blackbox.dimensional_workbench_gui.button_teleport"), e -> {
-			int x = DimensionalWorkbenchGUIScreen.this.x;
-			int y = DimensionalWorkbenchGUIScreen.this.y;
-			if (true) {
-				PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(1, x, y, z));
-				DimensionalWorkbenchGUIButtonMessage.handleButtonAction(entity, 1, x, y, z);
+			if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
+				return true;
 			}
-		}).bounds(this.leftPos + 59, this.topPos + 32, 67, 20).build();
-		this.addRenderableWidget(button_teleport);
-		button_end = Button.builder(Component.translatable("gui.blackbox.dimensional_workbench_gui.button_end"), e -> {
-			int x = DimensionalWorkbenchGUIScreen.this.x;
-			int y = DimensionalWorkbenchGUIScreen.this.y;
-			if (true) {
-				PacketDistributor.sendToServer(new DimensionalWorkbenchGUIButtonMessage(2, x, y, z));
-				DimensionalWorkbenchGUIButtonMessage.handleButtonAction(entity, 2, x, y, z);
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
+	@Override
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		ItemStack core = this.menu.getSlot(0).getItem();
+		boolean hasCore = core.is(BlackboxModItems.DIMENSION_CORE.get());
+		this.enterButton.active = hasCore;
+		this.saveNameButton.active = hasCore;
+		this.farmName.setEditable(hasCore);
+		if (hasCore && !this.nameInitialized) {
+			this.farmName.setValue(FarmCoreData.getFarmName(core));
+			this.nameInitialized = true;
+		} else if (!hasCore) {
+			this.nameInitialized = false;
+			this.farmName.setValue("");
+		}
+		super.render(graphics, mouseX, mouseY, partialTick);
+		this.renderTooltip(graphics, mouseX, mouseY);
+	}
+
+	@Override
+	protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+		drawPanel(graphics);
+		drawSlot(graphics, this.leftPos + 8, this.topPos + 24, 0xFF77CC88);
+		drawSlot(graphics, this.leftPos + 170, this.topPos + 51, 0xFFD5B85A);
+		for (int column = 0; column < 9; column++) {
+			drawSlot(graphics, this.leftPos + 8 + column * 18, this.topPos + 75, 0xFF5E8FB8);
+		}
+		for (int row = 0; row < 2; row++) {
+			for (int column = 0; column < 9; column++) {
+				drawSlot(graphics, this.leftPos + 8 + column * 18, this.topPos + 103 + row * 18, 0xFF77A96E);
 			}
-		}).bounds(this.leftPos + 129, this.topPos + 32, 40, 20).build();
-		this.addRenderableWidget(button_end);
+		}
+		for (int row = 0; row < 3; row++) {
+			for (int column = 0; column < 9; column++) {
+				drawSlot(graphics, this.leftPos + 8 + column * 18, this.topPos + 161 + row * 18, 0xFF68727D);
+			}
+		}
+		for (int column = 0; column < 9; column++) {
+			drawSlot(graphics, this.leftPos + 8 + column * 18, this.topPos + 219, 0xFF68727D);
+		}
+	}
+
+	@Override
+	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+		graphics.drawString(this.font, Component.translatable("gui.blackbox.workbench.title"), 8, 6, 0xFFE8EDF2, false);
+		graphics.drawString(this.font, Component.translatable("gui.blackbox.workbench.upgrade_short"), 169, 42, 0xFFD8C37A, false);
+		graphics.drawString(this.font, Component.translatable("gui.blackbox.machine.inputs"), 8, 64, 0xFF83BCE6, false);
+		graphics.drawString(this.font, Component.translatable("gui.blackbox.machine.outputs"), 8, 93, 0xFF8DDB9B, false);
+		graphics.drawString(this.font, Component.translatable("container.inventory"), 8, 150, 0xFFAAB4C0, false);
+
+		Component status;
+		int color;
+		if (!this.menu.getSlot(0).getItem().is(BlackboxModItems.DIMENSION_CORE.get())) {
+			status = Component.translatable("gui.blackbox.workbench.missing_core");
+			color = 0xFFFF7373;
+		} else if (this.menu.getCalculationPhase() == 1) {
+			status = Component.translatable("gui.blackbox.workbench.analysing");
+			color = 0xFFFFC866;
+		} else if (this.menu.getCalculationPhase() == 2) {
+			status = Component.translatable("gui.blackbox.workbench.measuring", this.menu.getCalculationSecondsRemaining());
+			color = 0xFF73C7FF;
+		} else if (FarmCoreData.isProgrammed(this.menu.getSlot(0).getItem())) {
+			if (this.menu.getSlot(28).getItem().is(BlackboxModItems.STABILITY_UPGRADE.get())) {
+				status = Component.translatable("gui.blackbox.machine.stable");
+				color = 0xFF73C7FF;
+			} else {
+				status = Component.translatable("gui.blackbox.machine.timeline");
+				color = 0xFF6EDC8C;
+			}
+		} else {
+			status = Component.translatable("gui.blackbox.workbench.ready");
+			color = 0xFFB8C2CC;
+		}
+		graphics.drawString(this.font, status, 8, 51, color, false);
+	}
+
+	private void drawPanel(GuiGraphics graphics) {
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + this.imageWidth, this.topPos + this.imageHeight, 0xFF171B21);
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + this.imageWidth, this.topPos + 2, 0xFF4C9B70);
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + 1, this.topPos + this.imageHeight, 0xFF596572);
+		graphics.fill(this.leftPos + this.imageWidth - 1, this.topPos, this.leftPos + this.imageWidth, this.topPos + this.imageHeight, 0xFF080A0D);
+	}
+
+	private void drawSlot(GuiGraphics graphics, int x, int y, int borderColor) {
+		graphics.fill(x - 1, y - 1, x + 17, y + 17, borderColor);
+		graphics.fill(x, y, x + 16, y + 16, 0xFF0C0F13);
 	}
 }

@@ -16,8 +16,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.core.SectionPos;
 
 import net.mcreator.blackbox.procedures.TeleporttoDimensionProcedure;
-import net.mcreator.blackbox.procedures.DimWBNamingProcedure;
-import net.mcreator.blackbox.procedures.CalcDimCoreatEndProcedure;
 import net.mcreator.blackbox.BlackboxMod;
 
 @EventBusSubscriber
@@ -50,16 +48,7 @@ public record DimensionalWorkbenchGUIButtonMessage(int buttonID, int x, int y, i
 		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
 			return;
 		if (buttonID == 0) {
-
-			DimWBNamingProcedure.execute(world, x, y, z, entity);
-		}
-		if (buttonID == 1) {
-
 			TeleporttoDimensionProcedure.execute(x, y, z, entity);
-		}
-		if (buttonID == 2) {
-
-			CalcDimCoreatEndProcedure.execute(world, x, y, z, entity);
 		}
 	}
 

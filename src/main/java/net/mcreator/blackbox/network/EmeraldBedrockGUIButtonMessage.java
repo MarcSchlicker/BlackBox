@@ -5,17 +5,19 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
 
-import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.core.SectionPos;
+import net.minecraft.core.BlockPos;
 
 import net.mcreator.blackbox.procedures.EmeraldBedrockTeleportProcedure;
+import net.mcreator.blackbox.init.BlackboxModBlocks;
+import net.mcreator.blackbox.util.FarmEnvironment;
 import net.mcreator.blackbox.BlackboxMod;
 
 @EventBusSubscriber
@@ -43,14 +45,15 @@ public record EmeraldBedrockGUIButtonMessage(int buttonID, int x, int y, int z) 
 	}
 
 	public static void handleButtonAction(Player entity, int buttonID, int x, int y, int z) {
-		Level world = entity.level();
-		// security measure to prevent arbitrary chunk generation
-		if (!world.getChunkSource().hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z)))
+		if (buttonID != 0 || !(entity instanceof ServerPlayer player) || !FarmEnvironment.isFarmDimension(player.level().dimension())) {
 			return;
-		if (buttonID == 0) {
-
-			EmeraldBedrockTeleportProcedure.execute(entity);
 		}
+		BlockPos floorPos = new BlockPos(x, y, z);
+		if (!floorPos.closerToCenterThan(player.position(), 8.0D) || !player.level().getBlockState(floorPos).is(BlackboxModBlocks.EMERALD_BEDROCK.get())) {
+			return;
+		}
+		player.closeContainer();
+		EmeraldBedrockTeleportProcedure.execute(player);
 	}
 
 	@SubscribeEvent

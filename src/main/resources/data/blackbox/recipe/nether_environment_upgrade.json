@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:compass" },
+    { "item": "minecraft:netherrack" },
+    { "item": "minecraft:fire_charge" }
+  ],
+  "result": { "id": "blackbox:nether_environment_upgrade", "count": 1 }
+}

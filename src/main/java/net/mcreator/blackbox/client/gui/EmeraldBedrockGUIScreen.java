@@ -2,85 +2,55 @@ package net.mcreator.blackbox.client.gui;
 
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import net.minecraft.world.level.Level;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
-import net.mcreator.blackbox.world.inventory.EmeraldBedrockGUIMenu;
-import net.mcreator.blackbox.network.EmeraldBedrockGUIButtonMessage;
 import net.mcreator.blackbox.init.BlackboxModScreens;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.mcreator.blackbox.network.EmeraldBedrockGUIButtonMessage;
+import net.mcreator.blackbox.world.inventory.EmeraldBedrockGUIMenu;
 
 public class EmeraldBedrockGUIScreen extends AbstractContainerScreen<EmeraldBedrockGUIMenu> implements BlackboxModScreens.ScreenAccessor {
-	private final Level world;
-	private final int x, y, z;
-	private final Player entity;
-	private boolean menuStateUpdateActive = false;
-	private Button button_teleport;
-	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/emerald_bedrock_gui.png");
+	private Button leaveButton;
 
-	public EmeraldBedrockGUIScreen(EmeraldBedrockGUIMenu container, Inventory inventory, Component text) {
-		super(container, inventory, text);
-		this.world = container.world;
-		this.x = container.x;
-		this.y = container.y;
-		this.z = container.z;
-		this.entity = container.entity;
-		this.imageWidth = 176;
-		this.imageHeight = 166;
+	public EmeraldBedrockGUIScreen(EmeraldBedrockGUIMenu menu, Inventory inventory, Component title) {
+		super(menu, inventory, title);
+		this.imageWidth = 196;
+		this.imageHeight = 108;
 	}
 
 	@Override
 	public void updateMenuState(int elementType, String name, Object elementState) {
-		menuStateUpdateActive = true;
-		menuStateUpdateActive = false;
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
-		this.renderTooltip(guiGraphics, mouseX, mouseY);
-	}
-
-	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-		RenderSystem.disableBlend();
-	}
-
-	@Override
-	public boolean keyPressed(int key, int b, int c) {
-		if (key == 256) {
-			this.minecraft.player.closeContainer();
-			return true;
-		}
-		return super.keyPressed(key, b, c);
-	}
-
-	@Override
-	protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-	}
-
-	@Override
-	public void init() {
+	protected void init() {
 		super.init();
-		button_teleport = Button.builder(Component.translatable("gui.blackbox.emerald_bedrock_gui.button_teleport"), e -> {
-			int x = EmeraldBedrockGUIScreen.this.x;
-			int y = EmeraldBedrockGUIScreen.this.y;
-			if (true) {
-				PacketDistributor.sendToServer(new EmeraldBedrockGUIButtonMessage(0, x, y, z));
-				EmeraldBedrockGUIButtonMessage.handleButtonAction(entity, 0, x, y, z);
-			}
-		}).bounds(this.leftPos + 55, this.topPos + 76, 67, 20).build();
-		this.addRenderableWidget(button_teleport);
+		this.leaveButton = this.addRenderableWidget(Button.builder(Component.translatable("gui.blackbox.farm_exit.confirm"), button -> {
+			PacketDistributor.sendToServer(new EmeraldBedrockGUIButtonMessage(0, this.menu.x, this.menu.y, this.menu.z));
+			this.minecraft.player.closeContainer();
+		}).bounds(this.leftPos + 24, this.topPos + 70, 148, 22).build());
+	}
+
+	@Override
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		super.render(graphics, mouseX, mouseY, partialTick);
+		this.renderTooltip(graphics, mouseX, mouseY);
+	}
+
+	@Override
+	protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + this.imageWidth, this.topPos + this.imageHeight, 0xFF171B21);
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + this.imageWidth, this.topPos + 2, 0xFF5DBA79);
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + 1, this.topPos + this.imageHeight, 0xFF596572);
+		graphics.fill(this.leftPos + this.imageWidth - 1, this.topPos, this.leftPos + this.imageWidth, this.topPos + this.imageHeight, 0xFF080A0D);
+	}
+
+	@Override
+	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+		graphics.drawCenteredString(this.font, Component.translatable("gui.blackbox.farm_exit.title"), this.imageWidth / 2, 13, 0xFFE8EDF2);
+		graphics.drawWordWrap(this.font, Component.translatable("gui.blackbox.farm_exit.description"), 16, 34, this.imageWidth - 32, 0xFFBBC5CE);
 	}
 }

@@ -1,13 +1,13 @@
 {
   "parent": "block/cube",
   "textures": {
-    "down": "minecraft:block/crafting_table_top",
-    "up": "minecraft:block/crafting_table_top",
-    "north": "minecraft:block/crafting_table_top",
-    "east": "minecraft:block/crafting_table_top",
-    "south": "minecraft:block/crafting_table_top",
-    "west": "minecraft:block/crafting_table_top",
-    "particle": "minecraft:block/crafting_table_top"
+    "down": "blackbox:block/dimensional_workbench_side",
+    "up": "blackbox:block/dimensional_workbench_top",
+    "north": "blackbox:block/dimensional_workbench_side",
+    "east": "blackbox:block/dimensional_workbench_side",
+    "south": "blackbox:block/dimensional_workbench_side",
+    "west": "blackbox:block/dimensional_workbench_side",
+    "particle": "blackbox:block/dimensional_workbench_side"
   },
   "render_type": "solid"
 }

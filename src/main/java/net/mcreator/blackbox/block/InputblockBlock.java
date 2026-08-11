@@ -1,5 +1,6 @@
 package net.mcreator.blackbox.block;
 
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -8,8 +9,11 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Containers;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 
 import net.mcreator.blackbox.block.entity.InputblockBlockEntity;
@@ -17,6 +21,18 @@ import net.mcreator.blackbox.block.entity.InputblockBlockEntity;
 public class InputblockBlock extends Block implements EntityBlock {
 	public InputblockBlock() {
 		super(BlockBehaviour.Properties.of().sound(SoundType.GRAVEL).strength(1f, 10f));
+	}
+
+	@Override
+	public InteractionResult useWithoutItem(BlockState blockstate, Level world, BlockPos pos, Player entity, BlockHitResult hit) {
+		super.useWithoutItem(blockstate, world, pos, entity, hit);
+		if (entity instanceof ServerPlayer player) {
+			MenuProvider menuProvider = this.getMenuProvider(blockstate, world, pos);
+			if (menuProvider != null) {
+				player.openMenu(menuProvider, pos);
+			}
+		}
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override

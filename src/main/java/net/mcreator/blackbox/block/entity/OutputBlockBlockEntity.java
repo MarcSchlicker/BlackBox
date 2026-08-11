@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 import io.netty.buffer.Unpooled;
 
 public class OutputBlockBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
-	private NonNullList<ItemStack> stacks = NonNullList.withSize(256, ItemStack.EMPTY);
+	private NonNullList<ItemStack> stacks = NonNullList.withSize(10, ItemStack.EMPTY);
 
 	public OutputBlockBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.OUTPUT_BLOCK.get(), position, state);
@@ -103,8 +103,6 @@ public class OutputBlockBlockEntity extends RandomizableContainerBlockEntity imp
 
 	@Override
 	public boolean canPlaceItem(int index, ItemStack stack) {
-		if (index == 0)
-			return false;
 		return true;
 	}
 
@@ -120,8 +118,6 @@ public class OutputBlockBlockEntity extends RandomizableContainerBlockEntity imp
 
 	@Override
 	public boolean canTakeItemThroughFace(int index, ItemStack itemstack, Direction direction) {
-		if (index == 0)
-			return false;
-		return true;
+		return false;
 	}
 }

@@ -1,86 +1,58 @@
 package net.mcreator.blackbox.client.gui;
 
-import net.neoforged.neoforge.network.PacketDistributor;
-
-import net.minecraft.world.level.Level;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
-import net.mcreator.blackbox.world.inventory.OutputBlockGUIMenu;
-import net.mcreator.blackbox.network.OutputBlockGUIButtonMessage;
 import net.mcreator.blackbox.init.BlackboxModScreens;
-
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.mcreator.blackbox.world.inventory.OutputBlockGUIMenu;
 
 public class OutputBlockGUIScreen extends AbstractContainerScreen<OutputBlockGUIMenu> implements BlackboxModScreens.ScreenAccessor {
-	private final Level world;
-	private final int x, y, z;
-	private final Player entity;
-	private boolean menuStateUpdateActive = false;
-	private Button button_save_postion;
-	private static final ResourceLocation BACKGROUND = ResourceLocation.parse("blackbox:textures/screens/output_block_gui.png");
-
-	public OutputBlockGUIScreen(OutputBlockGUIMenu container, Inventory inventory, Component text) {
-		super(container, inventory, text);
-		this.world = container.world;
-		this.x = container.x;
-		this.y = container.y;
-		this.z = container.z;
-		this.entity = container.entity;
+	public OutputBlockGUIScreen(OutputBlockGUIMenu menu, Inventory inventory, Component title) {
+		super(menu, inventory, title);
 		this.imageWidth = 176;
 		this.imageHeight = 166;
 	}
 
 	@Override
 	public void updateMenuState(int elementType, String name, Object elementState) {
-		menuStateUpdateActive = true;
-		menuStateUpdateActive = false;
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
-		this.renderTooltip(guiGraphics, mouseX, mouseY);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+		super.render(graphics, mouseX, mouseY, partialTick);
+		this.renderTooltip(graphics, mouseX, mouseY);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
-		RenderSystem.disableBlend();
-	}
-
-	@Override
-	public boolean keyPressed(int key, int b, int c) {
-		if (key == 256) {
-			this.minecraft.player.closeContainer();
-			return true;
-		}
-		return super.keyPressed(key, b, c);
-	}
-
-	@Override
-	protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-	}
-
-	@Override
-	public void init() {
-		super.init();
-		button_save_postion = Button.builder(Component.translatable("gui.blackbox.output_block_gui.button_save_postion"), e -> {
-			int x = OutputBlockGUIScreen.this.x;
-			int y = OutputBlockGUIScreen.this.y;
-			if (true) {
-				PacketDistributor.sendToServer(new OutputBlockGUIButtonMessage(0, x, y, z));
-				OutputBlockGUIButtonMessage.handleButtonAction(entity, 0, x, y, z);
+	protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + this.imageWidth, this.topPos + this.imageHeight, 0xFF172019);
+		graphics.fill(this.leftPos, this.topPos, this.leftPos + this.imageWidth, this.topPos + 2, 0xFF55A56A);
+		for (int row = 0; row < 2; row++) {
+			for (int column = 0; column < 5; column++) {
+				drawSlot(graphics, this.leftPos + 44 + column * 18, this.topPos + 27 + row * 18, 0xFF6FC784);
 			}
-		}).bounds(this.leftPos + 40, this.topPos + 44, 87, 20).build();
-		this.addRenderableWidget(button_save_postion);
+		}
+		for (int row = 0; row < 3; row++) {
+			for (int column = 0; column < 9; column++) {
+				drawSlot(graphics, this.leftPos + 8 + column * 18, this.topPos + 84 + row * 18, 0xFF68727D);
+			}
+		}
+		for (int column = 0; column < 9; column++) {
+			drawSlot(graphics, this.leftPos + 8 + column * 18, this.topPos + 142, 0xFF68727D);
+		}
+	}
+
+	@Override
+	protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+		graphics.drawString(this.font, Component.translatable("gui.blackbox.output.title"), 8, 7, 0xFFE8EDF2, false);
+		graphics.drawCenteredString(this.font, Component.translatable("gui.blackbox.output.manual"), this.imageWidth / 2, 66, 0xFF91C99C);
+		graphics.drawString(this.font, Component.translatable("container.inventory"), 8, 74, 0xFFAAB4C0, false);
+	}
+
+	private void drawSlot(GuiGraphics graphics, int x, int y, int borderColor) {
+		graphics.fill(x - 1, y - 1, x + 17, y + 17, borderColor);
+		graphics.fill(x, y, x + 16, y + 16, 0xFF0C0F13);
 	}
 }

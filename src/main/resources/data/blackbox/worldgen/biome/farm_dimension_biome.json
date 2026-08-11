@@ -11,9 +11,22 @@
     "water_fog_color": 329011
   },
   "spawners": {
-    "monster": [],
-    "creature": [],
-    "ambient": [],
+    "monster": [
+      { "type": "minecraft:spider", "maxCount": 4, "minCount": 4, "weight": 100 },
+      { "type": "minecraft:zombie", "maxCount": 4, "minCount": 4, "weight": 95 },
+      { "type": "minecraft:skeleton", "maxCount": 4, "minCount": 4, "weight": 100 },
+      { "type": "minecraft:creeper", "maxCount": 4, "minCount": 4, "weight": 100 },
+      { "type": "minecraft:enderman", "maxCount": 4, "minCount": 1, "weight": 10 }
+    ],
+    "creature": [
+      { "type": "minecraft:sheep", "maxCount": 4, "minCount": 4, "weight": 12 },
+      { "type": "minecraft:pig", "maxCount": 4, "minCount": 4, "weight": 10 },
+      { "type": "minecraft:chicken", "maxCount": 4, "minCount": 4, "weight": 10 },
+      { "type": "minecraft:cow", "maxCount": 4, "minCount": 4, "weight": 8 }
+    ],
+    "ambient": [
+      { "type": "minecraft:bat", "maxCount": 8, "minCount": 8, "weight": 10 }
+    ],
     "axolotls": [],
     "underground_water_creature": [],
     "water_creature": [],
@@ -32,9 +45,7 @@
     [],
     [],
     [],
-    [
-      "blackbox:farm_dimension_biome_tree"
-    ],
+    [],
     []
   ]
 }

@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Minecraft-Client starten (NeoForge)",
+      "type": "shell",
+      "command": ".\\gradlew.bat",
+      "args": [
+        "--no-problems-report",
+        "runClient"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Mod bauen",
+      "type": "shell",
+      "command": ".\\gradlew.bat",
+      "args": [
+        "--no-problems-report",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$javac"]
+    }
+  ]
+}

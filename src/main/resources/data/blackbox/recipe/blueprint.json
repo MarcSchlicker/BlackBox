@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PIP",
+    "PPP"
+  ],
+  "key": {
+    "P": { "item": "minecraft:paper" },
+    "I": { "item": "minecraft:ink_sac" }
+  },
+  "result": { "id": "blackbox:blueprint", "count": 1 }
+}

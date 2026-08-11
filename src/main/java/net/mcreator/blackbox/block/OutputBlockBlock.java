@@ -14,15 +14,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Containers;
-import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
 
 import net.mcreator.blackbox.world.inventory.OutputBlockGUIMenu;
-import net.mcreator.blackbox.procedures.SafeOutputProcedure;
 import net.mcreator.blackbox.block.entity.OutputBlockBlockEntity;
 
 import io.netty.buffer.Unpooled;
@@ -30,19 +27,6 @@ import io.netty.buffer.Unpooled;
 public class OutputBlockBlock extends Block implements EntityBlock {
 	public OutputBlockBlock() {
 		super(BlockBehaviour.Properties.of().sound(SoundType.GRAVEL).strength(1f, 10f));
-	}
-
-	@Override
-	public void onPlace(BlockState blockstate, Level world, BlockPos pos, BlockState oldState, boolean moving) {
-		super.onPlace(blockstate, world, pos, oldState, moving);
-		world.scheduleTick(pos, this, 1);
-	}
-
-	@Override
-	public void tick(BlockState blockstate, ServerLevel world, BlockPos pos, RandomSource random) {
-		super.tick(blockstate, world, pos, random);
-		SafeOutputProcedure.execute(world, pos.getX(), pos.getY(), pos.getZ());
-		world.scheduleTick(pos, this, 1);
 	}
 
 	@Override

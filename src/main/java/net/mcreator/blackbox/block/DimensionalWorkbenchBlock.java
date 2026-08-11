@@ -4,6 +4,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -14,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.Containers;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.FriendlyByteBuf;
@@ -21,12 +24,27 @@ import net.minecraft.core.BlockPos;
 
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 import net.mcreator.blackbox.block.entity.DimensionalWorkbenchBlockEntity;
+import net.mcreator.blackbox.init.BlackboxModBlockEntities;
+import net.mcreator.blackbox.util.BlackboxSimulationRuntime;
+import net.mcreator.blackbox.util.WorkbenchRuntime;
 
 import io.netty.buffer.Unpooled;
 
 public class DimensionalWorkbenchBlock extends Block implements EntityBlock {
 	public DimensionalWorkbenchBlock() {
 		super(BlockBehaviour.Properties.of().sound(SoundType.GRAVEL).strength(1f, 10f));
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+		if (level.isClientSide || type != BlackboxModBlockEntities.DIMENSIONAL_WORKBENCH.get()) {
+			return null;
+		}
+		return (tickLevel, pos, tickState, blockEntity) -> {
+			if (tickLevel instanceof ServerLevel serverLevel && tickLevel.getGameTime() % BlackboxSimulationRuntime.TICK_INTERVAL == 0) {
+				WorkbenchRuntime.tick(serverLevel, pos);
+			}
+		};
 	}
 
 	@Override

@@ -1,13 +1,13 @@
 {
   "parent": "block/cube",
   "textures": {
-    "down": "minecraft:block/hopper_top",
+    "down": "blackbox:block/output_block_side",
     "up": "minecraft:block/hopper_inside",
-    "north": "minecraft:block/hopper_top",
-    "east": "minecraft:block/hopper_top",
-    "south": "minecraft:block/hopper_top",
-    "west": "minecraft:block/hopper_top",
-    "particle": "minecraft:block/hopper_top"
+    "north": "blackbox:block/output_block_side",
+    "east": "blackbox:block/output_block_side",
+    "south": "blackbox:block/output_block_side",
+    "west": "blackbox:block/output_block_side",
+    "particle": "blackbox:block/output_block_side"
   },
   "render_type": "solid"
 }

@@ -16,6 +16,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 
 import net.mcreator.blackbox.BlackboxMod;
+import net.mcreator.blackbox.util.FarmCoreData;
+import net.mcreator.blackbox.util.FarmEnvironment;
 
 @EventBusSubscriber
 public class BlackboxModTabs {
@@ -25,10 +27,22 @@ public class BlackboxModTabs {
 				tabData.accept(BlackboxModBlocks.EMERALD_BEDROCK.get().asItem());
 				tabData.accept(BlackboxModBlocks.BLACKBOX_BLOCK.get().asItem());
 				tabData.accept(BlackboxModBlocks.DIMENSIONAL_WORKBENCH.get().asItem());
-				tabData.accept(BlackboxModItems.DIMENSION_CORE.get());
+				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.STANDARD));
+				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.OVERWORLD));
+				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.NETHER));
+				tabData.accept(FarmCoreData.createEnvironmentCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get()), FarmEnvironment.END));
 				tabData.accept(BlackboxModBlocks.OUTPUT_BLOCK.get().asItem());
 				tabData.accept(BlackboxModBlocks.INPUTBLOCK.get().asItem());
-				tabData.accept(BlackboxModItems.RED_DIMENSION_CORE.get());
+				tabData.accept(BlackboxModItems.HANDBOOK.get());
+				tabData.accept(BlackboxModItems.ADMIN_BOOK.get());
+				tabData.accept(BlackboxModItems.STANDARD_ENVIRONMENT_UPGRADE.get());
+				tabData.accept(BlackboxModItems.OVERWORLD_ENVIRONMENT_UPGRADE.get());
+				tabData.accept(BlackboxModItems.NETHER_ENVIRONMENT_UPGRADE.get());
+				tabData.accept(BlackboxModItems.END_ENVIRONMENT_UPGRADE.get());
+				tabData.accept(BlackboxModItems.STABILITY_UPGRADE.get());
+				tabData.accept(BlackboxModItems.MOB_SPAWN_UPGRADE.get());
+				tabData.accept(BlackboxModItems.BLUEPRINT.get());
+				tabData.accept(FarmCoreData.createExampleIronFarmCore(new ItemStack(BlackboxModItems.DIMENSION_CORE.get())));
 			}).withSearchBar().build());
 
 	@SubscribeEvent

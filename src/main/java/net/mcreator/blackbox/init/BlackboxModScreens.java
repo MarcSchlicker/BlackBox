@@ -12,6 +12,8 @@ import net.mcreator.blackbox.client.gui.OutputBlockGUIScreen;
 import net.mcreator.blackbox.client.gui.EmeraldBedrockGUIScreen;
 import net.mcreator.blackbox.client.gui.DimensionalWorkbenchGUIScreen;
 import net.mcreator.blackbox.client.gui.BlackBoxGuiScreen;
+import net.mcreator.blackbox.client.gui.HandbookScreen;
+import net.mcreator.blackbox.client.gui.AdminBookScreen;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class BlackboxModScreens {
@@ -21,6 +23,8 @@ public class BlackboxModScreens {
 		event.register(BlackboxModMenus.BLACK_BOX_GUI.get(), BlackBoxGuiScreen::new);
 		event.register(BlackboxModMenus.DIMENSIONAL_WORKBENCH_GUI.get(), DimensionalWorkbenchGUIScreen::new);
 		event.register(BlackboxModMenus.OUTPUT_BLOCK_GUI.get(), OutputBlockGUIScreen::new);
+		event.register(BlackboxModMenus.HANDBOOK.get(), HandbookScreen::new);
+		event.register(BlackboxModMenus.ADMIN_BOOK.get(), AdminBookScreen::new);
 	}
 
 	public interface ScreenAccessor {

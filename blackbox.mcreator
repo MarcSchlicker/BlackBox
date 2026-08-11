@@ -65,7 +65,7 @@
       "name": "Farmdimension",
       "type": "dimension",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "farmdimension",
       "metadata": {
         "files": [
@@ -112,7 +112,7 @@
       "name": "FarmDimensionBiome",
       "type": "biome",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "farm_dimension_biome",
       "metadata": {
         "files": [
@@ -127,7 +127,7 @@
       "name": "BlackBoxGui",
       "type": "gui",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "black_box_gui",
       "metadata": {
         "files": [
@@ -141,7 +141,7 @@
       "name": "BlackboxBlock",
       "type": "block",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "blackbox_block",
       "metadata": {
         "files": [
@@ -159,7 +159,7 @@
       "name": "EmeraldBedrockTeleport",
       "type": "procedure",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "emerald_bedrock_teleport",
       "metadata": {
         "files": [
@@ -178,7 +178,7 @@
       "name": "DimensionalWorkbenchGUI",
       "type": "gui",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "dimensional_workbench_gui",
       "metadata": {
         "files": [
@@ -193,7 +193,7 @@
       "name": "DimensionalWorkbench",
       "type": "block",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "dimensional_workbench",
       "metadata": {
         "files": [
@@ -244,7 +244,7 @@
       "name": "TeleporttoDimension",
       "type": "procedure",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "teleportto_dimension",
       "metadata": {
         "files": [
@@ -275,7 +275,7 @@
       "name": "OutputBlock",
       "type": "block",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "output_block",
       "metadata": {
         "files": [
@@ -297,45 +297,9 @@
       "metadata": {
         "files": [
           "src/main/java/net/mcreator/blackbox/client/gui/OutputBlockGUIScreen.java",
-          "src/main/java/net/mcreator/blackbox/network/OutputBlockGUIButtonMessage.java",
           "src/main/java/net/mcreator/blackbox/world/inventory/OutputBlockGUIMenu.java"
         ]
       }
-    },
-    {
-      "name": "DimWBNaming",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "dim_wb_naming",
-      "metadata": {
-        "files": [
-          "src/main/java/net/mcreator/blackbox/procedures/DimWBNamingProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ]
-      },
-      "path": "~/DimensionalWorkbench"
     },
     {
       "name": "DimWBEnd",
@@ -373,40 +337,10 @@
       "path": "~/DimensionalWorkbench"
     },
     {
-      "name": "OutputBlockPosition",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "output_block_position",
-      "metadata": {
-        "files": [
-          "src/main/java/net/mcreator/blackbox/procedures/OutputBlockPositionProcedure.java"
-        ],
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          }
-        ]
-      }
-    },
-    {
       "name": "Inputblock",
       "type": "block",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "inputblock",
       "metadata": {
         "files": [
@@ -420,24 +354,10 @@
       }
     },
     {
-      "name": "RedDimensionCore",
-      "type": "item",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "red_dimension_core",
-      "metadata": {
-        "files": [
-          "src/main/resources/assets/blackbox/models/item/red_dimension_core.json",
-          "src/main/java/net/mcreator/blackbox/item/RedDimensionCoreItem.java"
-        ]
-      },
-      "path": "~/General"
-    },
-    {
       "name": "ToolTipDimCore",
       "type": "procedure",
       "compiles": true,
-      "locked_code": false,
+      "locked_code": true,
       "registry_name": "tool_tip_dim_core",
       "metadata": {
         "dependencies": [
@@ -580,94 +500,6 @@
         ]
       },
       "path": "~/DimensionalWorkbench"
-    },
-    {
-      "name": "SafeOutput",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "safe_output",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/mcreator/blackbox/procedures/SafeOutputProcedure.java"
-        ]
-      }
-    },
-    {
-      "name": "ToolTipRedDimCore",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "tool_tip_red_dim_core",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "itemstack",
-            "type": "itemstack"
-          },
-          {
-            "name": "tooltip",
-            "type": "tooltip"
-          }
-        ],
-        "files": [
-          "src/main/java/net/mcreator/blackbox/procedures/ToolTipRedDimCoreProcedure.java"
-        ]
-      },
-      "path": "~/General"
-    },
-    {
-      "name": "CalcDimCoreatEnd",
-      "type": "procedure",
-      "compiles": true,
-      "locked_code": false,
-      "registry_name": "calc_dim_coreat_end",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          },
-          {
-            "name": "x",
-            "type": "number"
-          },
-          {
-            "name": "y",
-            "type": "number"
-          },
-          {
-            "name": "z",
-            "type": "number"
-          },
-          {
-            "name": "world",
-            "type": "world"
-          }
-        ],
-        "files": [
-          "src/main/java/net/mcreator/blackbox/procedures/CalcDimCoreatEndProcedure.java"
-        ]
-      },
-      "path": "~/DimensionalWorkbench"
     }
   ],
   "variable_elements": [
@@ -730,12 +562,6 @@
       "type": "number",
       "scope": "map",
       "value": "120.0"
-    },
-    {
-      "name": "RedDimensionCoreID",
-      "type": "itemstack",
-      "scope": "player_persistent",
-      "value": "ItemStack.EMPTY"
     }
   ],
   "sound_elements": [],
@@ -769,7 +595,6 @@
       "gui.blackbox.dimensional_workbench_gui.button_end": "End",
       "gui.blackbox.black_box_gui.button_start": "Start",
       "block.blackbox.inputblock": "Inputblock",
-      "item.blackbox.red_dimension_core": "Red Dimension Core",
       "gui.blackbox.black_box_gui.label_dimension_core": "Dimension Core"
     }
   },

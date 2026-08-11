@@ -81,7 +81,10 @@ public class BlackboxModVariables {
 		clone.OutputBlock_X = original.OutputBlock_X;
 		clone.OutputBlock_Y = original.OutputBlock_Y;
 		clone.OutputBlock_Z = original.OutputBlock_Z;
-		clone.RedDimensionCoreID = original.RedDimensionCoreID;
+		clone.BlueprintSelectionId = original.BlueprintSelectionId;
+		clone.BlueprintSelectionName = original.BlueprintSelectionName;
+		clone.BlueprintSelectionScope = original.BlueprintSelectionScope;
+		clone.BlueprintPreferredStorage = original.BlueprintPreferredStorage;
 		if (!event.isWasDeath()) {
 		}
 		event.getEntity().setData(PLAYER_VARIABLES, clone);
@@ -250,7 +253,10 @@ public class BlackboxModVariables {
 		public double OutputBlock_X = 0.0;
 		public double OutputBlock_Y = 0.0;
 		public double OutputBlock_Z = 0.0;
-		public ItemStack RedDimensionCoreID = ItemStack.EMPTY;
+		public String BlueprintSelectionId = "";
+		public String BlueprintSelectionName = "";
+		public String BlueprintSelectionScope = "local";
+		public String BlueprintPreferredStorage = "local";
 
 		@Override
 		public CompoundTag serializeNBT(HolderLookup.Provider lookupProvider) {
@@ -262,7 +268,10 @@ public class BlackboxModVariables {
 			nbt.putDouble("OutputBlock_X", OutputBlock_X);
 			nbt.putDouble("OutputBlock_Y", OutputBlock_Y);
 			nbt.putDouble("OutputBlock_Z", OutputBlock_Z);
-			nbt.put("RedDimensionCoreID", RedDimensionCoreID.saveOptional(lookupProvider));
+			nbt.putString("BlueprintSelectionId", BlueprintSelectionId);
+			nbt.putString("BlueprintSelectionName", BlueprintSelectionName);
+			nbt.putString("BlueprintSelectionScope", BlueprintSelectionScope);
+			nbt.putString("BlueprintPreferredStorage", BlueprintPreferredStorage);
 			return nbt;
 		}
 
@@ -275,7 +284,10 @@ public class BlackboxModVariables {
 			OutputBlock_X = nbt.getDouble("OutputBlock_X");
 			OutputBlock_Y = nbt.getDouble("OutputBlock_Y");
 			OutputBlock_Z = nbt.getDouble("OutputBlock_Z");
-			RedDimensionCoreID = ItemStack.parseOptional(lookupProvider, nbt.getCompound("RedDimensionCoreID"));
+			BlueprintSelectionId = nbt.getString("BlueprintSelectionId");
+			BlueprintSelectionName = nbt.getString("BlueprintSelectionName");
+			BlueprintSelectionScope = nbt.contains("BlueprintSelectionScope") ? nbt.getString("BlueprintSelectionScope") : "local";
+			BlueprintPreferredStorage = nbt.contains("BlueprintPreferredStorage") ? nbt.getString("BlueprintPreferredStorage") : "local";
 		}
 
 		public void markSyncDirty() {

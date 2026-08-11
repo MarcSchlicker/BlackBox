@@ -19,6 +19,8 @@ import net.mcreator.blackbox.world.inventory.OutputBlockGUIMenu;
 import net.mcreator.blackbox.world.inventory.EmeraldBedrockGUIMenu;
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 import net.mcreator.blackbox.world.inventory.BlackBoxGuiMenu;
+import net.mcreator.blackbox.world.inventory.HandbookMenu;
+import net.mcreator.blackbox.world.inventory.AdminBookMenu;
 import net.mcreator.blackbox.network.MenuStateUpdateMessage;
 import net.mcreator.blackbox.BlackboxMod;
 
@@ -30,6 +32,8 @@ public class BlackboxModMenus {
 	public static final DeferredHolder<MenuType<?>, MenuType<BlackBoxGuiMenu>> BLACK_BOX_GUI = REGISTRY.register("black_box_gui", () -> IMenuTypeExtension.create(BlackBoxGuiMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<DimensionalWorkbenchGUIMenu>> DIMENSIONAL_WORKBENCH_GUI = REGISTRY.register("dimensional_workbench_gui", () -> IMenuTypeExtension.create(DimensionalWorkbenchGUIMenu::new));
 	public static final DeferredHolder<MenuType<?>, MenuType<OutputBlockGUIMenu>> OUTPUT_BLOCK_GUI = REGISTRY.register("output_block_gui", () -> IMenuTypeExtension.create(OutputBlockGUIMenu::new));
+	public static final DeferredHolder<MenuType<?>, MenuType<HandbookMenu>> HANDBOOK = REGISTRY.register("handbook", () -> IMenuTypeExtension.create(HandbookMenu::new));
+	public static final DeferredHolder<MenuType<?>, MenuType<AdminBookMenu>> ADMIN_BOOK = REGISTRY.register("admin_book", () -> IMenuTypeExtension.create(AdminBookMenu::new));
 
 	public interface MenuAccessor {
 		Map<String, Object> getMenuState();

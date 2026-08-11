@@ -1,94 +1,68 @@
 package net.mcreator.blackbox.block.entity;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
-
-import javax.annotation.Nullable;
-
-import java.util.stream.IntStream;
+import net.mcreator.blackbox.init.BlackboxModItems;
+import net.mcreator.blackbox.util.FarmSimulationMachine;
+import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 
 import io.netty.buffer.Unpooled;
 
-public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
-	private NonNullList<ItemStack> stacks = NonNullList.withSize(10, ItemStack.EMPTY);
+import javax.annotation.Nullable;
+
+public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer, FarmSimulationMachine {
+	private static final int[] AUTOMATION_SLOTS = java.util.stream.IntStream.range(INPUT_START, OUTPUT_END).toArray();
+	private NonNullList<ItemStack> stacks = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+	private int simulationTicks;
+	private String activeCoreId = "";
+	private boolean stableCycleFunded;
+	private int calculationPhase;
+	private int calculationTicksRemaining;
 
 	public DimensionalWorkbenchBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.DIMENSIONAL_WORKBENCH.get(), position, state);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
-		super.loadAdditional(compound, lookupProvider);
-		if (!this.tryLoadLootTable(compound))
-			this.stacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compound, this.stacks, lookupProvider);
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+		super.loadAdditional(tag, lookupProvider);
+		this.stacks = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
+		ContainerHelper.loadAllItems(tag, this.stacks, lookupProvider);
+		this.simulationTicks = tag.getInt("SimulationTicks");
+		this.activeCoreId = tag.getString("ActiveCoreId");
+		this.stableCycleFunded = tag.getBoolean("StableCycleFunded");
+		this.calculationPhase = tag.getInt("CalculationPhase");
+		this.calculationTicksRemaining = tag.getInt("CalculationTicksRemaining");
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider lookupProvider) {
-		super.saveAdditional(compound, lookupProvider);
-		if (!this.trySaveLootTable(compound)) {
-			ContainerHelper.saveAllItems(compound, this.stacks, lookupProvider);
-		}
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+		super.saveAdditional(tag, lookupProvider);
+		ContainerHelper.saveAllItems(tag, this.stacks, lookupProvider);
+		tag.putInt("SimulationTicks", this.simulationTicks);
+		tag.putString("ActiveCoreId", this.activeCoreId);
+		tag.putBoolean("StableCycleFunded", this.stableCycleFunded);
+		tag.putInt("CalculationPhase", this.calculationPhase);
+		tag.putInt("CalculationTicksRemaining", this.calculationTicksRemaining);
 	}
 
 	@Override
-	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return ClientboundBlockEntityDataPacket.create(this);
-	}
-
-	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider lookupProvider) {
-		return this.saveWithFullMetadata(lookupProvider);
-	}
-
-	@Override
-	public int getContainerSize() {
-		return stacks.size();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		for (ItemStack itemstack : this.stacks)
-			if (!itemstack.isEmpty())
-				return false;
-		return true;
-	}
-
-	@Override
-	public Component getDefaultName() {
-		return Component.literal("dimensional_workbench");
-	}
-
-	@Override
-	public int getMaxStackSize() {
-		return 64;
-	}
-
-	@Override
-	public AbstractContainerMenu createMenu(int id, Inventory inventory) {
-		return new DimensionalWorkbenchGUIMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(this.worldPosition));
-	}
-
-	@Override
-	public Component getDisplayName() {
-		return Component.literal("Dimensional Workbench");
+	protected Component getDefaultName() {
+		return Component.translatable("block.blackbox.dimensional_workbench");
 	}
 
 	@Override
@@ -102,22 +76,93 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 	}
 
 	@Override
-	public boolean canPlaceItem(int index, ItemStack stack) {
-		return true;
+	public int getContainerSize() {
+		return SLOT_COUNT;
+	}
+
+	@Override
+	public AbstractContainerMenu createMenu(int id, Inventory inventory) {
+		return new DimensionalWorkbenchGUIMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(this.worldPosition));
+	}
+
+	@Override
+	public boolean canPlaceItem(int slot, ItemStack stack) {
+		if (slot == CORE_SLOT) {
+			return stack.is(BlackboxModItems.DIMENSION_CORE.get());
+		}
+		if (slot == UPGRADE_SLOT) {
+			return stack.is(BlackboxModItems.STABILITY_UPGRADE.get()) || stack.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get()) || stack.getItem() instanceof net.mcreator.blackbox.item.CoreEnvironmentUpgradeItem;
+		}
+		return slot >= INPUT_START && slot < INPUT_END;
 	}
 
 	@Override
 	public int[] getSlotsForFace(Direction side) {
-		return IntStream.range(0, this.getContainerSize()).toArray();
+		return AUTOMATION_SLOTS;
 	}
 
 	@Override
-	public boolean canPlaceItemThroughFace(int index, ItemStack itemstack, @Nullable Direction direction) {
-		return this.canPlaceItem(index, itemstack);
+	public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+		return canPlaceItem(slot, stack);
 	}
 
 	@Override
-	public boolean canTakeItemThroughFace(int index, ItemStack itemstack, Direction direction) {
-		return true;
+	public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+		return slot >= OUTPUT_START && slot < OUTPUT_END;
+	}
+
+	@Override
+	public int getSimulationTicks() {
+		return this.simulationTicks;
+	}
+
+	@Override
+	public void setSimulationTicks(int ticks) {
+		if (this.simulationTicks != ticks) {
+			this.simulationTicks = ticks;
+			this.setChanged();
+		}
+	}
+
+	@Override
+	public String getActiveCoreId() {
+		return this.activeCoreId;
+	}
+
+	@Override
+	public void setActiveCoreId(String coreId) {
+		if (!this.activeCoreId.equals(coreId)) {
+			this.activeCoreId = coreId;
+			this.setChanged();
+		}
+	}
+
+	@Override
+	public boolean isStableCycleFunded() {
+		return this.stableCycleFunded;
+	}
+
+	@Override
+	public void setStableCycleFunded(boolean funded) {
+		if (this.stableCycleFunded != funded) {
+			this.stableCycleFunded = funded;
+			this.setChanged();
+		}
+	}
+
+	public int getCalculationPhase() {
+		return this.calculationPhase;
+	}
+
+	public int getCalculationTicksRemaining() {
+		return this.calculationTicksRemaining;
+	}
+
+	public void setCalculationState(int phase, int ticksRemaining) {
+		if (this.calculationPhase != phase || this.calculationTicksRemaining != ticksRemaining) {
+			this.calculationPhase = phase;
+			this.calculationTicksRemaining = ticksRemaining;
+			this.setChanged();
+		}
 	}
 }

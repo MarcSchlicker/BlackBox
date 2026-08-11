@@ -10,6 +10,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.util.thread.SidedThreadGroups;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.bus.api.IEventBus;
 
@@ -24,6 +26,8 @@ import net.mcreator.blackbox.init.BlackboxModMenus;
 import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.init.BlackboxModBlocks;
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
+import net.mcreator.blackbox.init.BlackboxModChunkGenerators;
+import net.mcreator.blackbox.config.BlackboxConfig;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.Queue;
@@ -40,17 +44,19 @@ public class BlackboxMod {
 	public static final Logger LOGGER = LogManager.getLogger(BlackboxMod.class);
 	public static final String MODID = "blackbox";
 
-	public BlackboxMod(IEventBus modEventBus) {
+	public BlackboxMod(IEventBus modEventBus, ModContainer modContainer) {
 		// Start of user code block mod constructor
 		// End of user code block mod constructor
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);
 		BlackboxModBlocks.REGISTRY.register(modEventBus);
 		BlackboxModBlockEntities.REGISTRY.register(modEventBus);
+		BlackboxModChunkGenerators.REGISTRY.register(modEventBus);
 		BlackboxModItems.REGISTRY.register(modEventBus);
 		BlackboxModTabs.REGISTRY.register(modEventBus);
 		BlackboxModVariables.ATTACHMENT_TYPES.register(modEventBus);
 		BlackboxModMenus.REGISTRY.register(modEventBus);
+		modContainer.registerConfig(ModConfig.Type.SERVER, BlackboxConfig.SPEC);
 		// Start of user code block mod init
 		// End of user code block mod init
 	}

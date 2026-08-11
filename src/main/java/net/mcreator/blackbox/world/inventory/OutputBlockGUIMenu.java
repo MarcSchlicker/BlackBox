@@ -22,6 +22,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
 
 import net.mcreator.blackbox.init.BlackboxModMenus;
+import net.mcreator.blackbox.util.FarmEnvironment;
 
 import java.util.function.Supplier;
 import java.util.Map;
@@ -89,14 +90,14 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Blackbo
 				}
 			}
 		}
-		this.customSlots.put(0, this.addSlot(new SlotItemHandler(internal, 0, 16, 44) {
+		this.customSlots.put(0, this.addSlot(new SlotItemHandler(internal, 0, 44, 27) {
 			private final int slot = 0;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
 			public boolean mayPickup(Player entity) {
-				return false;
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
 			}
 
 			@Override
@@ -104,90 +105,135 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Blackbo
 				return false;
 			}
 		}));
-		this.customSlots.put(1, this.addSlot(new SlotItemHandler(internal, 1, 7, 8) {
+		this.customSlots.put(1, this.addSlot(new SlotItemHandler(internal, 1, 62, 27) {
 			private final int slot = 1;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(2, this.addSlot(new SlotItemHandler(internal, 2, 25, 8) {
+		this.customSlots.put(2, this.addSlot(new SlotItemHandler(internal, 2, 80, 27) {
 			private final int slot = 2;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(3, this.addSlot(new SlotItemHandler(internal, 3, 43, 8) {
+		this.customSlots.put(3, this.addSlot(new SlotItemHandler(internal, 3, 98, 27) {
 			private final int slot = 3;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(4, this.addSlot(new SlotItemHandler(internal, 4, 61, 8) {
+		this.customSlots.put(4, this.addSlot(new SlotItemHandler(internal, 4, 116, 27) {
 			private final int slot = 4;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(5, this.addSlot(new SlotItemHandler(internal, 5, 79, 8) {
+		this.customSlots.put(5, this.addSlot(new SlotItemHandler(internal, 5, 44, 45) {
 			private final int slot = 5;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(6, this.addSlot(new SlotItemHandler(internal, 6, 97, 8) {
+		this.customSlots.put(6, this.addSlot(new SlotItemHandler(internal, 6, 62, 45) {
 			private final int slot = 6;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(7, this.addSlot(new SlotItemHandler(internal, 7, 115, 8) {
+		this.customSlots.put(7, this.addSlot(new SlotItemHandler(internal, 7, 80, 45) {
 			private final int slot = 7;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
-			public boolean mayPlace(ItemStack stack) {
-				return false;
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
 			}
-		}));
-		this.customSlots.put(8, this.addSlot(new SlotItemHandler(internal, 8, 133, 8) {
-			private final int slot = 8;
-			private int x = OutputBlockGUIMenu.this.x;
-			private int y = OutputBlockGUIMenu.this.y;
 
 			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return false;
 			}
 		}));
-		this.customSlots.put(9, this.addSlot(new SlotItemHandler(internal, 9, 151, 8) {
+		this.customSlots.put(8, this.addSlot(new SlotItemHandler(internal, 8, 98, 45) {
+			private final int slot = 8;
+			private int x = OutputBlockGUIMenu.this.x;
+			private int y = OutputBlockGUIMenu.this.y;
+
+			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
+
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return false;
+			}
+		}));
+		this.customSlots.put(9, this.addSlot(new SlotItemHandler(internal, 9, 116, 45) {
 			private final int slot = 9;
 			private int x = OutputBlockGUIMenu.this.x;
 			private int y = OutputBlockGUIMenu.this.y;
+
+			@Override
+			public boolean mayPickup(Player entity) {
+				return OutputBlockGUIMenu.this.canPlayerExtract(entity);
+			}
 
 			@Override
 			public boolean mayPlace(ItemStack stack) {
@@ -216,6 +262,9 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Blackbo
 
 	@Override
 	public ItemStack quickMoveStack(Player playerIn, int index) {
+		if (index < 10 && !this.canPlayerExtract(playerIn)) {
+			return ItemStack.EMPTY;
+		}
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = (Slot) this.slots.get(index);
 		if (slot != null && slot.hasItem()) {
@@ -246,6 +295,10 @@ public class OutputBlockGUIMenu extends AbstractContainerMenu implements Blackbo
 			slot.onTake(playerIn, itemstack1);
 		}
 		return itemstack;
+	}
+
+	private boolean canPlayerExtract(Player player) {
+		return FarmEnvironment.isFarmDimension(player.level().dimension());
 	}
 
 	@Override
