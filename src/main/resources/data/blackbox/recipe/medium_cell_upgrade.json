@@ -2,14 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "ICI",
-    "CAC",
-    "ICI"
+    "C C",
+    " R ",
+    "C C"
   ],
   "key": {
-    "I": { "item": "minecraft:iron_ingot" },
     "C": { "item": "minecraft:copper_ingot" },
-    "A": { "item": "minecraft:amethyst_shard" }
+    "R": { "item": "minecraft:redstone" }
   },
   "result": { "id": "blackbox:medium_cell_upgrade", "count": 1 }
 }

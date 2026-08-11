@@ -16,7 +16,7 @@ BlackBox is an experimental NeoForge mod for moving automated farms out of perma
 ## How It Works
 
 1. Place a Dimensional Workbench and insert a Dimension Core.
-2. Choose a 1x1, 2x2 or 3x3 chunk cell before the core's first visit.
+2. Use the free 1x1 chunk cell or apply an affordable 2x2/3x3 Cell Upgrade before the core's first visit.
 3. Build the farm in the isolated cell and connect its resources through the Farm Input and Farm Output.
 4. Leave the cell when the farm is ready. Building time is never measured.
 5. After a hidden warmup period, the configured measurement window records the cell's net item, fluid and energy balance.
@@ -29,7 +29,8 @@ Moving a pre-filled chest through hoppers does not create free resources: BlackB
 ### Isolated Farm Cells
 
 - Every assigned Dimension Core receives a persistent UUID and a separate farm cell.
-- Selectable 1x1, 2x2 and 3x3 chunk sizes use increasingly expensive, but deliberately affordable, upgrades.
+- Every core starts with a 1x1 chunk cell and needs no size item.
+- The 2x2 upgrade costs only four copper ingots and one redstone; the 3x3 upgrade is crafted from two 2x2 upgrades.
 - A cell has one Dimensional Bedrock layer at Y=0. Unselected surrounding chunks have no floor.
 - Placement and breaking are restricted to the core's exact cell.
 - Farm Input and Farm Output ports are created automatically.
@@ -83,12 +84,12 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 ### Upgrades
 
 Core upgrades and machine upgrades have separate visual forms and tooltip categories.
+Recipes are intentionally affordable because upgrades reduce server load rather than increase farm output. The Nether Environment Upgrade therefore uses a compass, netherrack and Nether Wart instead of a rarer combat resource.
 
 | Upgrade | Target | Effect |
 | --- | --- | --- |
-| Compact Cell | New core | Selects a 1x1 chunk cell |
-| Medium Cell | New core | Selects a 2x2 chunk cell |
-| Large Cell | New core | Selects a 3x3 chunk cell |
+| 2x2 Cell | New core | Expands the default cell to 2x2 chunks |
+| 3x3 Cell | New core | Crafted from two 2x2 upgrades and expands the cell to 3x3 chunks |
 | Standard Environment | New core | Selects the neutral environment |
 | Overworld Environment | New core | Selects Overworld properties |
 | Nether Environment | New core | Selects Nether properties |
@@ -142,7 +143,7 @@ All craftable BlackBox content uses standard Minecraft JSON recipes, so JEI and 
 
 1. Craft a Dimensional Workbench, Dimension Core, both farm ports and the Handbook.
 2. Insert the core, enter a farm name and choose its access mode.
-3. Optionally apply cell-size, environment and mob-spawn upgrades before the first visit.
+3. Optionally apply a 2x2/3x3 cell, environment or mob-spawn upgrade before the first visit.
 4. Enter the cell and build the farm.
 5. Feed external resources through the blue Farm Input and route products into the green Farm Output.
 6. Leave through Dimensional Bedrock and wait for measurement to finish.

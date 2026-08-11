@@ -1,15 +1,9 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "misc",
-  "pattern": [
-    "IGI",
-    "GAG",
-    "IGI"
+  "ingredients": [
+    { "item": "blackbox:medium_cell_upgrade" },
+    { "item": "blackbox:medium_cell_upgrade" }
   ],
-  "key": {
-    "I": { "item": "minecraft:iron_ingot" },
-    "G": { "item": "minecraft:gold_ingot" },
-    "A": { "item": "minecraft:amethyst_shard" }
-  },
   "result": { "id": "blackbox:large_cell_upgrade", "count": 1 }
 }

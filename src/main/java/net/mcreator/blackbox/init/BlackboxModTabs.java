@@ -44,7 +44,6 @@ public class BlackboxModTabs {
 				tabData.accept(BlackboxModItems.END_ENVIRONMENT_UPGRADE.get());
 				tabData.accept(BlackboxModItems.STABILITY_UPGRADE.get());
 				tabData.accept(BlackboxModItems.MOB_SPAWN_UPGRADE.get());
-				tabData.accept(BlackboxModItems.COMPACT_CELL_UPGRADE.get());
 				tabData.accept(BlackboxModItems.MEDIUM_CELL_UPGRADE.get());
 				tabData.accept(BlackboxModItems.LARGE_CELL_UPGRADE.get());
 				tabData.accept(BlackboxModItems.BLUEPRINT.get());
