@@ -56,6 +56,7 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 - NeoForge fluid and energy capabilities are included in the resource balance.
 - Persistent consumed mobs are recorded as inputs. Natural mobs and spawner mobs with a remaining spawner are excluded.
 - The Farm Input imports items, fluids and FE from the workbench; every Farm Output exports all three resource types back to it.
+- Measurement output is compressed into a persistent workbench buffer whenever visible item slots, fluid tanks or the FE store are full, so a farm never stops being recorded because of output capacity.
 - Item production timestamps are stored so a normal Blackbox can replay peaks and quiet periods.
 - Active measurements and their snapshots survive server restarts.
 - Farm and workbench chunks use persistent, fully ticking NeoForge tickets only while a measurement is active.
@@ -184,7 +185,13 @@ Linux or macOS build:
 ./gradlew --no-problems-report build
 ```
 
-The generated JAR is written to `build/libs/`.
+The generated development JAR is written to `build/libs/BlackBox-1.0.jar`.
+
+### Lunar Client Testing
+
+BlackBox uses standard NeoForge 1.21.1 APIs and has no additional client-side dependencies. For Lunar Client, create or select a Minecraft 1.21.1 profile using NeoForge 21.1.190 or newer, then install `BlackBox-1.0.jar` through that profile's Mods page. Lunar Features may stay enabled; disable them in the profile only when isolating a compatibility problem.
+
+A separately packaged and validated server release will be prepared during the final release phase.
 
 ## Development
 

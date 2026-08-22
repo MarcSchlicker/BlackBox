@@ -17,6 +17,7 @@ public final class WorkbenchRuntime {
 		if (!(level.getBlockEntity(pos) instanceof DimensionalWorkbenchBlockEntity workbench)) {
 			return;
 		}
+		workbench.measurementOutputBuffer().flushInto(workbench);
 		ItemStack core = workbench.getItem(FarmSimulationMachine.CORE_SLOT);
 		if (FarmDimensionRuntime.isSimulationPaused(level.getServer(), core)) {
 			return;

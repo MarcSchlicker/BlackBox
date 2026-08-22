@@ -603,30 +603,39 @@ public final class FarmDimensionRuntime {
 					continue;
 				}
 				ItemStack template = stored.copyWithCount(1);
-				int moved = insertIntoWorkbench(workbench, stored.copy());
-				if (moved <= 0) {
-					continue;
+				int total = stored.getCount();
+				int inserted = insertIntoWorkbench(workbench, stored.copy());
+				int buffered = total - inserted;
+				if (buffered > 0) {
+					workbench.measurementOutputBuffer().addItem(template, buffered);
 				}
-				stored.shrink(moved);
-				if (stored.isEmpty()) {
-					output.setItem(slot, ItemStack.EMPTY);
-				} else {
-					output.setChanged();
-				}
+				output.setItem(slot, ItemStack.EMPTY);
 				if (measurement.isSampling()) {
-					measurement.exportedSinceBaseline.items.add(template, moved);
+					measurement.exportedSinceBaseline.items.add(template, total);
 				}
 			}
+			List<FluidStack> fluidTypes = new ArrayList<>();
 			for (int tank = 0; tank < output.fluidStorage().getTanks(); tank++) {
 				FluidStack template = output.fluidStorage().getFluidInTank(tank).copy();
-				long moved = moveFluid(output.fluidStorage(), workbench.resources().outputFluids(), template, template.getAmount());
-				if (moved > 0 && measurement.isSampling()) {
-					measurement.exportedSinceBaseline.fluids.add(template, moved);
+				if (!template.isEmpty() && fluidTypes.stream().noneMatch(existing -> FluidStack.isSameFluidSameComponents(existing, template))) {
+					fluidTypes.add(template.copyWithAmount(1));
 				}
 			}
-			int movedEnergy = moveEnergy(output.energyStorage(), workbench.resources().outputEnergy());
-			if (movedEnergy > 0 && measurement.isSampling()) {
-				measurement.exportedSinceBaseline.energy += movedEnergy;
+			for (FluidStack template : fluidTypes) {
+				long total = output.fluidStorage().amountOf(template);
+				long inserted = moveFluid(output.fluidStorage(), workbench.resources().outputFluids(), template,
+						(int) Math.min(Integer.MAX_VALUE, total));
+				long buffered = output.fluidStorage().drainLong(template, total - inserted, IFluidHandler.FluidAction.EXECUTE);
+				workbench.measurementOutputBuffer().addFluid(template, buffered);
+				if (measurement.isSampling()) {
+					measurement.exportedSinceBaseline.fluids.add(template, inserted + buffered);
+				}
+			}
+			int insertedEnergy = moveEnergy(output.energyStorage(), workbench.resources().outputEnergy());
+			int bufferedEnergy = output.energyStorage().extractEnergy(Integer.MAX_VALUE, false);
+			workbench.measurementOutputBuffer().addEnergy(bufferedEnergy);
+			if (measurement.isSampling()) {
+				measurement.exportedSinceBaseline.energy += (long) insertedEnergy + bufferedEnergy;
 			}
 			output.setChanged();
 		}

@@ -94,7 +94,7 @@
   "gui.blackbox.handbook.page.0.tip": "Entering an active farm cancels its measurement and opens it for editing.",
   "gui.blackbox.handbook.page.1.title": "Connect Resources",
   "gui.blackbox.handbook.page.1.body": "Blue Farm Inputs receive items, fluids and energy from the workbench. Green Farm Outputs return products automatically. You may place several Outputs; all of them are collected and measured together.",
-  "gui.blackbox.handbook.page.1.tip": "Output contents remain in place whenever the workbench has no free capacity.",
+  "gui.blackbox.handbook.page.1.tip": "Full workbench outputs use a persistent buffer, so recording continues without losing resources.",
   "gui.blackbox.handbook.page.2.title": "Record Production",
   "gui.blackbox.handbook.page.2.body": "Leave through dimensional bedrock when the farm is ready. After internal preparation, every inventory, tank, energy store, Output and persistent mob is compared for the configured measurement duration.",
   "gui.blackbox.handbook.page.2.tip": "The farm chunks stay ticking and unfinished measurements survive restarts.",

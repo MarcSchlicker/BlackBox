@@ -20,6 +20,7 @@ import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.util.FarmSimulationMachine;
 import net.mcreator.blackbox.util.FarmResourceStorage;
 import net.mcreator.blackbox.util.MobInputStorage;
+import net.mcreator.blackbox.util.MeasurementOutputBuffer;
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 
 import io.netty.buffer.Unpooled;
@@ -37,6 +38,7 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 	private int calculationTicksRemaining;
 	private final FarmResourceStorage resources = new FarmResourceStorage(this::setChanged);
 	private final MobInputStorage mobInputs = new MobInputStorage(this::setChanged);
+	private final MeasurementOutputBuffer measurementOutputBuffer = new MeasurementOutputBuffer(this::setChanged);
 
 	public DimensionalWorkbenchBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.DIMENSIONAL_WORKBENCH.get(), position, state);
@@ -55,6 +57,7 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		this.calculationTicksRemaining = tag.getInt("CalculationTicksRemaining");
 		this.resources.load(tag, lookupProvider);
 		this.mobInputs.load(tag.getList("MobInputs", net.minecraft.nbt.Tag.TAG_COMPOUND));
+		this.measurementOutputBuffer.load(tag.getCompound("MeasurementOutputBuffer"), lookupProvider);
 	}
 
 	@Override
@@ -69,6 +72,7 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		tag.putInt("CalculationTicksRemaining", this.calculationTicksRemaining);
 		this.resources.save(tag, lookupProvider);
 		tag.put("MobInputs", this.mobInputs.save());
+		tag.put("MeasurementOutputBuffer", this.measurementOutputBuffer.save(lookupProvider));
 	}
 
 	@Override
@@ -200,5 +204,9 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 	@Override
 	public MobInputStorage mobInputs() {
 		return this.mobInputs;
+	}
+
+	public MeasurementOutputBuffer measurementOutputBuffer() {
+		return this.measurementOutputBuffer;
 	}
 }

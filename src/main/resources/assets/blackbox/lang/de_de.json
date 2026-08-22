@@ -94,7 +94,7 @@
   "gui.blackbox.handbook.page.0.tip": "Das Betreten einer aktiven Farm beendet ihre Messung und öffnet den Baumodus.",
   "gui.blackbox.handbook.page.1.title": "Ressourcen anschließen",
   "gui.blackbox.handbook.page.1.body": "Blaue Farm-Inputs erhalten Items, Flüssigkeiten und Energie von der Werkbank. Grüne Farm-Outputs führen Produkte zurück. Mehrere Outputs sind erlaubt; sie werden gemeinsam geleert und gemessen.",
-  "gui.blackbox.handbook.page.1.tip": "Ohne freie Werkbankslots bleibt der Inhalt sicher im jeweiligen Output.",
+  "gui.blackbox.handbook.page.1.tip": "Volle Werkbankausgaben nutzen einen dauerhaften Puffer; die Messung läuft verlustfrei weiter.",
   "gui.blackbox.handbook.page.2.title": "Produktion messen",
   "gui.blackbox.handbook.page.2.body": "Verlasse die fertige Farm über das Dimensionsgrundgestein. Nach interner Vorbereitung werden Inventare, Tanks, Energie, Outputs und beständige Mobs für die eingestellte Dauer verglichen.",
   "gui.blackbox.handbook.page.2.tip": "Farmchunks ticken weiter; unfertige Messungen überleben Serverneustarts.",
