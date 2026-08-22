@@ -9,6 +9,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -34,10 +35,6 @@ public class ToolTipDimCoreProcedure {
 	}
 
 	private static void addTooltip(ItemStack core, List<Component> tooltip, HolderLookup.Provider lookupProvider) {
-		String farmName = FarmCoreData.getFarmName(core);
-		if (!farmName.isEmpty()) {
-			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.name", farmName).withStyle(ChatFormatting.AQUA));
-		}
 		FarmCoreData.getCoreId(core).ifPresent(id -> tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.id", id.toString().substring(0, 8)).withStyle(ChatFormatting.DARK_GRAY)));
 		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.environment." + FarmCoreData.getEnvironment(core).id()).withStyle(ChatFormatting.GRAY));
 		int size = FarmCoreData.getCellSizeChunks(core);
@@ -54,7 +51,7 @@ public class ToolTipDimCoreProcedure {
 			return;
 		}
 
-		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.summary", recipe.inputs().size(), recipe.outputs().size(), recipe.fluidInputs().size(), recipe.fluidOutputs().size()).withStyle(ChatFormatting.GREEN));
+		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.summary", recipe.inputs().size(), recipe.outputs().size(), recipe.entityInputs().size(), recipe.fluidInputs().size(), recipe.fluidOutputs().size()).withStyle(ChatFormatting.GREEN));
 		if (!Screen.hasShiftDown()) {
 			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.hold_shift").withStyle(ChatFormatting.DARK_GRAY));
 			return;
@@ -75,6 +72,13 @@ public class ToolTipDimCoreProcedure {
 		if (!recipe.fluidInputs().isEmpty()) {
 			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.fluid_inputs_per_minute").withStyle(ChatFormatting.YELLOW));
 			addFluidEntries(tooltip, recipe.fluidInputs(), recipe.sampleTicks());
+		}
+		if (!recipe.entityInputs().isEmpty()) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.mob_inputs_per_cycle").withStyle(ChatFormatting.LIGHT_PURPLE));
+			for (FarmCoreData.EntityAmount entry : recipe.entityInputs()) {
+				var entityType = BuiltInRegistries.ENTITY_TYPE.get(entry.entityType());
+				tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.mob_entry", entry.amount(), entityType.getDescription()).withStyle(ChatFormatting.GRAY));
+			}
 		}
 		if (!recipe.fluidOutputs().isEmpty()) {
 			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.fluid_outputs_per_minute").withStyle(ChatFormatting.AQUA));

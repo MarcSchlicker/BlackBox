@@ -12,12 +12,15 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
+import net.neoforged.neoforge.common.world.chunk.TicketController;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -27,13 +30,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.TicketType;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 
 import net.mcreator.blackbox.block.entity.DimensionalWorkbenchBlockEntity;
 import net.mcreator.blackbox.block.entity.InputblockBlockEntity;
@@ -43,11 +47,12 @@ import net.mcreator.blackbox.init.BlackboxModBlocks;
 import net.mcreator.blackbox.init.BlackboxModItems;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,10 +71,16 @@ public final class FarmDimensionRuntime {
 	private static final String DATA_RETURN_Z = "BlackboxReturnZ";
 	private static final String DATA_FARM_DIMENSION = "BlackboxFarmDimension";
 	private static final Map<UUID, FarmMeasurement> ACTIVE_MEASUREMENTS = new HashMap<>();
-	private static final TicketType<UUID> MEASUREMENT_TICKET = TicketType.create("blackbox:farm_measurement", Comparator.<UUID>naturalOrder());
+	private static final Set<UUID> EDITING_CORES = new HashSet<>();
+	private static final TicketController MEASUREMENT_TICKETS = new TicketController(
+			ResourceLocation.fromNamespaceAndPath("blackbox", "farm_measurement"));
 	private static MinecraftServer loadedServer;
 
 	private FarmDimensionRuntime() {
+	}
+
+	public static void registerTicketController(RegisterTicketControllersEvent event) {
+		event.register(MEASUREMENT_TICKETS);
 	}
 
 	public static FarmCell enterFarmDimension(ServerPlayer player, ServerLevel farmLevel, BlockPos workbenchPos, ResourceKey<Level> workbenchDimension) {
@@ -100,7 +111,11 @@ public final class FarmDimensionRuntime {
 		if (runningMeasurement != null) {
 			cancelMeasurement(player.server, runningMeasurement, true);
 			player.sendSystemMessage(Component.translatable("message.blackbox.measurement.cancelled_for_editing").withStyle(ChatFormatting.YELLOW));
+		} else if (FarmCoreData.isProgrammed(core)) {
+			FarmCoreData.clearProfile(core, farmLevel.registryAccess());
+			modifiable.setStackInSlot(coreSlot, core);
 		}
+		EDITING_CORES.add(coreId);
 
 		FarmCell cell = FarmCell.fromCoreId(coreId, cellSize);
 		CompoundTag data = player.getPersistentData();
@@ -184,8 +199,9 @@ public final class FarmDimensionRuntime {
 		return FarmCoreData.getEnvironment(workbench.getStackInSlot(coreSlot)).dimension();
 	}
 
-	public static boolean isMeasurementActive(ItemStack core) {
-		return FarmCoreData.getCoreId(core).map(ACTIVE_MEASUREMENTS::containsKey).orElse(false);
+	public static boolean isSimulationPaused(MinecraftServer server, ItemStack core) {
+		ensureMeasurementsLoaded(server);
+		return FarmCoreData.getCoreId(core).map(coreId -> ACTIVE_MEASUREMENTS.containsKey(coreId) || EDITING_CORES.contains(coreId)).orElse(false);
 	}
 
 	public static List<FarmWorldData.FarmRecord> farmRecords(MinecraftServer server) {
@@ -221,6 +237,7 @@ public final class FarmDimensionRuntime {
 	public static boolean deleteFarmCell(MinecraftServer server, UUID coreId) {
 		ensureMeasurementsLoaded(server);
 		FarmMeasurement running = ACTIVE_MEASUREMENTS.remove(coreId);
+		EDITING_CORES.remove(coreId);
 		if (running != null) {
 			cancelMeasurement(server, running, false);
 		}
@@ -292,6 +309,7 @@ public final class FarmDimensionRuntime {
 		}
 		setMeasurementTickets(player.server, measurement, true);
 		ACTIVE_MEASUREMENTS.put(measurement.cell.coreId(), measurement);
+		EDITING_CORES.remove(measurement.cell.coreId());
 		setWorkbenchCalculationState(player.server, measurement, 1, 0);
 		persistMeasurements(player.server);
 		player.sendSystemMessage(Component.translatable("message.blackbox.measurement.started_after_exit").withStyle(ChatFormatting.YELLOW));
@@ -324,11 +342,14 @@ public final class FarmDimensionRuntime {
 				measurement.lastTimelineSnapshot = measurement.baseline.items.copy();
 				measurement.importedSinceBaseline = new ResourceSnapshot();
 				measurement.exportedSinceBaseline = new ResourceSnapshot();
+				measurement.mobSamples.clear();
+				measurement.mobSamples.add(measurement.baseline.entities.copy());
 				setWorkbenchCalculationState(server, measurement, 2, measurement.sampleTicks);
 				notifyOwner(server, measurement, Component.translatable("message.blackbox.measurement.scanning_ports").withStyle(ChatFormatting.AQUA));
 			}
 			if (measurement.elapsedTicks > measurement.warmupTicks && measurement.elapsedTicks % 20 == 0) {
 				recordProductionTimeline(farmLevel, measurement);
+				recordMobSample(farmLevel, measurement);
 			}
 			if (measurement.elapsedTicks >= measurement.totalTicks()) {
 				finishMeasurement(server, farmLevel, measurement);
@@ -364,6 +385,7 @@ public final class FarmDimensionRuntime {
 	public static void onServerStopped(ServerStoppedEvent event) {
 		if (loadedServer == event.getServer()) {
 			ACTIVE_MEASUREMENTS.clear();
+			EDITING_CORES.clear();
 			loadedServer = null;
 		}
 	}
@@ -379,15 +401,16 @@ public final class FarmDimensionRuntime {
 		List<FarmCoreData.FluidAmount> fluidOutputs = increased(available.fluids, finished.fluids);
 		long energyInput = Math.max(0, available.energy - finished.energy);
 		long energyOutput = Math.max(0, finished.energy - available.energy);
+		List<FarmCoreData.EntityAmount> entityInputs = stableEntityInputs(measurement.baseline.entities, measurement.mobSamples);
 		List<FarmCoreData.ProductionEvent> timeline = normalizeTimeline(measurement.productionTimeline, outputs, measurement.sampleTicks);
 		boolean hasOutput = !outputs.isEmpty() || !fluidOutputs.isEmpty() || energyOutput > 0;
-		boolean saved = hasOutput && writeSampleToWorkbench(server, measurement, inputs, outputs, timeline, fluidInputs, fluidOutputs, energyInput, energyOutput);
+		boolean saved = hasOutput && writeSampleToWorkbench(server, measurement, inputs, outputs, timeline, entityInputs, fluidInputs, fluidOutputs, energyInput, energyOutput);
 		if (!hasOutput) {
 			notifyOwner(server, measurement, Component.translatable("message.blackbox.measurement.no_output_port").withStyle(ChatFormatting.RED));
 		} else if (!saved) {
 			notifyOwner(server, measurement, Component.translatable("message.blackbox.measurement.no_matching_core").withStyle(ChatFormatting.RED));
 		} else {
-			notifyOwner(server, measurement, Component.translatable("message.blackbox.measurement.saved_resources", inputs.size(), outputs.size(), fluidInputs.size(), fluidOutputs.size(), energyInput, energyOutput)
+			notifyOwner(server, measurement, Component.translatable("message.blackbox.measurement.saved_resources", inputs.size(), outputs.size(), entityInputs.size(), fluidInputs.size(), fluidOutputs.size(), energyInput, energyOutput)
 					.withStyle(ChatFormatting.GREEN));
 		}
 		FarmMobSpawnRules.clearCell(farmLevel, measurement.cell);
@@ -455,6 +478,20 @@ public final class FarmDimensionRuntime {
 				}
 			}
 		}
+		boolean activeSpawnerExists = false;
+		for (int chunkX = cell.minChunkX(); chunkX <= cell.maxChunkX() && !activeSpawnerExists; chunkX++) {
+			for (int chunkZ = cell.minChunkZ(); chunkZ <= cell.maxChunkZ() && !activeSpawnerExists; chunkZ++) {
+				activeSpawnerExists = level.getChunk(chunkX, chunkZ).getBlockEntities().values().stream()
+						.anyMatch(blockEntity -> cell.contains(blockEntity.getBlockPos())
+								&& (blockEntity.getBlockState().is(Blocks.SPAWNER) || blockEntity.getBlockState().is(Blocks.TRIAL_SPAWNER)));
+			}
+		}
+		AABB bounds = new AABB(cell.minBlockX(), level.getMinBuildHeight(), cell.minBlockZ(),
+				cell.maxBlockX() + 1.0D, level.getMaxBuildHeight(), cell.maxBlockZ() + 1.0D);
+		boolean spawnerExists = activeSpawnerExists;
+		for (Mob mob : level.getEntitiesOfClass(Mob.class, bounds, entity -> FarmMobAccounting.shouldCount(entity, spawnerExists))) {
+			result.entities.add(BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()), 1);
+		}
 		return result;
 	}
 
@@ -503,7 +540,7 @@ public final class FarmDimensionRuntime {
 	}
 
 	private static boolean writeSampleToWorkbench(MinecraftServer server, FarmMeasurement measurement, List<FarmCoreData.StackAmount> inputs,
-			List<FarmCoreData.StackAmount> outputs, List<FarmCoreData.ProductionEvent> timeline, List<FarmCoreData.FluidAmount> fluidInputs,
+			List<FarmCoreData.StackAmount> outputs, List<FarmCoreData.ProductionEvent> timeline, List<FarmCoreData.EntityAmount> entityInputs, List<FarmCoreData.FluidAmount> fluidInputs,
 			List<FarmCoreData.FluidAmount> fluidOutputs, long energyInput, long energyOutput) {
 		DimensionalWorkbenchBlockEntity workbench = getWorkbenchBlockEntity(server, measurement);
 		if (workbench == null) {
@@ -515,7 +552,7 @@ public final class FarmDimensionRuntime {
 				continue;
 			}
 			ItemStack core = stored.copyWithCount(1);
-			FarmCoreData.write(core, workbench.getLevel().registryAccess(), inputs, outputs, timeline, fluidInputs, fluidOutputs, energyInput, energyOutput,
+			FarmCoreData.write(core, workbench.getLevel().registryAccess(), inputs, outputs, timeline, entityInputs, fluidInputs, fluidOutputs, energyInput, energyOutput,
 					measurement.warmupTicks, measurement.sampleTicks);
 			workbench.setItem(slot, core);
 			workbench.setActiveCoreId(measurement.cell.coreId().toString());
@@ -555,45 +592,60 @@ public final class FarmDimensionRuntime {
 	}
 
 	private static void transferFarmOutput(MinecraftServer server, ServerLevel farmLevel, FarmMeasurement measurement) {
-		if (!(farmLevel.getBlockEntity(measurement.cell.outputPos()) instanceof OutputBlockBlockEntity output)) {
-			return;
-		}
 		DimensionalWorkbenchBlockEntity workbench = getWorkbenchBlockEntity(server, measurement);
 		if (workbench == null) {
 			return;
 		}
-		for (int slot = 0; slot < output.getContainerSize(); slot++) {
-			ItemStack stored = output.getItem(slot);
-			if (stored.isEmpty()) {
-				continue;
+		for (OutputBlockBlockEntity output : outputPorts(farmLevel, measurement.cell)) {
+			for (int slot = 0; slot < output.getContainerSize(); slot++) {
+				ItemStack stored = output.getItem(slot);
+				if (stored.isEmpty()) {
+					continue;
+				}
+				ItemStack template = stored.copyWithCount(1);
+				int moved = insertIntoWorkbench(workbench, stored.copy());
+				if (moved <= 0) {
+					continue;
+				}
+				stored.shrink(moved);
+				if (stored.isEmpty()) {
+					output.setItem(slot, ItemStack.EMPTY);
+				} else {
+					output.setChanged();
+				}
+				if (measurement.isSampling()) {
+					measurement.exportedSinceBaseline.items.add(template, moved);
+				}
 			}
-			ItemStack template = stored.copyWithCount(1);
-			int moved = insertIntoWorkbench(workbench, stored.copy());
-			if (moved <= 0) {
-				continue;
+			for (int tank = 0; tank < output.fluidStorage().getTanks(); tank++) {
+				FluidStack template = output.fluidStorage().getFluidInTank(tank).copy();
+				long moved = moveFluid(output.fluidStorage(), workbench.resources().outputFluids(), template, template.getAmount());
+				if (moved > 0 && measurement.isSampling()) {
+					measurement.exportedSinceBaseline.fluids.add(template, moved);
+				}
 			}
-			stored.shrink(moved);
-			if (stored.isEmpty()) {
-				output.setItem(slot, ItemStack.EMPTY);
-			} else {
-				output.setChanged();
+			int movedEnergy = moveEnergy(output.energyStorage(), workbench.resources().outputEnergy());
+			if (movedEnergy > 0 && measurement.isSampling()) {
+				measurement.exportedSinceBaseline.energy += movedEnergy;
 			}
-			if (measurement.isSampling()) {
-				measurement.exportedSinceBaseline.items.add(template, moved);
-			}
-		}
-		for (int tank = 0; tank < output.fluidStorage().getTanks(); tank++) {
-			FluidStack template = output.fluidStorage().getFluidInTank(tank).copy();
-			long moved = moveFluid(output.fluidStorage(), workbench.resources().outputFluids(), template, template.getAmount());
-			if (moved > 0 && measurement.isSampling()) {
-				measurement.exportedSinceBaseline.fluids.add(template, moved);
-			}
-		}
-		int movedEnergy = moveEnergy(output.energyStorage(), workbench.resources().outputEnergy());
-		if (movedEnergy > 0 && measurement.isSampling()) {
-			measurement.exportedSinceBaseline.energy += movedEnergy;
+			output.setChanged();
 		}
 		workbench.setChanged();
+	}
+
+	private static List<OutputBlockBlockEntity> outputPorts(ServerLevel level, FarmCell cell) {
+		List<OutputBlockBlockEntity> outputs = new ArrayList<>();
+		for (int chunkX = cell.minChunkX(); chunkX <= cell.maxChunkX(); chunkX++) {
+			for (int chunkZ = cell.minChunkZ(); chunkZ <= cell.maxChunkZ(); chunkZ++) {
+				for (BlockEntity blockEntity : level.getChunk(chunkX, chunkZ).getBlockEntities().values()) {
+					if (blockEntity instanceof OutputBlockBlockEntity output && cell.contains(output.getBlockPos())) {
+						outputs.add(output);
+					}
+				}
+			}
+		}
+		outputs.sort(java.util.Comparator.comparingLong(output -> output.getBlockPos().asLong()));
+		return outputs;
 	}
 
 	private static void transferWorkbenchInput(MinecraftServer server, ServerLevel farmLevel, FarmMeasurement measurement) {
@@ -676,6 +728,33 @@ public final class FarmDimensionRuntime {
 			measurement.productionTimeline.add(new FarmCoreData.ProductionEvent(measurement.elapsedTicks - measurement.warmupTicks, produced));
 		}
 		measurement.lastTimelineSnapshot = current;
+	}
+
+	private static void recordMobSample(ServerLevel farmLevel, FarmMeasurement measurement) {
+		measurement.mobSamples.add(scanCellResources(farmLevel, measurement.cell).entities.copy());
+		while (measurement.mobSamples.size() > 10) {
+			measurement.mobSamples.remove(0);
+		}
+	}
+
+	private static List<FarmCoreData.EntityAmount> stableEntityInputs(MeasuredEntities baseline, List<MeasuredEntities> samples) {
+		List<FarmCoreData.EntityAmount> result = new ArrayList<>();
+		for (FarmCoreData.EntityAmount entry : baseline.entries()) {
+			if (samples.isEmpty()) {
+				continue;
+			}
+			List<Long> counts = new ArrayList<>();
+			for (MeasuredEntities sample : samples) {
+				counts.add(sample.amountOf(entry.entityType()));
+			}
+			counts.sort(Long::compareTo);
+			long stableFinalCount = counts.get(counts.size() / 2);
+			long consumed = entry.amount() - stableFinalCount;
+			if (consumed > 0) {
+				result.add(new FarmCoreData.EntityAmount(entry.entityType(), consumed));
+			}
+		}
+		return result;
 	}
 
 	private static List<FarmCoreData.ProductionEvent> normalizeTimeline(List<FarmCoreData.ProductionEvent> measured,
@@ -844,11 +923,7 @@ public final class FarmDimensionRuntime {
 		ServerLevel workbenchLevel = dimensionId == null ? null : server.getLevel(ResourceKey.create(Registries.DIMENSION, dimensionId));
 		if (workbenchLevel != null) {
 			ChunkPos chunkPos = new ChunkPos(measurement.workbenchPos);
-			if (loaded) {
-				workbenchLevel.getChunkSource().addRegionTicket(MEASUREMENT_TICKET, chunkPos, 2, measurement.cell.coreId(), true);
-			} else {
-				workbenchLevel.getChunkSource().removeRegionTicket(MEASUREMENT_TICKET, chunkPos, 2, measurement.cell.coreId(), true);
-			}
+			MEASUREMENT_TICKETS.forceChunk(workbenchLevel, measurement.cell.coreId(), chunkPos.x, chunkPos.z, loaded, true);
 		}
 	}
 
@@ -856,11 +931,7 @@ public final class FarmDimensionRuntime {
 		for (int chunkX = cell.minChunkX(); chunkX <= cell.maxChunkX(); chunkX++) {
 			for (int chunkZ = cell.minChunkZ(); chunkZ <= cell.maxChunkZ(); chunkZ++) {
 				ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-				if (loaded) {
-					level.getChunkSource().addRegionTicket(MEASUREMENT_TICKET, chunkPos, 0, cell.coreId(), true);
-				} else {
-					level.getChunkSource().removeRegionTicket(MEASUREMENT_TICKET, chunkPos, 0, cell.coreId(), true);
-				}
+				MEASUREMENT_TICKETS.forceChunk(level, cell.coreId(), chunkPos.x, chunkPos.z, loaded, true);
 			}
 		}
 	}
@@ -870,6 +941,7 @@ public final class FarmDimensionRuntime {
 			return;
 		}
 		ACTIVE_MEASUREMENTS.clear();
+		EDITING_CORES.clear();
 		loadedServer = server;
 		for (Tag entry : FarmWorldData.get(server).measurements()) {
 			if (!(entry instanceof CompoundTag tag)) {
@@ -950,6 +1022,7 @@ public final class FarmDimensionRuntime {
 		private ResourceSnapshot exportedSinceBaseline = new ResourceSnapshot();
 		private MeasuredItems lastTimelineSnapshot = new MeasuredItems();
 		private final List<FarmCoreData.ProductionEvent> productionTimeline = new ArrayList<>();
+		private final List<MeasuredEntities> mobSamples = new ArrayList<>();
 
 		private FarmMeasurement(FarmCell cell, UUID owner, BlockPos workbenchPos, String workbenchDimension, String farmDimension, int warmupTicks, int sampleTicks) {
 			this.cell = cell;
@@ -996,6 +1069,13 @@ public final class FarmDimensionRuntime {
 				timeline.add(eventTag);
 			}
 			tag.put("Timeline", timeline);
+			ListTag mobs = new ListTag();
+			for (MeasuredEntities sample : this.mobSamples) {
+				CompoundTag sampleTag = new CompoundTag();
+				sampleTag.put("Entities", sample.save());
+				mobs.add(sampleTag);
+			}
+			tag.put("MobSamples", mobs);
 			return tag;
 		}
 
@@ -1016,6 +1096,10 @@ public final class FarmDimensionRuntime {
 					measurement.productionTimeline.add(new FarmCoreData.ProductionEvent(eventTag.getInt("Tick"),
 							MeasuredItems.load(eventTag.getList("Items", Tag.TAG_COMPOUND), lookupProvider).entries()));
 				}
+				ListTag mobs = tag.getList("MobSamples", Tag.TAG_COMPOUND);
+				for (int index = Math.max(0, mobs.size() - 10); index < mobs.size(); index++) {
+					measurement.mobSamples.add(MeasuredEntities.load(mobs.getCompound(index).getList("Entities", Tag.TAG_COMPOUND)));
+				}
 				return measurement;
 			} catch (IllegalArgumentException exception) {
 				return null;
@@ -1026,11 +1110,13 @@ public final class FarmDimensionRuntime {
 	private static final class ResourceSnapshot {
 		private final MeasuredItems items = new MeasuredItems();
 		private final MeasuredFluids fluids = new MeasuredFluids();
+		private final MeasuredEntities entities = new MeasuredEntities();
 		private long energy;
 
 		private void addAll(ResourceSnapshot other) {
 			this.items.addAll(other.items);
 			this.fluids.addAll(other.fluids);
+			this.entities.addAll(other.entities);
 			this.energy += other.energy;
 		}
 
@@ -1044,6 +1130,7 @@ public final class FarmDimensionRuntime {
 			CompoundTag tag = new CompoundTag();
 			tag.put("Items", this.items.save(lookupProvider));
 			tag.put("Fluids", this.fluids.save(lookupProvider));
+			tag.put("Entities", this.entities.save());
 			tag.putLong("Energy", this.energy);
 			return tag;
 		}
@@ -1052,7 +1139,60 @@ public final class FarmDimensionRuntime {
 			ResourceSnapshot result = new ResourceSnapshot();
 			result.items.addAll(MeasuredItems.load(tag.getList("Items", Tag.TAG_COMPOUND), lookupProvider));
 			result.fluids.addAll(MeasuredFluids.load(tag.getList("Fluids", Tag.TAG_COMPOUND), lookupProvider));
+			result.entities.addAll(MeasuredEntities.load(tag.getList("Entities", Tag.TAG_COMPOUND)));
 			result.energy = Math.max(0, tag.getLong("Energy"));
+			return result;
+		}
+	}
+
+	private static final class MeasuredEntities {
+		private final Map<ResourceLocation, Long> entries = new HashMap<>();
+
+		private void add(ResourceLocation type, long amount) {
+			if (type != null && amount > 0) {
+				this.entries.merge(type, amount, Long::sum);
+			}
+		}
+
+		private void addAll(MeasuredEntities other) {
+			other.entries.forEach(this::add);
+		}
+
+		private MeasuredEntities copy() {
+			MeasuredEntities result = new MeasuredEntities();
+			result.addAll(this);
+			return result;
+		}
+
+		private long amountOf(ResourceLocation type) {
+			return this.entries.getOrDefault(type, 0L);
+		}
+
+		private List<FarmCoreData.EntityAmount> entries() {
+			return this.entries.entrySet().stream()
+					.sorted(Map.Entry.comparingByKey())
+					.map(entry -> new FarmCoreData.EntityAmount(entry.getKey(), entry.getValue()))
+					.toList();
+		}
+
+		private ListTag save() {
+			ListTag list = new ListTag();
+			for (FarmCoreData.EntityAmount entry : entries()) {
+				CompoundTag tag = new CompoundTag();
+				tag.putString("Type", entry.entityType().toString());
+				tag.putLong("Amount", entry.amount());
+				list.add(tag);
+			}
+			return list;
+		}
+
+		private static MeasuredEntities load(ListTag list) {
+			MeasuredEntities result = new MeasuredEntities();
+			for (int index = 0; index < list.size(); index++) {
+				CompoundTag tag = list.getCompound(index);
+				ResourceLocation type = ResourceLocation.tryParse(tag.getString("Type"));
+				result.add(type, tag.getLong("Amount"));
+			}
 			return result;
 		}
 	}

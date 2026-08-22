@@ -29,6 +29,7 @@ import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.init.BlackboxModChunkGenerators;
 import net.mcreator.blackbox.init.BlackboxModCapabilities;
 import net.mcreator.blackbox.config.BlackboxConfig;
+import net.mcreator.blackbox.util.FarmDimensionRuntime;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.Queue;
@@ -51,6 +52,7 @@ public class BlackboxMod {
 		NeoForge.EVENT_BUS.register(this);
 		modEventBus.addListener(this::registerNetworking);
 		modEventBus.addListener(BlackboxModCapabilities::register);
+		modEventBus.addListener(FarmDimensionRuntime::registerTicketController);
 		BlackboxModBlocks.REGISTRY.register(modEventBus);
 		BlackboxModBlockEntities.REGISTRY.register(modEventBus);
 		BlackboxModChunkGenerators.REGISTRY.register(modEventBus);

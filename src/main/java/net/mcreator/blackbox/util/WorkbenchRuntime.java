@@ -18,7 +18,7 @@ public final class WorkbenchRuntime {
 			return;
 		}
 		ItemStack core = workbench.getItem(FarmSimulationMachine.CORE_SLOT);
-		if (FarmDimensionRuntime.isMeasurementActive(core)) {
+		if (FarmDimensionRuntime.isSimulationPaused(level.getServer(), core)) {
 			return;
 		}
 

@@ -23,5 +23,11 @@ public interface FarmSimulationMachine extends Container {
 
 	void setStableCycleFunded(boolean funded);
 
+	long getSimulationCycleSeed();
+
+	void setSimulationCycleSeed(long seed);
+
+	MobInputStorage mobInputs();
+
 	FarmResourceStorage resources();
 }

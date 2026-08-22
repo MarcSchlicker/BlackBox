@@ -27,6 +27,7 @@ import net.mcreator.blackbox.block.entity.DimensionalWorkbenchBlockEntity;
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.util.BlackboxSimulationRuntime;
 import net.mcreator.blackbox.util.WorkbenchRuntime;
+import net.mcreator.blackbox.util.FarmMobTransport;
 
 import io.netty.buffer.Unpooled;
 
@@ -42,6 +43,7 @@ public class DimensionalWorkbenchBlock extends Block implements EntityBlock {
 		}
 		return (tickLevel, pos, tickState, blockEntity) -> {
 			if (tickLevel instanceof ServerLevel serverLevel && tickLevel.getGameTime() % BlackboxSimulationRuntime.TICK_INTERVAL == 0) {
+				FarmMobTransport.checkWorkbench(serverLevel, pos);
 				WorkbenchRuntime.tick(serverLevel, pos);
 			}
 		};

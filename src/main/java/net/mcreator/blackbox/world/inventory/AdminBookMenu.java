@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +21,7 @@ import java.util.List;
 public class AdminBookMenu extends AbstractContainerMenu {
 	public static final int GHOST_SLOT_COUNT = 18;
 	private final SimpleContainer ghostInventory = new SimpleContainer(GHOST_SLOT_COUNT);
+	private final DataSlot measurementSeconds = DataSlot.standalone();
 
 	public AdminBookMenu(int id, Inventory inventory) {
 		this(id, inventory, true);
@@ -32,6 +34,7 @@ public class AdminBookMenu extends AbstractContainerMenu {
 	private AdminBookMenu(int id, Inventory inventory, boolean loadConfig) {
 		super(BlackboxModMenus.ADMIN_BOOK.get(), id);
 		if (loadConfig) {
+			this.measurementSeconds.set(BlackboxConfig.MEASUREMENT_SECONDS.get());
 			int slot = 0;
 			for (Block block : BlackboxConfig.deniedBlocks()) {
 				if (slot >= GHOST_SLOT_COUNT) {
@@ -41,16 +44,25 @@ public class AdminBookMenu extends AbstractContainerMenu {
 			}
 		}
 		for (int slot = 0; slot < GHOST_SLOT_COUNT; slot++) {
-			this.addSlot(new GhostSlot(this.ghostInventory, slot, 8 + (slot % 9) * 18, 33 + (slot / 9) * 18));
+			this.addSlot(new GhostSlot(this.ghostInventory, slot, 8 + (slot % 9) * 18, 77 + (slot / 9) * 18));
 		}
 		for (int row = 0; row < 3; row++) {
 			for (int column = 0; column < 9; column++) {
-				this.addSlot(new Slot(inventory, column + (row + 1) * 9, 8 + column * 18, 88 + row * 18));
+				this.addSlot(new Slot(inventory, column + (row + 1) * 9, 8 + column * 18, 130 + row * 18));
 			}
 		}
 		for (int column = 0; column < 9; column++) {
-			this.addSlot(new Slot(inventory, column, 8 + column * 18, 146));
+			this.addSlot(new Slot(inventory, column, 8 + column * 18, 188));
 		}
+		this.addDataSlot(this.measurementSeconds);
+	}
+
+	public int getMeasurementSeconds() {
+		return this.measurementSeconds.get();
+	}
+
+	public void setMeasurementSeconds(int seconds) {
+		this.measurementSeconds.set(seconds);
 	}
 
 	@Override

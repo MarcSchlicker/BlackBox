@@ -19,7 +19,7 @@ BlackBox is an experimental NeoForge mod for moving automated farms out of perma
 2. Use the free 1x1 chunk cell or apply an affordable 2x2/3x3 Cell Upgrade before the core's first visit.
 3. Build the farm in the isolated cell and connect its resources through the Farm Input and Farm Output.
 4. Leave the cell when the farm is ready. Building time is never measured.
-5. After a hidden warmup period, the configured measurement window records the cell's net item, fluid and energy balance.
+5. After a hidden warmup period, the configured measurement window records the cell's net item, fluid, energy and persistent-mob balance.
 6. The programmed core replays that profile inside the workbench or a separate Blackbox without loading the original farm.
 
 Moving a pre-filled chest through hoppers does not create free resources: BlackBox compares the complete cell at the start and end and subtracts imported resources while adding exported resources.
@@ -33,7 +33,7 @@ Moving a pre-filled chest through hoppers does not create free resources: BlackB
 - The 2x2 upgrade costs only four copper ingots and one redstone; the 3x3 upgrade is crafted from two 2x2 upgrades.
 - A cell has one Dimensional Bedrock layer at Y=0. Unselected surrounding chunks have no floor.
 - Placement and breaking are restricted to the core's exact cell.
-- Farm Input and Farm Output ports are created automatically.
+- Farm Input and Farm Output ports are created automatically. Additional Output ports are supported and collected together.
 - Right-clicking Dimensional Bedrock opens the safe return interface in every farm environment.
 - Registered cells can be inspected and permanently removed through the operator-only Admin Book.
 
@@ -54,10 +54,11 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 - Warmup activity is ignored; only the following configured window becomes the farm profile.
 - Vanilla containers and NeoForge item handlers are included in the inventory balance.
 - NeoForge fluid and energy capabilities are included in the resource balance.
-- The Farm Input imports items, fluids and FE from the workbench; the Farm Output exports all three resource types back to it.
+- Persistent consumed mobs are recorded as inputs. Natural mobs and spawner mobs with a remaining spawner are excluded.
+- The Farm Input imports items, fluids and FE from the workbench; every Farm Output exports all three resource types back to it.
 - Item production timestamps are stored so a normal Blackbox can replay peaks and quiet periods.
 - Active measurements and their snapshots survive server restarts.
-- Farm and workbench chunks stay ticketed only while a measurement is active.
+- Farm and workbench chunks use persistent, fully ticking NeoForge tickets only while a measurement is active.
 - Removing the core, destroying the workbench or losing a required dimension aborts safely without generating output.
 - Re-entering a measuring farm cancels the measurement and clears its profile so it can be edited and measured again.
 
@@ -67,7 +68,7 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 - Support private, scoreboard-team and public access. Operators retain administrative access.
 - Change color for Standard, Overworld, Nether and End environments.
 - Gain an enchantment glint after a valid profile is stored.
-- Show item, fluid and energy rates per minute while Shift is held.
+- Show item, fluid and energy rates plus required mob inputs while Shift is held.
 - Include a pre-programmed example iron farm core in the creative tab.
 
 ### Workbench and Blackbox
@@ -75,11 +76,12 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 - Both machines provide one core slot, nine item input slots, eighteen item output slots, four input fluid tanks, four output fluid tanks and separate FE buffers.
 - The Dimensional Workbench builds, measures and simulates farms in one block.
 - A Blackbox starts automatically when a programmed core is inserted.
-- A cycle only starts when every measured item, fluid and energy input is available.
+- A cycle only starts when every measured item, fluid, energy and mob input is available.
 - Output capacity is checked before production, so resources are never silently deleted.
-- Without a Stability Upgrade, measured item peaks and pauses are replayed.
+- Without a Stability Upgrade, measured item peaks and pauses are moderately randomized for every cycle while totals remain exact.
 - With a reusable Stability Upgrade, item, fluid and energy output is distributed evenly across the cycle.
 - Automation can insert resources from the sides and extract simulated fluid or energy output from the bottom.
+- Required mobs can be supplied in occupied boats or minecarts; the passenger is accepted and the vehicle remains outside.
 
 ### Upgrades
 
@@ -114,8 +116,9 @@ Blueprints currently store block states, not block-entity NBT, inventories, enti
 
 ### Handbook and Administration
 
-- The survival Handbook explains the workflow and renders every crafting recipe, including cell-size upgrades.
+- The survival Handbook uses direct section tabs, explains the complete workflow and renders every crafting recipe.
 - The Admin Book uses ghost slots to maintain the server's denied-block list.
+- Operators can set the duration used by future measurements directly in the Admin Book.
 - Ender Chests, Blackboxes and Dimensional Workbenches are denied in farm cells by default.
 - A second Admin Book view lists registered cells and deletes abandoned cells with confirmation.
 - Farm ownership can be private, shared with the owner's scoreboard team, or public when allowed by server config.
@@ -156,6 +159,7 @@ All craftable BlackBox content uses standard Minecraft JSON recipes, so JEI and 
 - Direction-specific machine wrappers may not expose every internal tank through their unsided capability.
 - Blueprint templates do not preserve block-entity data, inventories, entities, fluids or live redstone state.
 - Fluid and FE profiles store totals; only item outputs currently retain a measured peak timeline.
+- Mob accounting stores entity type and count, not professions, trades, equipment, age or other individual entity data.
 - Automated compatibility, migration and load testing for large modpacks is still incomplete.
 - Interfaces, textures and balance remain work in progress.
 
@@ -187,6 +191,8 @@ The generated JAR is written to `build/libs/`.
 The workspace was originally created with MCreator. Core farm, measurement, simulation, networking, capability and Blueprint logic is now maintained as regular Java code. Relevant MCreator elements are locked where needed to prevent accidental regeneration.
 
 Testing with modded machines, multiplayer ownership, server restarts, unusual farms and high-throughput resource networks is especially valuable. Issues and pull requests are welcome.
+
+The separate [ModJam 2026 concept](docs/MODJAM_2026_CONCEPT.md) describes how the existing recording system could be presented as an "Echoes of the Past" entry. Those presentation ideas are not implemented gameplay features.
 
 ## License
 

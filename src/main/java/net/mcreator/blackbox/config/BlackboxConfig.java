@@ -50,6 +50,11 @@ public final class BlackboxConfig {
 		return WARMUP_SECONDS.get() * 20;
 	}
 
+	public static void setMeasurementSeconds(int seconds) {
+		MEASUREMENT_SECONDS.set(Math.max(10, Math.min(3600, seconds)));
+		SPEC.save();
+	}
+
 	public static Set<Block> deniedBlocks() {
 		Set<Block> result = new LinkedHashSet<>();
 		for (String value : DENIED_FARM_BLOCKS.get()) {

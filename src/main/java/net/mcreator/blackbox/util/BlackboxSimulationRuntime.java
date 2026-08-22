@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import net.mcreator.blackbox.block.entity.DimensionalWorkbenchBlockEntity;
 import net.mcreator.blackbox.init.BlackboxModItems;
 
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -13,6 +12,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class BlackboxSimulationRuntime {
 	public static final int TICK_INTERVAL = 20;
@@ -26,13 +26,14 @@ public final class BlackboxSimulationRuntime {
 			return;
 		}
 		ItemStack core = machine.getItem(FarmSimulationMachine.CORE_SLOT);
-		if (blockEntity instanceof DimensionalWorkbenchBlockEntity && FarmDimensionRuntime.isMeasurementActive(core)) {
+		if (FarmDimensionRuntime.isSimulationPaused(level.getServer(), core)) {
 			return;
 		}
 		if (!core.is(BlackboxModItems.DIMENSION_CORE.get()) || !FarmCoreData.isProgrammed(core)) {
 			machine.setSimulationTicks(0);
 			machine.setActiveCoreId("");
 			machine.setStableCycleFunded(false);
+			machine.setSimulationCycleSeed(0L);
 			return;
 		}
 
@@ -59,13 +60,14 @@ public final class BlackboxSimulationRuntime {
 		if (newCore) {
 			machine.setSimulationTicks(0);
 			machine.setStableCycleFunded(false);
+			machine.setSimulationCycleSeed(0L);
 		}
 		if (!fundCycle(machine, recipe)) {
 			return;
 		}
 		int before = machine.getSimulationTicks();
 		int after = Math.min(recipe.sampleTicks(), before + TICK_INTERVAL);
-		ResourceDue due = new ResourceDue(timelineOutputsDue(recipe, before, after),
+		ResourceDue due = new ResourceDue(timelineOutputsDue(recipe, before, after, machine.getSimulationCycleSeed()),
 				after >= recipe.sampleTicks() ? recipe.fluidOutputs() : List.of(),
 				after >= recipe.sampleTicks() ? recipe.energyOutput() : 0);
 		if (!canInsert(machine, due)) {
@@ -103,6 +105,7 @@ public final class BlackboxSimulationRuntime {
 		}
 		consume(machine, recipe);
 		machine.setStableCycleFunded(true);
+		machine.setSimulationCycleSeed(ThreadLocalRandom.current().nextLong());
 		return true;
 	}
 
@@ -110,20 +113,34 @@ public final class BlackboxSimulationRuntime {
 		if (after >= recipe.sampleTicks()) {
 			machine.setSimulationTicks(0);
 			machine.setStableCycleFunded(false);
+			machine.setSimulationCycleSeed(0L);
 		} else {
 			machine.setSimulationTicks(after);
 		}
 		machine.setChanged();
 	}
 
-	private static List<FarmCoreData.StackAmount> timelineOutputsDue(FarmCoreData.Recipe recipe, int before, int after) {
+	private static List<FarmCoreData.StackAmount> timelineOutputsDue(FarmCoreData.Recipe recipe, int before, int after, long cycleSeed) {
 		List<FarmCoreData.StackAmount> due = new ArrayList<>();
-		for (FarmCoreData.ProductionEvent event : recipe.timeline()) {
-			if ((before == 0 && event.tick() == 0) || event.tick() > before && event.tick() <= after) {
+		for (int index = 0; index < recipe.timeline().size(); index++) {
+			FarmCoreData.ProductionEvent event = recipe.timeline().get(index);
+			int eventTick = randomizedEventTick(event.tick(), recipe.sampleTicks(), cycleSeed, index);
+			if ((before == 0 && eventTick == 0) || eventTick > before && eventTick <= after) {
 				due.addAll(event.outputs());
 			}
 		}
 		return due;
+	}
+
+	private static int randomizedEventTick(int measuredTick, int sampleTicks, long cycleSeed, int eventIndex) {
+		int jitter = Math.max(TICK_INTERVAL, sampleTicks / 12);
+		long mixed = cycleSeed + 0x9E3779B97F4A7C15L * (eventIndex + 1L);
+		mixed = (mixed ^ (mixed >>> 30)) * 0xBF58476D1CE4E5B9L;
+		mixed = (mixed ^ (mixed >>> 27)) * 0x94D049BB133111EBL;
+		mixed ^= mixed >>> 31;
+		int offset = (int) Math.floorMod(mixed, jitter * 2L + 1L) - jitter;
+		int shifted = Math.max(0, Math.min(sampleTicks, measuredTick + offset));
+		return shifted / TICK_INTERVAL * TICK_INTERVAL;
 	}
 
 	private static List<FarmCoreData.StackAmount> outputsDue(List<FarmCoreData.StackAmount> outputs, int sampleTicks, int before, int after) {
@@ -167,6 +184,11 @@ public final class BlackboxSimulationRuntime {
 				return false;
 			}
 		}
+		for (FarmCoreData.EntityAmount entry : recipe.entityInputs()) {
+			if (machine.mobInputs().amountOf(entry.entityType()) < entry.amount()) {
+				return false;
+			}
+		}
 		for (FarmCoreData.FluidAmount entry : recipe.fluidInputs()) {
 			if (machine.resources().inputFluids().amountOf(entry.stack()) < entry.amount()) {
 				return false;
@@ -186,6 +208,9 @@ public final class BlackboxSimulationRuntime {
 					remaining -= removed;
 				}
 			}
+		}
+		for (FarmCoreData.EntityAmount entry : recipe.entityInputs()) {
+			machine.mobInputs().consume(entry.entityType(), entry.amount());
 		}
 		for (FarmCoreData.FluidAmount entry : recipe.fluidInputs()) {
 			machine.resources().inputFluids().drainLong(entry.stack(), entry.amount(), IFluidHandler.FluidAction.EXECUTE);

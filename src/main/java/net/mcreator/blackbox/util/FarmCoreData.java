@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public final class FarmCoreData {
-	public static final int DATA_VERSION = 4;
+	public static final int DATA_VERSION = 5;
 	public static final UUID EXAMPLE_IRON_FARM_ID = UUID.fromString("bb000000-0000-4000-8000-000000000001");
 	private static final String CORE_ID_TAG = "farm_core_id";
 	private static final String EXAMPLE_TAG = "example_iron_farm";
@@ -51,6 +51,15 @@ public final class FarmCoreData {
 		}
 	}
 
+	public record EntityAmount(ResourceLocation entityType, long amount) {
+		public EntityAmount {
+			if (entityType == null) {
+				throw new IllegalArgumentException("entityType must not be null");
+			}
+			amount = Math.max(0, amount);
+		}
+	}
+
 	public record ProductionEvent(int tick, List<StackAmount> outputs) {
 		public ProductionEvent {
 			tick = Math.max(0, tick);
@@ -58,12 +67,13 @@ public final class FarmCoreData {
 		}
 	}
 
-	public record Recipe(int sampleTicks, List<StackAmount> inputs, List<StackAmount> outputs, List<ProductionEvent> timeline,
+	public record Recipe(int sampleTicks, List<StackAmount> inputs, List<StackAmount> outputs, List<ProductionEvent> timeline, List<EntityAmount> entityInputs,
 			List<FluidAmount> fluidInputs, List<FluidAmount> fluidOutputs, long energyInput, long energyOutput) {
 		public Recipe {
 			inputs = List.copyOf(inputs);
 			outputs = List.copyOf(outputs);
 			timeline = timeline.isEmpty() && !outputs.isEmpty() ? List.of(new ProductionEvent(sampleTicks, outputs)) : List.copyOf(timeline);
+			entityInputs = List.copyOf(entityInputs);
 			fluidInputs = List.copyOf(fluidInputs);
 			fluidOutputs = List.copyOf(fluidOutputs);
 			energyInput = Math.max(0, energyInput);
@@ -104,6 +114,7 @@ public final class FarmCoreData {
 	}
 
 	public static void setFarmName(ItemStack core, String name) {
+		boolean hadFarmName = !getFarmName(core).isEmpty();
 		String cleanName = name == null ? "" : name.trim();
 		if (cleanName.length() > 32) {
 			cleanName = cleanName.substring(0, 32);
@@ -116,6 +127,11 @@ public final class FarmCoreData {
 				tag.putString(FARM_NAME_TAG, finalName);
 			}
 		});
+		if (cleanName.isEmpty() && hadFarmName) {
+			core.remove(DataComponents.CUSTOM_NAME);
+		} else if (!cleanName.isEmpty()) {
+			core.set(DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal(cleanName));
+		}
 	}
 
 	public static FarmEnvironment getEnvironment(ItemStack core) {
@@ -221,7 +237,7 @@ public final class FarmCoreData {
 	}
 
 	public static void clearProfile(ItemStack core, HolderLookup.Provider lookupProvider) {
-		write(core, lookupProvider, List.of(), List.of(), List.of(), List.of(), List.of(), 0, 0,
+		write(core, lookupProvider, List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), 0, 0,
 				BlackboxConfig.warmupTicks(), BlackboxConfig.measurementTicks());
 	}
 
@@ -240,16 +256,16 @@ public final class FarmCoreData {
 	}
 
 	public static void write(ItemStack core, HolderLookup.Provider lookupProvider, List<StackAmount> inputs, List<StackAmount> outputs, int warmupTicks, int sampleTicks) {
-		write(core, lookupProvider, inputs, outputs, List.of(), List.of(), List.of(), 0, 0, warmupTicks, sampleTicks);
+		write(core, lookupProvider, inputs, outputs, List.of(), List.of(), List.of(), List.of(), 0, 0, warmupTicks, sampleTicks);
 	}
 
 	public static void write(ItemStack core, HolderLookup.Provider lookupProvider, List<StackAmount> inputs, List<StackAmount> outputs,
 			List<ProductionEvent> timeline, int warmupTicks, int sampleTicks) {
-		write(core, lookupProvider, inputs, outputs, timeline, List.of(), List.of(), 0, 0, warmupTicks, sampleTicks);
+		write(core, lookupProvider, inputs, outputs, timeline, List.of(), List.of(), List.of(), 0, 0, warmupTicks, sampleTicks);
 	}
 
 	public static void write(ItemStack core, HolderLookup.Provider lookupProvider, List<StackAmount> inputs, List<StackAmount> outputs,
-			List<ProductionEvent> timeline, List<FluidAmount> fluidInputs, List<FluidAmount> fluidOutputs, long energyInput, long energyOutput,
+			List<ProductionEvent> timeline, List<EntityAmount> entityInputs, List<FluidAmount> fluidInputs, List<FluidAmount> fluidOutputs, long energyInput, long energyOutput,
 			int warmupTicks, int sampleTicks) {
 		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> {
 			clearLegacyData(tag);
@@ -261,6 +277,7 @@ public final class FarmCoreData {
 			tag.put("inputs", writeEntries(lookupProvider, inputs));
 			tag.put("outputs", writeEntries(lookupProvider, outputs));
 			tag.put("timeline", writeTimeline(lookupProvider, timeline));
+			tag.put("entity_inputs", writeEntityEntries(entityInputs));
 			tag.put("fluid_inputs", writeFluidEntries(lookupProvider, fluidInputs));
 			tag.put("fluid_outputs", writeFluidEntries(lookupProvider, fluidOutputs));
 			tag.putLong("energy_input", Math.max(0, energyInput));
@@ -282,6 +299,7 @@ public final class FarmCoreData {
 					readEntries(tag.getList("inputs", Tag.TAG_COMPOUND), lookupProvider),
 					readEntries(tag.getList("outputs", Tag.TAG_COMPOUND), lookupProvider),
 					readTimeline(tag.getList("timeline", Tag.TAG_COMPOUND), lookupProvider),
+					readEntityEntries(tag.getList("entity_inputs", Tag.TAG_COMPOUND)),
 					readFluidEntries(tag.getList("fluid_inputs", Tag.TAG_COMPOUND), lookupProvider),
 					readFluidEntries(tag.getList("fluid_outputs", Tag.TAG_COMPOUND), lookupProvider),
 					tag.getLong("energy_input"), tag.getLong("energy_output"));
@@ -293,7 +311,7 @@ public final class FarmCoreData {
 					new ProductionEvent(300, List.of(new StackAmount(iron, 2))),
 					new ProductionEvent(850, List.of(new StackAmount(iron, 8))),
 					new ProductionEvent(1100, List.of(new StackAmount(iron, 2)))
-			), List.of(), List.of(), 0, 0);
+			), List.of(), List.of(), List.of(), 0, 0);
 		}
 		return readLegacy(tag, sampleTicks);
 	}
@@ -352,6 +370,33 @@ public final class FarmCoreData {
 		return entries;
 	}
 
+	private static ListTag writeEntityEntries(List<EntityAmount> entries) {
+		ListTag list = new ListTag();
+		for (EntityAmount entry : entries) {
+			if (entry.amount() <= 0 || !BuiltInRegistries.ENTITY_TYPE.containsKey(entry.entityType())) {
+				continue;
+			}
+			CompoundTag entryTag = new CompoundTag();
+			entryTag.putString("type", entry.entityType().toString());
+			entryTag.putLong("amount", entry.amount());
+			list.add(entryTag);
+		}
+		return list;
+	}
+
+	private static List<EntityAmount> readEntityEntries(ListTag list) {
+		List<EntityAmount> entries = new ArrayList<>();
+		for (int index = 0; index < list.size(); index++) {
+			CompoundTag entryTag = list.getCompound(index);
+			ResourceLocation type = ResourceLocation.tryParse(entryTag.getString("type"));
+			long amount = entryTag.getLong("amount");
+			if (type != null && amount > 0 && BuiltInRegistries.ENTITY_TYPE.containsKey(type)) {
+				entries.add(new EntityAmount(type, amount));
+			}
+		}
+		return entries;
+	}
+
 	private static ListTag writeTimeline(HolderLookup.Provider lookupProvider, List<ProductionEvent> timeline) {
 		ListTag list = new ListTag();
 		for (ProductionEvent event : timeline) {
@@ -394,7 +439,7 @@ public final class FarmCoreData {
 				outputs.add(new StackAmount(new ItemStack(BuiltInRegistries.ITEM.get(id)), amount));
 			}
 		}
-		return new Recipe(sampleTicks, List.of(), outputs, List.of(), List.of(), List.of(), 0, 0);
+		return new Recipe(sampleTicks, List.of(), outputs, List.of(), List.of(), List.of(), List.of(), 0, 0);
 	}
 
 	private static void writeLegacyData(CompoundTag tag, List<StackAmount> inputs, List<StackAmount> outputs, int sampleTicks) {

@@ -19,6 +19,7 @@ import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.init.BlackboxModItems;
 import net.mcreator.blackbox.util.FarmSimulationMachine;
 import net.mcreator.blackbox.util.FarmResourceStorage;
+import net.mcreator.blackbox.util.MobInputStorage;
 import net.mcreator.blackbox.world.inventory.DimensionalWorkbenchGUIMenu;
 
 import io.netty.buffer.Unpooled;
@@ -31,9 +32,11 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 	private int simulationTicks;
 	private String activeCoreId = "";
 	private boolean stableCycleFunded;
+	private long simulationCycleSeed;
 	private int calculationPhase;
 	private int calculationTicksRemaining;
 	private final FarmResourceStorage resources = new FarmResourceStorage(this::setChanged);
+	private final MobInputStorage mobInputs = new MobInputStorage(this::setChanged);
 
 	public DimensionalWorkbenchBlockEntity(BlockPos position, BlockState state) {
 		super(BlackboxModBlockEntities.DIMENSIONAL_WORKBENCH.get(), position, state);
@@ -47,9 +50,11 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		this.simulationTicks = tag.getInt("SimulationTicks");
 		this.activeCoreId = tag.getString("ActiveCoreId");
 		this.stableCycleFunded = tag.getBoolean("StableCycleFunded");
+		this.simulationCycleSeed = tag.getLong("SimulationCycleSeed");
 		this.calculationPhase = tag.getInt("CalculationPhase");
 		this.calculationTicksRemaining = tag.getInt("CalculationTicksRemaining");
 		this.resources.load(tag, lookupProvider);
+		this.mobInputs.load(tag.getList("MobInputs", net.minecraft.nbt.Tag.TAG_COMPOUND));
 	}
 
 	@Override
@@ -59,9 +64,11 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		tag.putInt("SimulationTicks", this.simulationTicks);
 		tag.putString("ActiveCoreId", this.activeCoreId);
 		tag.putBoolean("StableCycleFunded", this.stableCycleFunded);
+		tag.putLong("SimulationCycleSeed", this.simulationCycleSeed);
 		tag.putInt("CalculationPhase", this.calculationPhase);
 		tag.putInt("CalculationTicksRemaining", this.calculationTicksRemaining);
 		this.resources.save(tag, lookupProvider);
+		tag.put("MobInputs", this.mobInputs.save());
 	}
 
 	@Override
@@ -156,6 +163,19 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 		}
 	}
 
+	@Override
+	public long getSimulationCycleSeed() {
+		return this.simulationCycleSeed;
+	}
+
+	@Override
+	public void setSimulationCycleSeed(long seed) {
+		if (this.simulationCycleSeed != seed) {
+			this.simulationCycleSeed = seed;
+			this.setChanged();
+		}
+	}
+
 	public int getCalculationPhase() {
 		return this.calculationPhase;
 	}
@@ -175,5 +195,10 @@ public class DimensionalWorkbenchBlockEntity extends RandomizableContainerBlockE
 	@Override
 	public FarmResourceStorage resources() {
 		return this.resources;
+	}
+
+	@Override
+	public MobInputStorage mobInputs() {
+		return this.mobInputs;
 	}
 }
