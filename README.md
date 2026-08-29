@@ -89,7 +89,7 @@ The Village Archive is a deliberately optional Easter egg and is **disabled by d
 | Expert | 6 Villager Heads + 32 Emeralds | Sealed Blaze Farm Core |
 | Master | 8 Villager Heads + 48 Emeralds | Unbreaking III / Looting II Sacrificial Sword |
 
-The same trader also offers an empty Dimension Core, the 2x2 Cell Upgrade, Stability Upgrade and Mob Spawn Upgrade at progressively higher levels. The archive cores use the normal simulation and peak replay system, so they can be placed directly into a Blackbox.
+The same trader also offers an empty Dimension Core, the 2x2 Cell Upgrade, Stability Upgrade and Mob Spawn Upgrade at progressively higher levels. The archive cores use the normal simulation and peak replay system, so they can be placed directly into a Blackbox. The sealed Iron Farm Core models a modest Java Edition three-Villager-and-Zombie farm: 360 Iron Ingots and 90 Poppies per hour, arriving in two randomly shifted Golem-kill peaks every 80 seconds.
 
 ### Workbench and Blackbox
 

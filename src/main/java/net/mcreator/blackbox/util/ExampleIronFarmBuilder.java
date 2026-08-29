@@ -90,9 +90,9 @@ public final class ExampleIronFarmBuilder {
 		spawnData.put("entity", entityData);
 		spawnData.put("custom_spawn_rules", new CompoundTag());
 		settings.put("SpawnData", spawnData);
-		settings.putShort("Delay", (short) 20);
-		settings.putShort("MinSpawnDelay", (short) 40);
-		settings.putShort("MaxSpawnDelay", (short) 80);
+		settings.putShort("Delay", (short) 800);
+		settings.putShort("MinSpawnDelay", (short) 800);
+		settings.putShort("MaxSpawnDelay", (short) 800);
 		settings.putShort("SpawnCount", (short) 1);
 		settings.putShort("MaxNearbyEntities", (short) 4);
 		settings.putShort("RequiredPlayerRange", (short) 32);

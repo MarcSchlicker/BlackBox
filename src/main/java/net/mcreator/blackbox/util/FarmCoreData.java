@@ -368,25 +368,28 @@ public final class FarmCoreData {
 					tag.getLong("energy_input"), tag.getLong("energy_output"));
 		}
 		if (isExampleIronFarm(core)) {
-			ItemStack iron = new ItemStack(Items.IRON_INGOT);
-			return new Recipe(60 * 20, List.of(), List.of(new StackAmount(iron, 16)), List.of(
-					new ProductionEvent(0, List.of(new StackAmount(iron, 4))),
-					new ProductionEvent(300, List.of(new StackAmount(iron, 2))),
-					new ProductionEvent(850, List.of(new StackAmount(iron, 8))),
-					new ProductionEvent(1100, List.of(new StackAmount(iron, 2)))
-			), List.of(), List.of(), List.of(), 0, 0);
+			return threeVillagerIronFarmRecipe();
 		}
 		return readLegacy(tag, sampleTicks);
 	}
 
 	private static Recipe readVillageArchive(String archiveKind) {
 		return switch (archiveKind) {
-			case "iron" -> archiveRecipe(Items.IRON_INGOT, 16, 4, 2, 8, 2);
+			case "iron" -> threeVillagerIronFarmRecipe();
 			case "sugar_cane" -> archiveRecipe(Items.SUGAR_CANE, 48, 12, 6, 18, 12);
 			case "nether_wart" -> archiveRecipe(Items.NETHER_WART, 24, 8, 4, 8, 4);
 			case "blaze" -> archiveRecipe(Items.BLAZE_ROD, 12, 2, 4, 1, 5);
 			default -> new Recipe(0, List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), 0, 0);
 		};
+	}
+
+	private static Recipe threeVillagerIronFarmRecipe() {
+		ItemStack iron = new ItemStack(Items.IRON_INGOT);
+		ItemStack poppy = new ItemStack(Items.POPPY);
+		return new Recipe(80 * 20, List.of(), List.of(new StackAmount(iron, 8), new StackAmount(poppy, 2)), List.of(
+				new ProductionEvent(200, List.of(new StackAmount(iron, 4), new StackAmount(poppy, 1))),
+				new ProductionEvent(1000, List.of(new StackAmount(iron, 4), new StackAmount(poppy, 1)))
+		), List.of(), List.of(), List.of(), 0, 0);
 	}
 
 	private static Recipe archiveRecipe(net.minecraft.world.item.Item item, long total, long first, long second, long third, long fourth) {

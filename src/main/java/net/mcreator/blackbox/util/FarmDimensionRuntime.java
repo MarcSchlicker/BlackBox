@@ -338,7 +338,7 @@ public final class FarmDimensionRuntime {
 			transferWorkbenchInput(server, farmLevel, measurement);
 			transferFarmOutput(server, farmLevel, measurement);
 			if (measurement.cell.coreId().equals(FarmCoreData.EXAMPLE_IRON_FARM_ID) && measurement.elapsedTicks >= measurement.warmupTicks
-					&& measurement.elapsedTicks % 200 == 0) {
+					&& measurement.elapsedTicks % 800 == 0) {
 				ExampleIronFarmBuilder.spawnTestGolem(farmLevel, measurement.cell);
 			}
 			if (measurement.elapsedTicks == measurement.warmupTicks) {
