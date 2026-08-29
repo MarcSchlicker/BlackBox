@@ -46,7 +46,7 @@ public final class WorkbenchRuntime {
 			workbench.setActiveCoreId("");
 			workbench.setSimulationTicks(0);
 			workbench.setChanged();
-		} else if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && upgrade.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get())) {
+		} else if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && !FarmCoreData.isVillageArchiveCore(core) && upgrade.is(BlackboxModItems.MOB_SPAWN_UPGRADE.get())) {
 			FarmCoreData.setMobSpawningEnabled(core, true);
 			FarmCoreData.clearProfile(core, level.registryAccess());
 			upgrade.shrink(1);

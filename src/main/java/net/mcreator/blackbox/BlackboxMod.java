@@ -28,6 +28,8 @@ import net.mcreator.blackbox.init.BlackboxModBlocks;
 import net.mcreator.blackbox.init.BlackboxModBlockEntities;
 import net.mcreator.blackbox.init.BlackboxModChunkGenerators;
 import net.mcreator.blackbox.init.BlackboxModCapabilities;
+import net.mcreator.blackbox.init.BlackboxModConditions;
+import net.mcreator.blackbox.init.BlackboxModVillagers;
 import net.mcreator.blackbox.config.BlackboxConfig;
 import net.mcreator.blackbox.util.FarmDimensionRuntime;
 
@@ -60,6 +62,8 @@ public class BlackboxMod {
 		BlackboxModTabs.REGISTRY.register(modEventBus);
 		BlackboxModVariables.ATTACHMENT_TYPES.register(modEventBus);
 		BlackboxModMenus.REGISTRY.register(modEventBus);
+		BlackboxModConditions.REGISTRY.register(modEventBus);
+		BlackboxModVillagers.REGISTRY.register(modEventBus);
 		modContainer.registerConfig(ModConfig.Type.SERVER, BlackboxConfig.SPEC);
 		// Start of user code block mod init
 		// End of user code block mod init

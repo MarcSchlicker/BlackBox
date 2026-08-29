@@ -1,4 +1,9 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "blackbox:village_archive_enabled"
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [

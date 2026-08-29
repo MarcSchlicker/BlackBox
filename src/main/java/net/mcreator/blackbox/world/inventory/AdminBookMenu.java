@@ -22,6 +22,7 @@ public class AdminBookMenu extends AbstractContainerMenu {
 	public static final int GHOST_SLOT_COUNT = 18;
 	private final SimpleContainer ghostInventory = new SimpleContainer(GHOST_SLOT_COUNT);
 	private final DataSlot measurementSeconds = DataSlot.standalone();
+	private final DataSlot villageArchiveEnabled = DataSlot.standalone();
 
 	public AdminBookMenu(int id, Inventory inventory) {
 		this(id, inventory, true);
@@ -35,6 +36,7 @@ public class AdminBookMenu extends AbstractContainerMenu {
 		super(BlackboxModMenus.ADMIN_BOOK.get(), id);
 		if (loadConfig) {
 			this.measurementSeconds.set(BlackboxConfig.MEASUREMENT_SECONDS.get());
+			this.villageArchiveEnabled.set(BlackboxConfig.isVillageArchiveEnabled() ? 1 : 0);
 			int slot = 0;
 			for (Block block : BlackboxConfig.deniedBlocks()) {
 				if (slot >= GHOST_SLOT_COUNT) {
@@ -44,17 +46,18 @@ public class AdminBookMenu extends AbstractContainerMenu {
 			}
 		}
 		for (int slot = 0; slot < GHOST_SLOT_COUNT; slot++) {
-			this.addSlot(new GhostSlot(this.ghostInventory, slot, 8 + (slot % 9) * 18, 77 + (slot / 9) * 18));
+			this.addSlot(new GhostSlot(this.ghostInventory, slot, 8 + (slot % 9) * 18, 104 + (slot / 9) * 18));
 		}
 		for (int row = 0; row < 3; row++) {
 			for (int column = 0; column < 9; column++) {
-				this.addSlot(new Slot(inventory, column + (row + 1) * 9, 8 + column * 18, 130 + row * 18));
+				this.addSlot(new Slot(inventory, column + (row + 1) * 9, 8 + column * 18, 157 + row * 18));
 			}
 		}
 		for (int column = 0; column < 9; column++) {
-			this.addSlot(new Slot(inventory, column, 8 + column * 18, 188));
+			this.addSlot(new Slot(inventory, column, 8 + column * 18, 215));
 		}
 		this.addDataSlot(this.measurementSeconds);
+		this.addDataSlot(this.villageArchiveEnabled);
 	}
 
 	public int getMeasurementSeconds() {
@@ -63,6 +66,14 @@ public class AdminBookMenu extends AbstractContainerMenu {
 
 	public void setMeasurementSeconds(int seconds) {
 		this.measurementSeconds.set(seconds);
+	}
+
+	public boolean isVillageArchiveEnabled() {
+		return this.villageArchiveEnabled.get() != 0;
+	}
+
+	public void setVillageArchiveEnabled(boolean enabled) {
+		this.villageArchiveEnabled.set(enabled ? 1 : 0);
 	}
 
 	@Override

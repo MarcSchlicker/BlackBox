@@ -99,6 +99,10 @@ public final class FarmDimensionRuntime {
 			player.sendSystemMessage(Component.translatable("message.blackbox.farm.access_denied").withStyle(ChatFormatting.RED));
 			return null;
 		}
+		if (FarmCoreData.isVillageArchiveCore(core)) {
+			player.sendSystemMessage(Component.translatable("message.blackbox.village_archive.read_only_core").withStyle(ChatFormatting.RED));
+			return null;
+		}
 		FarmCoreData.ensureOwner(core, player);
 		UUID coreId = FarmCoreData.ensureCoreId(core);
 		int cellSize = FarmCoreData.getCellSizeChunks(core);

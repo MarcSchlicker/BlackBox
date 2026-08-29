@@ -61,7 +61,7 @@ public record DimensionalWorkbenchGUIButtonMessage(int buttonID, int x, int y, i
 				&& new BlockPos(x, y, z).closerToCenterThan(player.position(), 8.0D)
 				&& world.getBlockEntity(new BlockPos(x, y, z)) instanceof DimensionalWorkbenchBlockEntity workbench) {
 			ItemStack core = workbench.getItem(0);
-			if (!core.is(BlackboxModItems.DIMENSION_CORE.get()) || !FarmCoreData.canManage(core, player)) {
+			if (!core.is(BlackboxModItems.DIMENSION_CORE.get()) || FarmCoreData.isVillageArchiveCore(core) || !FarmCoreData.canManage(core, player)) {
 				player.sendSystemMessage(Component.translatable("message.blackbox.farm.access_denied"));
 				return;
 			}

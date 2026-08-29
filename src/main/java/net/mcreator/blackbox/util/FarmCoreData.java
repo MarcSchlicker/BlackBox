@@ -34,6 +34,8 @@ public final class FarmCoreData {
 	private static final String OWNER_NAME_TAG = "farm_owner_name";
 	private static final String OWNER_TEAM_TAG = "farm_owner_team";
 	private static final String ACCESS_TAG = "farm_access";
+	private static final String ARCHIVE_TAG = "village_archive_core";
+	private static final String ARCHIVE_KIND_TAG = "village_archive_kind";
 	private static final int MAX_LEGACY_ENTRIES = 64;
 
 	private FarmCoreData() {
@@ -87,6 +89,9 @@ public final class FarmCoreData {
 
 	public static boolean isProgrammed(ItemStack core) {
 		CompoundTag tag = data(core);
+		if (tag.getBoolean(ARCHIVE_TAG)) {
+			return true;
+		}
 		if (tag.getInt("blackbox_version") >= 3) {
 			return !tag.getList("outputs", Tag.TAG_COMPOUND).isEmpty()
 					|| !tag.getList("fluid_outputs", Tag.TAG_COMPOUND).isEmpty()
@@ -114,6 +119,9 @@ public final class FarmCoreData {
 	}
 
 	public static void setFarmName(ItemStack core, String name) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		boolean hadFarmName = !getFarmName(core).isEmpty();
 		String cleanName = name == null ? "" : name.trim();
 		if (cleanName.length() > 32) {
@@ -139,6 +147,9 @@ public final class FarmCoreData {
 	}
 
 	public static void setEnvironment(ItemStack core, FarmEnvironment environment) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> tag.putString(ENVIRONMENT_TAG, environment.id()));
 	}
 
@@ -152,6 +163,9 @@ public final class FarmCoreData {
 	}
 
 	public static void setCellSizeChunks(ItemStack core, int sizeChunks) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		int size = clampCellSize(sizeChunks);
 		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> tag.putInt(CELL_SIZE_TAG, size));
 	}
@@ -174,6 +188,9 @@ public final class FarmCoreData {
 	}
 
 	public static void setMobSpawningEnabled(ItemStack core, boolean enabled) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> tag.putBoolean(MOB_SPAWNING_TAG, enabled));
 	}
 
@@ -202,6 +219,9 @@ public final class FarmCoreData {
 	}
 
 	public static void setAccessMode(ItemStack core, FarmAccessMode mode) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> tag.putString(ACCESS_TAG, mode.id()));
 	}
 
@@ -237,6 +257,9 @@ public final class FarmCoreData {
 	}
 
 	public static void clearProfile(ItemStack core, HolderLookup.Provider lookupProvider) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		write(core, lookupProvider, List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), 0, 0,
 				BlackboxConfig.warmupTicks(), BlackboxConfig.measurementTicks());
 	}
@@ -255,6 +278,40 @@ public final class FarmCoreData {
 		return data(core).getBoolean(EXAMPLE_TAG);
 	}
 
+	public static boolean isVillageArchiveCore(ItemStack core) {
+		return data(core).getBoolean(ARCHIVE_TAG);
+	}
+
+	public static ItemStack createArchiveIronFarmCore(ItemStack core) {
+		return createVillageArchiveCore(core, "iron", FarmEnvironment.OVERWORLD, 2);
+	}
+
+	public static ItemStack createArchiveSugarCaneFarmCore(ItemStack core) {
+		return createVillageArchiveCore(core, "sugar_cane", FarmEnvironment.OVERWORLD, 2);
+	}
+
+	public static ItemStack createArchiveNetherWartFarmCore(ItemStack core) {
+		return createVillageArchiveCore(core, "nether_wart", FarmEnvironment.NETHER, 2);
+	}
+
+	public static ItemStack createArchiveBlazeFarmCore(ItemStack core) {
+		return createVillageArchiveCore(core, "blaze", FarmEnvironment.NETHER, 3);
+	}
+
+	private static ItemStack createVillageArchiveCore(ItemStack core, String archiveKind, FarmEnvironment environment, int cellSize) {
+		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> {
+			tag.putString(CORE_ID_TAG, UUID.randomUUID().toString());
+			tag.putBoolean(ARCHIVE_TAG, true);
+			tag.putString(ARCHIVE_KIND_TAG, archiveKind);
+			tag.putString(ENVIRONMENT_TAG, environment.id());
+			tag.putInt(CELL_SIZE_TAG, cellSize);
+			tag.putBoolean(MOB_SPAWNING_TAG, false);
+			tag.putString(ACCESS_TAG, FarmAccessMode.PRIVATE.id());
+		});
+		core.set(DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.translatable("item.blackbox.dimension_core.archive." + archiveKind));
+		return core;
+	}
+
 	public static void write(ItemStack core, HolderLookup.Provider lookupProvider, List<StackAmount> inputs, List<StackAmount> outputs, int warmupTicks, int sampleTicks) {
 		write(core, lookupProvider, inputs, outputs, List.of(), List.of(), List.of(), List.of(), 0, 0, warmupTicks, sampleTicks);
 	}
@@ -267,6 +324,9 @@ public final class FarmCoreData {
 	public static void write(ItemStack core, HolderLookup.Provider lookupProvider, List<StackAmount> inputs, List<StackAmount> outputs,
 			List<ProductionEvent> timeline, List<EntityAmount> entityInputs, List<FluidAmount> fluidInputs, List<FluidAmount> fluidOutputs, long energyInput, long energyOutput,
 			int warmupTicks, int sampleTicks) {
+		if (isVillageArchiveCore(core)) {
+			return;
+		}
 		CustomData.update(DataComponents.CUSTOM_DATA, core, tag -> {
 			clearLegacyData(tag);
 			tag.putInt("blackbox_version", DATA_VERSION);
@@ -290,6 +350,9 @@ public final class FarmCoreData {
 
 	public static Recipe read(ItemStack core, HolderLookup.Provider lookupProvider) {
 		CompoundTag tag = data(core);
+		if (tag.getBoolean(ARCHIVE_TAG)) {
+			return readVillageArchive(tag.getString(ARCHIVE_KIND_TAG));
+		}
 		int sampleTicks = tag.getInt("sample_ticks");
 		if (sampleTicks <= 0) {
 			sampleTicks = 10 * 20;
@@ -314,6 +377,26 @@ public final class FarmCoreData {
 			), List.of(), List.of(), List.of(), 0, 0);
 		}
 		return readLegacy(tag, sampleTicks);
+	}
+
+	private static Recipe readVillageArchive(String archiveKind) {
+		return switch (archiveKind) {
+			case "iron" -> archiveRecipe(Items.IRON_INGOT, 16, 3, 5, 6, 2);
+			case "sugar_cane" -> archiveRecipe(Items.SUGAR_CANE, 48, 12, 6, 18, 12);
+			case "nether_wart" -> archiveRecipe(Items.NETHER_WART, 24, 8, 4, 8, 4);
+			case "blaze" -> archiveRecipe(Items.BLAZE_ROD, 12, 2, 4, 1, 5);
+			default -> new Recipe(0, List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), 0, 0);
+		};
+	}
+
+	private static Recipe archiveRecipe(net.minecraft.world.item.Item item, long total, long first, long second, long third, long fourth) {
+		ItemStack output = new ItemStack(item);
+		return new Recipe(60 * 20, List.of(), List.of(new StackAmount(output, total)), List.of(
+				new ProductionEvent(0, List.of(new StackAmount(output, first))),
+				new ProductionEvent(250, List.of(new StackAmount(output, second))),
+				new ProductionEvent(700, List.of(new StackAmount(output, third))),
+				new ProductionEvent(1050, List.of(new StackAmount(output, fourth)))
+		), List.of(), List.of(), List.of(), 0, 0);
 	}
 
 	private static ListTag writeEntries(HolderLookup.Provider lookupProvider, List<StackAmount> entries) {

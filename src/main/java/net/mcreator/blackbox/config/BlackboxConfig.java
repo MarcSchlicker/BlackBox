@@ -34,6 +34,9 @@ public final class BlackboxConfig {
 	public static final ModConfigSpec.BooleanValue ALLOW_PUBLIC_FARMS = BUILDER
 			.comment("Allow core owners to make farm cells public.")
 			.define("allowPublicFarms", true);
+	public static final ModConfigSpec.BooleanValue VILLAGE_ARCHIVE_ENABLED = BUILDER
+			.comment("Enable the optional Village Archive Easter egg: Sacrificial Swords, Villager Heads and Dimensional Archivists.")
+			.define("villageArchiveEnabled", false);
 	public static final ModConfigSpec.ConfigValue<List<? extends String>> DENIED_FARM_BLOCKS = BUILDER
 			.comment("Blocks that players may not place inside a farm cell.")
 			.defineListAllowEmpty("deniedFarmBlocks", DEFAULT_DENIED_BLOCKS, BlackboxConfig::isValidBlockId);
@@ -52,6 +55,20 @@ public final class BlackboxConfig {
 
 	public static void setMeasurementSeconds(int seconds) {
 		MEASUREMENT_SECONDS.set(Math.max(10, Math.min(3600, seconds)));
+		SPEC.save();
+	}
+
+	public static boolean isVillageArchiveEnabled() {
+		try {
+			return VILLAGE_ARCHIVE_ENABLED.get();
+		} catch (IllegalStateException ignored) {
+			// Recipe conditions are evaluated before a per-world server config is attached.
+			return false;
+		}
+	}
+
+	public static void setVillageArchiveEnabled(boolean enabled) {
+		VILLAGE_ARCHIVE_ENABLED.set(enabled);
 		SPEC.save();
 	}
 

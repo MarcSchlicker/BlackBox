@@ -20,6 +20,7 @@ import net.mcreator.blackbox.item.CoreCellSizeUpgradeItem;
 import net.mcreator.blackbox.item.StabilityUpgradeItem;
 import net.mcreator.blackbox.item.MobSpawnUpgradeItem;
 import net.mcreator.blackbox.item.BlueprintItem;
+import net.mcreator.blackbox.item.VillagerHeadItem;
 import net.mcreator.blackbox.util.FarmEnvironment;
 import net.mcreator.blackbox.BlackboxMod;
 
@@ -43,6 +44,7 @@ public class BlackboxModItems {
 	public static final DeferredItem<Item> MEDIUM_CELL_UPGRADE;
 	public static final DeferredItem<Item> LARGE_CELL_UPGRADE;
 	public static final DeferredItem<Item> BLUEPRINT;
+	public static final DeferredItem<Item> VILLAGER_HEAD;
 	static {
 		OPFERSCHWERT = REGISTRY.register("opferschwert", OpferschwertItem::new);
 		EMERALD_BEDROCK = block(BlackboxModBlocks.EMERALD_BEDROCK);
@@ -62,6 +64,7 @@ public class BlackboxModItems {
 		MEDIUM_CELL_UPGRADE = REGISTRY.register("medium_cell_upgrade", () -> new CoreCellSizeUpgradeItem(2));
 		LARGE_CELL_UPGRADE = REGISTRY.register("large_cell_upgrade", () -> new CoreCellSizeUpgradeItem(3));
 		BLUEPRINT = REGISTRY.register("blueprint", BlueprintItem::new);
+		VILLAGER_HEAD = REGISTRY.register("villager_head", VillagerHeadItem::new);
 	}
 
 	// Start of user code block custom items

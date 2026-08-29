@@ -48,7 +48,7 @@ public record FarmNameUpdateMessage(int x, int y, int z, String name) implements
 			}
 			if (player.level().getBlockEntity(pos) instanceof DimensionalWorkbenchBlockEntity workbench) {
 				ItemStack core = workbench.getItem(0);
-				if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && FarmCoreData.canManage(core, player)) {
+				if (core.is(BlackboxModItems.DIMENSION_CORE.get()) && !FarmCoreData.isVillageArchiveCore(core) && FarmCoreData.canManage(core, player)) {
 					FarmCoreData.ensureOwner(core, player);
 					FarmCoreData.setFarmName(core, message.name);
 					workbench.setChanged();

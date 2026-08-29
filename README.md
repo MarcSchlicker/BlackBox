@@ -72,6 +72,25 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 - Show item, fluid and energy rates plus required mob inputs while Shift is held.
 - Include a pre-programmed example iron farm core in the creative tab.
 
+### Optional Village Archive
+
+The Village Archive is a deliberately optional Easter egg and is **disabled by default**. An operator enables it in the Admin Book or through the authoritative server configuration. On a dedicated server, the server setting decides the feature state for every player.
+
+- When enabled, a player who kills a Villager with a Sacrificial Sword receives a Villager Head.
+- Placing a Dimensional Workbench near a Nitwit turns the closest one into a Dimensional Archivist.
+- Archivists sell sealed, pre-programmed cores. These cores replay a known farm profile but cannot be named, entered, upgraded or remeasured.
+- The regular Sword recipe is available only while the module is enabled; the recipe list and Archivist trades refresh when an operator changes the setting.
+
+| Archivist level | Trade | Result |
+| --- | --- | --- |
+| Novice | 2 Villager Heads + 12 Emeralds | Sealed Iron Farm Core |
+| Apprentice | 3 Villager Heads + 18 Emeralds | Sealed Sugar Cane Farm Core |
+| Journeyman | 4 Villager Heads + 24 Emeralds | Sealed Nether Wart Farm Core |
+| Expert | 6 Villager Heads + 32 Emeralds | Sealed Blaze Farm Core |
+| Master | 8 Villager Heads + 48 Emeralds | Unbreaking III / Looting II Sacrificial Sword |
+
+The same trader also offers an empty Dimension Core, the 2x2 Cell Upgrade, Stability Upgrade and Mob Spawn Upgrade at progressively higher levels. The archive cores use the normal simulation and peak replay system, so they can be placed directly into a Blackbox.
+
 ### Workbench and Blackbox
 
 - Both machines provide one core slot, nine item input slots, eighteen item output slots, four input fluid tanks, four output fluid tanks and separate FE buffers.
@@ -120,6 +139,7 @@ Blueprints currently store block states, not block-entity NBT, inventories, enti
 - The survival Handbook uses direct section tabs, explains the complete workflow and renders every crafting recipe.
 - The Admin Book uses ghost slots to maintain the server's denied-block list.
 - Operators can set the duration used by future measurements directly in the Admin Book.
+- Operators can enable or disable the optional Village Archive directly in the Admin Book.
 - Ender Chests, Blackboxes and Dimensional Workbenches are denied in farm cells by default.
 - A second Admin Book view lists registered cells and deletes abandoned cells with confirmation.
 - Farm ownership can be private, shared with the owner's scoreboard team, or public when allowed by server config.
@@ -135,6 +155,7 @@ BlackBox uses a per-world NeoForge server configuration. Current options are:
 | `maxBlueprintBlocks` | 20,000 | Maximum blocks in one template |
 | `maxServerBlueprints` | 256 | Maximum shared templates listed by the server |
 | `allowPublicFarms` | `true` | Allows owners to select public access |
+| `villageArchiveEnabled` | `false` | Enables the optional Sacrificial Sword and Dimensional Archivist content |
 | `deniedFarmBlocks` | See Admin Book | Blocks that cannot be placed in farm cells |
 
 Useful future configuration candidates include resource-buffer sizes, measurement chunk-ticket limits, maximum cells per owner, public-farm policy by permission level, and a server-wide cap on simultaneous measurements.

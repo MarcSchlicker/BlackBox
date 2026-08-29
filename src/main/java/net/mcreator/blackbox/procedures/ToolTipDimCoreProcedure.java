@@ -39,6 +39,9 @@ public class ToolTipDimCoreProcedure {
 		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.environment." + FarmCoreData.getEnvironment(core).id()).withStyle(ChatFormatting.GRAY));
 		int size = FarmCoreData.getCellSizeChunks(core);
 		tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.cell_size", size, size).withStyle(ChatFormatting.AQUA));
+		if (FarmCoreData.isVillageArchiveCore(core)) {
+			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.archive").withStyle(ChatFormatting.LIGHT_PURPLE));
+		}
 		if (!FarmCoreData.getOwnerName(core).isBlank()) {
 			tooltip.add(Component.translatable("tooltip.blackbox.dimension_core.owner", FarmCoreData.getOwnerName(core)).withStyle(ChatFormatting.DARK_GRAY));
 		}

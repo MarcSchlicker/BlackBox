@@ -8,10 +8,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.BlockTags;
 
-import net.mcreator.blackbox.procedures.DropHeadProcedure;
+import net.mcreator.blackbox.config.BlackboxConfig;
+import net.mcreator.blackbox.init.BlackboxModItems;
 
 public class OpferschwertItem extends SwordItem {
 	private static final Tier TOOL_TIER = new Tier() {
@@ -53,7 +57,12 @@ public class OpferschwertItem extends SwordItem {
 	@Override
 	public boolean hurtEnemy(ItemStack itemstack, LivingEntity entity, LivingEntity sourceentity) {
 		boolean retval = super.hurtEnemy(itemstack, entity, sourceentity);
-		DropHeadProcedure.execute(entity.level(), entity);
+		if (BlackboxConfig.isVillageArchiveEnabled() && sourceentity instanceof Player && entity instanceof net.minecraft.world.entity.npc.Villager
+				&& entity.isDeadOrDying() && entity.level() instanceof ServerLevel level) {
+			ItemEntity head = new ItemEntity(level, entity.getX(), entity.getY(), entity.getZ(), new ItemStack(BlackboxModItems.VILLAGER_HEAD.get()));
+			head.setPickUpDelay(10);
+			level.addFreshEntity(head);
+		}
 		return retval;
 	}
 }
