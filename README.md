@@ -29,6 +29,7 @@ Moving a pre-filled chest through hoppers does not create free resources: BlackB
 ### Isolated Farm Cells
 
 - Every assigned Dimension Core receives a persistent UUID and a separate farm cell.
+- Every active cell is enclosed by a full-height Vanilla Barrier ring. The surrounding dimension remains empty, and server-side bounds enforcement returns players who try to bypass the wall.
 - Every core starts with a 1x1 chunk cell and needs no size item.
 - The 2x2 upgrade costs only four copper ingots and one redstone; the 3x3 upgrade is crafted from two 2x2 upgrades.
 - A cell has one Dimensional Bedrock layer at Y=0. Unselected surrounding chunks have no floor.

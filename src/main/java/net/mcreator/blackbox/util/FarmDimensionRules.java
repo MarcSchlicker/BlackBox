@@ -3,6 +3,7 @@ package net.mcreator.blackbox.util;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -51,5 +52,20 @@ public final class FarmDimensionRules {
 			event.setCanceled(true);
 			player.displayClientMessage(Component.translatable("message.blackbox.farm.outside_cell").withStyle(ChatFormatting.RED), true);
 		}
+	}
+
+	@SubscribeEvent
+	public static void onPlayerTick(PlayerTickEvent.Post event) {
+		if (!(event.getEntity() instanceof ServerPlayer player) || !FarmEnvironment.isFarmDimension(player.level().dimension())) {
+			return;
+		}
+		FarmCell cell = FarmDimensionRuntime.getAssignedCell(player).orElse(null);
+		if (cell == null || cell.contains(player.blockPosition())) {
+			return;
+		}
+		double x = Math.max(cell.minBlockX() + 0.5D, Math.min(cell.maxBlockX() + 0.5D, player.getX()));
+		double z = Math.max(cell.minBlockZ() + 0.5D, Math.min(cell.maxBlockZ() + 0.5D, player.getZ()));
+		player.teleportTo((ServerLevel) player.level(), x, player.getY(), z, player.getYRot(), player.getXRot());
+		player.displayClientMessage(Component.translatable("message.blackbox.farm.outside_cell").withStyle(ChatFormatting.RED), true);
 	}
 }

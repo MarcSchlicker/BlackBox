@@ -289,6 +289,7 @@ public final class FarmDimensionRuntime {
 				}
 			}
 		}
+		placeCellBoundary(level, cell);
 		if (level.getBlockState(cell.inputPos()).isAir()) {
 			level.setBlock(cell.inputPos(), BlackboxModBlocks.INPUTBLOCK.get().defaultBlockState(), 3);
 		}
@@ -1011,6 +1012,49 @@ public final class FarmDimensionRuntime {
 					}
 				}
 			}
+		}
+		clearCellBoundary(level, cell);
+	}
+
+	private static void placeCellBoundary(ServerLevel level, FarmCell cell) {
+		int minX = cell.minBlockX() - 1;
+		int maxX = cell.maxBlockX() + 1;
+		int minZ = cell.minBlockZ() - 1;
+		int maxZ = cell.maxBlockZ() + 1;
+		if (level.getBlockState(new BlockPos(minX, level.getMinBuildHeight(), minZ)).is(Blocks.BARRIER)) {
+			return;
+		}
+		for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight(); y++) {
+			for (int x = minX; x <= maxX; x++) {
+				placeBarrier(level, new BlockPos(x, y, minZ));
+				placeBarrier(level, new BlockPos(x, y, maxZ));
+			}
+			for (int z = minZ + 1; z < maxZ; z++) {
+				placeBarrier(level, new BlockPos(minX, y, z));
+				placeBarrier(level, new BlockPos(maxX, y, z));
+			}
+		}
+	}
+
+	private static void clearCellBoundary(ServerLevel level, FarmCell cell) {
+		for (int x = cell.minBlockX() - 1; x <= cell.maxBlockX() + 1; x++) {
+			for (int z = cell.minBlockZ() - 1; z <= cell.maxBlockZ() + 1; z++) {
+				if (x != cell.minBlockX() - 1 && x != cell.maxBlockX() + 1 && z != cell.minBlockZ() - 1 && z != cell.maxBlockZ() + 1) {
+					continue;
+				}
+				for (int y = level.getMinBuildHeight(); y < level.getMaxBuildHeight(); y++) {
+					BlockPos pos = new BlockPos(x, y, z);
+					if (level.getBlockState(pos).is(Blocks.BARRIER)) {
+						level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+					}
+				}
+			}
+		}
+	}
+
+	private static void placeBarrier(ServerLevel level, BlockPos pos) {
+		if (!level.getBlockState(pos).is(Blocks.BARRIER)) {
+			level.setBlock(pos, Blocks.BARRIER.defaultBlockState(), 2);
 		}
 	}
 
