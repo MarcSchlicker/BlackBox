@@ -54,6 +54,7 @@
   "gui.blackbox.workbench.analysing": "Preparing farm ...",
   "gui.blackbox.workbench.measuring": "Measurement: %s s remaining",
   "gui.blackbox.workbench.simulating": "Farm profile active",
+  "gui.blackbox.workbench.archive": "Archivist profile: sealed",
   "gui.blackbox.workbench.cell_size": "%sx%s cell",
   "gui.blackbox.workbench.access_tooltip": "Cycle farm access: private, team, public",
   "gui.blackbox.access.private": "Private",

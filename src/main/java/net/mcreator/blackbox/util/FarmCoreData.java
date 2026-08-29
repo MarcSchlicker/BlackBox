@@ -381,7 +381,7 @@ public final class FarmCoreData {
 
 	private static Recipe readVillageArchive(String archiveKind) {
 		return switch (archiveKind) {
-			case "iron" -> archiveRecipe(Items.IRON_INGOT, 16, 3, 5, 6, 2);
+			case "iron" -> archiveRecipe(Items.IRON_INGOT, 16, 4, 2, 8, 2);
 			case "sugar_cane" -> archiveRecipe(Items.SUGAR_CANE, 48, 12, 6, 18, 12);
 			case "nether_wart" -> archiveRecipe(Items.NETHER_WART, 24, 8, 4, 8, 4);
 			case "blaze" -> archiveRecipe(Items.BLAZE_ROD, 12, 2, 4, 1, 5);

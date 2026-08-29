@@ -78,14 +78,15 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
 		ItemStack core = this.menu.getSlot(0).getItem();
 		boolean hasCore = core.is(BlackboxModItems.DIMENSION_CORE.get());
-		this.enterButton.active = hasCore;
-		this.saveNameButton.active = hasCore;
-		this.farmName.setEditable(hasCore);
-		this.accessButton.active = hasCore;
+		boolean archiveCore = hasCore && FarmCoreData.isVillageArchiveCore(core);
+		this.enterButton.active = hasCore && !archiveCore;
+		this.saveNameButton.active = hasCore && !archiveCore;
+		this.farmName.setEditable(hasCore && !archiveCore);
+		this.accessButton.active = hasCore && !archiveCore;
 		FarmAccessMode access = hasCore ? FarmCoreData.getAccessMode(core) : FarmAccessMode.PRIVATE;
 		this.accessButton.setMessage(Component.translatable("gui.blackbox.access." + access.id()));
 		if (hasCore && !this.nameInitialized) {
-			this.farmName.setValue(FarmCoreData.getFarmName(core));
+			this.farmName.setValue(archiveCore ? core.getHoverName().getString() : FarmCoreData.getFarmName(core));
 			this.nameInitialized = true;
 		} else if (!hasCore) {
 			this.nameInitialized = false;
@@ -131,6 +132,9 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 		if (!this.menu.getSlot(0).getItem().is(BlackboxModItems.DIMENSION_CORE.get())) {
 			status = Component.translatable("gui.blackbox.workbench.missing_core");
 			color = 0xFFFF7373;
+		} else if (FarmCoreData.isVillageArchiveCore(this.menu.getSlot(0).getItem())) {
+			status = Component.translatable("gui.blackbox.workbench.archive");
+			color = 0xFFC59AEF;
 		} else if (this.menu.getCalculationPhase() == 1) {
 			status = Component.translatable("gui.blackbox.workbench.analysing");
 			color = 0xFFFFC866;

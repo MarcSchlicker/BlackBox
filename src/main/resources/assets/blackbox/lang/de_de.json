@@ -54,6 +54,7 @@
   "gui.blackbox.workbench.analysing": "Farm wird vorbereitet ...",
   "gui.blackbox.workbench.measuring": "Messung: noch %s s",
   "gui.blackbox.workbench.simulating": "Farmprofil aktiv",
+  "gui.blackbox.workbench.archive": "Archivistenprofil: versiegelt",
   "gui.blackbox.workbench.cell_size": "%sx%s Zelle",
   "gui.blackbox.workbench.access_tooltip": "Farmzugriff wechseln: Privat, Team, Öffentlich",
   "gui.blackbox.access.private": "Privat",
