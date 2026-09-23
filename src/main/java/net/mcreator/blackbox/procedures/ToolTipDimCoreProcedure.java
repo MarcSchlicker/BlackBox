@@ -31,7 +31,7 @@ public class ToolTipDimCoreProcedure {
 	}
 
 	public static void execute(ItemStack itemstack, List<Component> tooltip) {
-		// Kept for compatibility with the existing MCreator procedure hook.
+		// Kept for compatibility with the existing procedure hook.
 	}
 
 	private static void addTooltip(ItemStack core, List<Component> tooltip, HolderLookup.Provider lookupProvider) {

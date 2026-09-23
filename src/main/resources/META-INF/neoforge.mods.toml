@@ -6,9 +6,9 @@ license="Not specified"
 modId="blackbox"
 version="1.0.0"
 displayName="BlackBox"
-displayURL="https://mcreator.net"
-credits="Created using mod maker MCreator - https://mcreator.net/about"
-authors="Marc, MCreator"
+displayURL="https://github.com/MarcSchlicker/BlackBox"
+credits="BlackBox contributors"
+authors="Marc"
 
 # Start of user code block mod configuration
 # End of user code block mod configuration

@@ -217,7 +217,7 @@ A separately packaged and validated server release will be prepared during the f
 
 ## Development
 
-The workspace was originally created with MCreator. Core farm, measurement, simulation, networking, capability and Blueprint logic is now maintained as regular Java code. Relevant MCreator elements are locked where needed to prevent accidental regeneration.
+BlackBox is maintained as a standard NeoForge Java project. Core farm, measurement, simulation, networking, capability and Blueprint logic live directly in the source tree.
 
 Testing with modded machines, multiplayer ownership, server restarts, unusual farms and high-throughput resource networks is especially valuable. Issues and pull requests are welcome.
 
