@@ -1,0 +1,16 @@
+[
+{
+  "modid": "blackboxlegacy",
+  "name": "BlackBox Legacy",
+  "description": "A Forge 1.12.2 edition of BlackBox for isolated, simulated farms.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/MarcSchlicker/BlackBox",
+  "updateUrl": "",
+  "authorList": ["Marc"],
+  "credits": "BlackBox contributors",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

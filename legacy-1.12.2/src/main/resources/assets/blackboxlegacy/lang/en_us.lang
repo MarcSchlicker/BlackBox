@@ -1,0 +1,5 @@
+item.dimension_core.name=Dimension Core
+tile.blackbox.name=BlackBox
+tile.dimensional_workbench.name=Dimensional Workbench
+tile.dimensional_bedrock.name=Dimensional Bedrock
+itemGroup.blackboxlegacy=BlackBox Legacy

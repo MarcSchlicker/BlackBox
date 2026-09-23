@@ -6,12 +6,10 @@ BlackBox is an experimental NeoForge mod for moving automated farms out of perma
 
 ## Compatibility
 
-| Component | Version |
-| --- | --- |
-| Minecraft | 1.21.1 |
-| Mod loader | NeoForge 21.1.190 or newer |
-| Java | 21 |
-| Sides | Client and dedicated server |
+| Edition | Minecraft | Loader | Java | Status |
+| --- | --- | --- | --- | --- |
+| Main | 1.21.1 | NeoForge 21.1.190 or newer | 21 | Active development |
+| Legacy | 1.12.2 | Forge 14.23.5.2854 or compatible | 8 | Early SkyFactory-oriented port; see `legacy-1.12.2/README.md` |
 
 ## How It Works
 
