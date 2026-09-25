@@ -158,8 +158,8 @@ public final class FarmCoreData {
 		if (tag.contains(CELL_SIZE_TAG, Tag.TAG_INT)) {
 			return clampCellSize(tag.getInt(CELL_SIZE_TAG));
 		}
-		// Cores that already own a cell were 3x3 before variable sizes existed.
-		return getCoreId(core).isPresent() ? 3 : 1;
+		// A core does not gain a larger cell merely because it receives its first ID.
+		return FarmCell.MIN_SIZE_CHUNKS;
 	}
 
 	public static void setCellSizeChunks(ItemStack core, int sizeChunks) {

@@ -15,7 +15,7 @@ public record FarmCell(UUID coreId, int centerChunkX, int centerChunkZ, int size
 	}
 
 	public static FarmCell fromCoreId(UUID coreId) {
-		return fromCoreId(coreId, MAX_SIZE_CHUNKS);
+		return fromCoreId(coreId, MIN_SIZE_CHUNKS);
 	}
 
 	public static FarmCell fromCoreId(UUID coreId, int sizeChunks) {

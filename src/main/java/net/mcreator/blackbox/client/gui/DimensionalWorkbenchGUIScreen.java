@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -64,12 +63,10 @@ public class DimensionalWorkbenchGUIScreen extends AbstractContainerScreen<Dimen
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (this.farmName != null && this.farmName.isFocused()) {
-			if (this.farmName.keyPressed(keyCode, scanCode, modifiers)) {
-				return true;
-			}
-			if (Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
-				return true;
-			}
+			this.farmName.keyPressed(keyCode, scanCode, modifiers);
+			// Do not forward focused text input to the container screen: its inventory
+			// shortcut would otherwise close the workbench for keys such as I or E.
+			return true;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
