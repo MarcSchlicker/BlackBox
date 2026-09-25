@@ -122,6 +122,11 @@ public final class FarmDimensionRuntime {
 		EDITING_CORES.add(coreId);
 
 		FarmCell cell = FarmCell.fromCoreId(coreId, cellSize);
+		FarmWorldData.FarmRecord previousCell = FarmWorldData.get(player.server).find(coreId);
+		if (previousCell != null && previousCell.sizeChunks() != cellSize) {
+			// Size data from the earlier default could leave a larger barrier behind.
+			clearCellBoundary(farmLevel, FarmCell.fromCoreId(coreId, previousCell.sizeChunks()));
+		}
 		CompoundTag data = player.getPersistentData();
 		data.putString(DATA_CORE_ID, coreId.toString());
 		data.putInt(DATA_CELL_SIZE, cellSize);

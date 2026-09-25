@@ -21,7 +21,7 @@ public final class BlackboxConfig {
 	private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 	public static final ModConfigSpec.IntValue MEASUREMENT_SECONDS = BUILDER
 			.comment("Number of seconds recorded after the hidden warmup phase.")
-			.defineInRange("measurementSeconds", 60, 10, 3600);
+			.defineInRange("measurementSeconds", 600, 10, 3600);
 	public static final ModConfigSpec.IntValue WARMUP_SECONDS = BUILDER
 			.comment("Hidden preparation time before a farm measurement begins.")
 			.defineInRange("warmupSeconds", 30, 0, 600);
