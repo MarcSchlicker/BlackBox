@@ -2,7 +2,7 @@
 
 BlackBox is a NeoForge mod that records an automated farm once, then replays its measured net production from a compact machine while the original farm stays unloaded.
 
-> **Status:** Playable work in progress. Please test farms carefully before relying on them in a large modpack or multiplayer server.
+> **Status:** Playable work in progress. Please test exploits. 
 
 ## Screenshots
 
