@@ -232,8 +232,6 @@ BlackBox is maintained as a standard Gradle NeoForge Java project. Core farm, me
 
 Testing with modded machines, multiplayer ownership, server restarts, unusual farms and high-throughput resource networks is especially valuable. Issues and pull requests are welcome.
 
-The separate [ModJam 2026 concept](docs/MODJAM_2026_CONCEPT.md) describes how the existing recording system could be presented as an "Echoes of the Past" entry. Those presentation ideas are not implemented gameplay features.
-
 ## License
 
-No project license has been selected yet. Add an explicit open-source license before redistribution or release.
+BlackBox is licensed under the [MIT License](LICENSE).
