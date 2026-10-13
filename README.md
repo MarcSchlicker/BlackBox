@@ -4,6 +4,20 @@ BlackBox is an experimental NeoForge mod for moving automated farms out of perma
 
 > **Status:** Work in progress and playable prototype. The complete build-measure-simulate loop is implemented, but large modpacks and multiplayer servers still need broader compatibility and performance testing.
 
+## Screenshots
+
+### Blackbox Farm Controls
+
+![A programmed Dimension Core in a Blackbox, with farm controls, side routing, output filtering, and resource buffers visible.](docs/images/blackbox-farm-controls.png)
+
+### Spawner Blackbox and Side Routing
+
+![Spawner Blackbox showing its spawner slots, masher modules, generated drops, output filter, and per-side item, fluid, and FE routing.](docs/images/spawner-blackbox-routing.png)
+
+### Farm Cell Example
+
+![An example automated farm built in a flat BlackBox farm cell with Dimensional Bedrock.](docs/images/farm-cell-example.png)
+
 ## Compatibility
 
 | Edition | Minecraft | Loader | Java | Status |
