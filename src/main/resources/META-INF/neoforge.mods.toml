@@ -1,21 +1,18 @@
 modLoader="javafml"
 loaderVersion="[4,)"
-license="Not specified"
+license="MIT"
 
 [[mods]]
 modId="blackbox"
 version="1.2.0"
 displayName="BlackBox"
 displayURL="https://github.com/MarcSchlicker/BlackBox"
+issueTrackerURL="https://github.com/MarcSchlicker/BlackBox/issues"
 credits="BlackBox contributors"
-authors="Marc"
-
-# Start of user code block mod configuration
-# End of user code block mod configuration
-
-
-# Start of user code block custom mixins
-# End of user code block custom mixins
+authors="Marc Schlicker"
+description='''
+Record automated farms in isolated cells, then replay their measured net production from compact Blackboxes without keeping the original farms loaded.
+'''
 
 [[dependencies.blackbox]]
     modId="neoforge"
@@ -38,8 +35,3 @@ authors="Marc"
     ordering="AFTER"
     side="CLIENT"
 
-
-
-
-# Start of user code block dependencies configuration
-# End of user code block dependencies configuration
