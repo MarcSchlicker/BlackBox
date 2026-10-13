@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/images/curseforge-logo.png" alt="BlackBox logo" width="240">
-</p>
-
 # BlackBox
 
 BlackBox is a NeoForge mod that records an automated farm once, then replays its measured net production from a compact machine while the original farm stays unloaded.
