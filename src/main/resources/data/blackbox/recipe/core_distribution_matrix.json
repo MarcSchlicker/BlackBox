@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CCC",
+    "ISI",
+    "CHC"
+  ],
+  "key": {
+    "C": { "item": "minecraft:copper_ingot" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "S": { "item": "blackbox:core_splitter" },
+    "H": { "item": "minecraft:hopper" }
+  },
+  "result": { "id": "blackbox:core_distribution_matrix", "count": 1 }
+}

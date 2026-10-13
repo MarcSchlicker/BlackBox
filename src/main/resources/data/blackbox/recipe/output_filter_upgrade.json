@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GRG",
+    "IHI",
+    "GRG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass_pane" },
+    "R": { "item": "minecraft:redstone" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "H": { "item": "minecraft:hopper" }
+  },
+  "result": { "id": "blackbox:output_filter_upgrade", "count": 1 }
+}

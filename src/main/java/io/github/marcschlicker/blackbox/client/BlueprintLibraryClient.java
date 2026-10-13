@@ -1,0 +1,130 @@
+package io.github.marcschlicker.blackbox.client;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import io.github.marcschlicker.blackbox.client.gui.BlueprintLibraryScreen;
+import io.github.marcschlicker.blackbox.client.gui.BlueprintNameScreen;
+import io.github.marcschlicker.blackbox.item.BlueprintItem.StorageScope;
+import io.github.marcschlicker.blackbox.network.BlackboxModVariables;
+import io.github.marcschlicker.blackbox.network.BlueprintLibraryMessage;
+import io.github.marcschlicker.blackbox.network.BlueprintTransferMessage;
+import io.github.marcschlicker.blackbox.util.BlueprintLibrary.BlueprintSummary;
+import io.github.marcschlicker.blackbox.util.FarmEnvironment;
+
+import java.util.List;
+
+public final class BlueprintLibraryClient {
+	private BlueprintLibraryClient() {
+	}
+
+	public static void open(List<BlueprintSummary> entries, String selectedId, String selectedName, StorageScope selectedScope,
+			StorageScope preferredStorage, InteractionHand hand) {
+		setClientSelection(selectedId, selectedName, selectedScope);
+		setClientPreferredStorage(preferredStorage);
+		Minecraft.getInstance().setScreen(new BlueprintLibraryScreen(entries, LocalBlueprintLibrary.list(), selectedId, selectedScope, preferredStorage, hand));
+	}
+
+	public static void openNamePrompt(InteractionHand hand, StorageScope storageScope) {
+		Minecraft.getInstance().setScreen(new BlueprintNameScreen(hand, storageScope));
+	}
+
+	public static void createNew(StorageScope storageScope, InteractionHand hand) {
+		if (Minecraft.getInstance().player == null) {
+			return;
+		}
+		if (!FarmEnvironment.isFarmDimension(Minecraft.getInstance().player.level().dimension())) {
+			Minecraft.getInstance().player.displayClientMessage(Component.translatable("message.blackbox.blueprint.create_in_farm"), true);
+			return;
+		}
+		setClientPreferredStorage(storageScope);
+		PacketDistributor.sendToServer(BlueprintLibraryMessage.setScope(hand, storageScope));
+		openNamePrompt(hand, storageScope);
+	}
+
+	public static void select(String id, String name, StorageScope scope, InteractionHand hand) {
+		setClientSelection(id, name, scope);
+		PacketDistributor.sendToServer(BlueprintLibraryMessage.select(hand, id, name, scope));
+	}
+
+	public static void saveLocal(String name, byte[] data) {
+		BlueprintSummary saved = LocalBlueprintLibrary.save(data);
+		if (Minecraft.getInstance().player != null) {
+			Minecraft.getInstance().player.displayClientMessage(Component.translatable(saved != null ? "message.blackbox.blueprint.saved_local" : "message.blackbox.blueprint.save_failed", name), true);
+			if (saved != null) {
+				setClientSelection(saved.id(), saved.name(), StorageScope.LOCAL);
+				PacketDistributor.sendToServer(BlueprintLibraryMessage.select(InteractionHand.MAIN_HAND, saved.id(), saved.name(), StorageScope.LOCAL));
+			}
+		}
+	}
+
+	public static void rename(String id, String currentName, String newName, StorageScope scope, InteractionHand hand) {
+		if (scope == StorageScope.LOCAL) {
+			BlueprintSummary renamed = LocalBlueprintLibrary.rename(id, newName);
+			if (renamed == null) {
+				showMessage("message.blackbox.blueprint.manage_failed", currentName);
+				return;
+			}
+			setClientSelection(renamed.id(), renamed.name(), StorageScope.LOCAL);
+		}
+		PacketDistributor.sendToServer(BlueprintLibraryMessage.rename(hand, id, newName, scope));
+	}
+
+	public static void delete(String id, String name, StorageScope scope, InteractionHand hand) {
+		if (scope == StorageScope.LOCAL && !LocalBlueprintLibrary.delete(id)) {
+			showMessage("message.blackbox.blueprint.manage_failed", name);
+			return;
+		}
+		PacketDistributor.sendToServer(BlueprintLibraryMessage.delete(hand, id, scope));
+		setClientSelection("", "", StorageScope.LOCAL);
+	}
+
+	public static void applyLocal(String blueprintId, InteractionHand hand) {
+		byte[] data = LocalBlueprintLibrary.load(blueprintId);
+		if (data.length == 0) {
+			showMissingLocal();
+			return;
+		}
+		PacketDistributor.sendToServer(BlueprintTransferMessage.applyLocal(hand, blueprintId, data));
+	}
+
+	public static void publishLocal(String blueprintId, InteractionHand hand) {
+		byte[] data = LocalBlueprintLibrary.load(blueprintId);
+		if (data.length == 0) {
+			showMissingLocal();
+			return;
+		}
+		PacketDistributor.sendToServer(BlueprintTransferMessage.publishServer(hand, blueprintId, data));
+	}
+
+	private static void showMissingLocal() {
+		if (Minecraft.getInstance().player != null) {
+			Minecraft.getInstance().player.displayClientMessage(Component.translatable("message.blackbox.blueprint.not_local"), true);
+		}
+	}
+
+	private static void showMessage(String key, String name) {
+		if (Minecraft.getInstance().player != null) {
+			Minecraft.getInstance().player.displayClientMessage(Component.translatable(key, name), true);
+		}
+	}
+
+	private static void setClientSelection(String id, String name, StorageScope scope) {
+		if (Minecraft.getInstance().player == null) {
+			return;
+		}
+		BlackboxModVariables.PlayerVariables variables = Minecraft.getInstance().player.getData(BlackboxModVariables.PLAYER_VARIABLES);
+		variables.BlueprintSelectionId = id;
+		variables.BlueprintSelectionName = name;
+		variables.BlueprintSelectionScope = scope.id();
+	}
+
+	private static void setClientPreferredStorage(StorageScope scope) {
+		if (Minecraft.getInstance().player != null) {
+			Minecraft.getInstance().player.getData(BlackboxModVariables.PLAYER_VARIABLES).BlueprintPreferredStorage = scope.id();
+		}
+	}
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "minecraft:block/copper_block",
+    "side": "minecraft:block/chiseled_bookshelf_side",
+    "top": "minecraft:block/respawn_anchor_top",
+    "particle": "minecraft:block/respawn_anchor_top"
+  }
+}

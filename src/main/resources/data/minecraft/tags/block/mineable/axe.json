@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "blackbox:blackbox_block",
+    "blackbox:spawner_blackbox",
+    "blackbox:dimensional_workbench",
+    "blackbox:inputblock",
+    "blackbox:output_block"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "blackbox:block/spawner_blackbox" }
+  }
+}

@@ -1,7 +1,8 @@
 {
   "variants": {
-    "": {
-      "model": "blackbox:block/inputblock"
-    }
+    "facing=north": { "model": "blackbox:block/inputblock_north" },
+    "facing=east": { "model": "blackbox:block/inputblock_east" },
+    "facing=south": { "model": "blackbox:block/inputblock_south" },
+    "facing=west": { "model": "blackbox:block/inputblock_west" }
   }
 }

@@ -1,0 +1,47 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "base": "minecraft:block/deepslate_tiles",
+    "frame": "minecraft:block/cut_copper",
+    "core": "minecraft:block/sea_lantern",
+    "particle": "minecraft:block/sea_lantern"
+  },
+  "elements": [
+    {
+      "from": [2, 0, 2],
+      "to": [14, 2, 14],
+      "faces": {
+        "down": {"texture": "#base"},
+        "up": {"texture": "#base"},
+        "north": {"texture": "#base"},
+        "south": {"texture": "#base"},
+        "west": {"texture": "#base"},
+        "east": {"texture": "#base"}
+      }
+    },
+    {
+      "from": [5, 2, 5],
+      "to": [11, 10, 11],
+      "faces": {
+        "down": {"texture": "#frame"},
+        "up": {"texture": "#core"},
+        "north": {"texture": "#frame"},
+        "south": {"texture": "#frame"},
+        "west": {"texture": "#frame"},
+        "east": {"texture": "#frame"}
+      }
+    },
+    {
+      "from": [3, 10, 3],
+      "to": [13, 16, 13],
+      "faces": {
+        "down": {"texture": "#core"},
+        "up": {"texture": "#core"},
+        "north": {"texture": "#core"},
+        "south": {"texture": "#core"},
+        "west": {"texture": "#core"},
+        "east": {"texture": "#core"}
+      }
+    }
+  ]
+}

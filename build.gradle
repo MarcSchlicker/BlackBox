@@ -3,8 +3,17 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
 }
 
-version = '1.0'
+version = '1.2.0'
 base.archivesName = "BlackBox"
+
+repositories {
+    maven { url = 'https://maven.blamejared.com' }
+}
+
+dependencies {
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.57.0.446"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.57.0.446"
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 

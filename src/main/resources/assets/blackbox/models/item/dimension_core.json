@@ -1,6 +1,9 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "blackbox:item/dimension_core_neutral"
+    "layer0": "blackbox:item/dimension_core_frame",
+    "layer1": "blackbox:item/dimension_core_top",
+    "layer2": "blackbox:item/dimension_core_bottom",
+    "layer3": "blackbox:item/dimension_core_split"
   }
 }

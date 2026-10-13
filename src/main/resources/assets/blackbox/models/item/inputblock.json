@@ -1,5 +1,5 @@
 {
-  "parent": "blackbox:block/inputblock",
+  "parent": "blackbox:block/inputblock_north",
   "display": {
     "thirdperson": {
       "rotation": [

@@ -1,0 +1,17 @@
+{
+  "textures": {
+    "base": "blackbox:block/inputblock_side",
+    "top": "minecraft:block/hopper_inside",
+    "cart": "minecraft:item/minecart",
+    "particle": "blackbox:block/inputblock_side"
+  },
+  "render_type": "cutout",
+  "elements": [
+    { "from": [0, 0, 0], "to": [16, 16, 16], "faces": {
+      "down": { "texture": "#base" }, "up": { "texture": "#top" },
+      "north": { "texture": "#base", "cullface": "north" }, "east": { "texture": "#base", "cullface": "east" },
+      "south": { "texture": "#base", "cullface": "south" }, "west": { "texture": "#base", "cullface": "west" }
+    } },
+    { "from": [0, 0, 15.99], "to": [16, 16, 16.01], "faces": { "south": { "texture": "#cart" } } }
+  ]
+}

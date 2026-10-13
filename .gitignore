@@ -1,6 +1,7 @@
-# Gradle build system ignores
+# Gradle build system
 .gradle/
 build/
+**/build/
 
 # Other IDE related folders
 .idea/
@@ -12,8 +13,19 @@ build/
 !.vscode/extensions.json
 !.vscode/tasks.json
 
-# MCreator workspace
-.mcreator/
+# Local editor and assistant state
+/.agents/
+/.codex/
+/PROJECT_KNOWLEDGE.md
+/PROJECT_STATUS.md
+/PROJEKTPILOT.md
+/RELEASES.md
+
+# Local companion projects and publication scratch space
+/addons/
+/art/
+/net/
+/publish/
 
 # Minecraft client/server files
 run/

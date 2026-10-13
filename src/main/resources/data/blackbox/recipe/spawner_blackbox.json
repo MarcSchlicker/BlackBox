@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "neoforge:conditions": [
+    { "type": "neoforge:mod_loaded", "modid": "mob_grinding_utils" },
+    { "type": "neoforge:mod_loaded", "modid": "apotheosis" },
+    { "type": "neoforge:mod_loaded", "modid": "apothic_spawners" }
+  ],
+  "pattern": [
+    " F ",
+    "FHF",
+    "BMN"
+  ],
+  "key": {
+    "B": { "item": "blackbox:blackbox_block" },
+    "H": { "item": "mob_grinding_utils:absorption_hopper" },
+    "F": { "item": "mob_grinding_utils:fan" },
+    "M": { "item": "mob_grinding_utils:saw" },
+    "N": { "item": "minecraft:netherite_ingot" }
+  },
+  "result": { "id": "blackbox:spawner_blackbox", "count": 1 }
+}

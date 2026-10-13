@@ -13,12 +13,12 @@ BlackBox is an experimental NeoForge mod for moving automated farms out of perma
 
 ## How It Works
 
-1. Place a Dimensional Workbench and insert a Dimension Core.
-2. Use the free 1x1 chunk cell or apply an affordable 2x2/3x3 Cell Upgrade before the core's first visit.
-3. Build the farm in the isolated cell and connect its resources through the Farm Input and Farm Output.
-4. Leave the cell when the farm is ready. Building time is never measured.
-5. After a hidden warmup period, the configured measurement window records the cell's net item, fluid, energy and persistent-mob balance.
-6. The programmed core replays that profile inside the workbench or a separate Blackbox without loading the original farm.
+1. Place a Blackbox, insert an empty Dimension Core, and give the farm a name.
+2. Before the first visit, apply any 2x2/3x3 cell, environment, or mob-spawn upgrades to the core at an Anvil.
+3. Enter the core's isolated cell and connect the farm through one Farm Input and one or more Farm Outputs.
+4. Leave through Dimensional Bedrock when the farm is ready. Building time is never measured.
+5. After a hidden preparation period, the configured measurement window records the cell's net item, fluid, FE, and persistent-mob balance.
+6. The programmed core replays that profile in any Blackbox without loading the original farm.
 
 Moving a pre-filled chest through hoppers does not create free resources: BlackBox compares the complete cell at the start and end and subtracts imported resources while adding exported resources.
 
@@ -54,12 +54,12 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 - Vanilla containers and NeoForge item handlers are included in the inventory balance.
 - NeoForge fluid and energy capabilities are included in the resource balance.
 - Persistent consumed mobs are recorded as inputs. Natural mobs and spawner mobs with a remaining spawner are excluded.
-- The Farm Input imports items, fluids and FE from the workbench; every Farm Output exports all three resource types back to it.
-- Measurement output is compressed into a persistent workbench buffer whenever visible item slots, fluid tanks or the FE store are full, so a farm never stops being recorded because of output capacity.
+- The Farm Input imports items, fluids and FE from the Blackbox; every Farm Output exports all three resource types back to it.
+- Measurement output is compressed into a persistent Blackbox buffer whenever visible item slots, fluid tanks or the FE store are full, so a farm never stops being recorded because of output capacity.
 - Item production timestamps are stored so a normal Blackbox can replay peaks and quiet periods.
 - Active measurements and their snapshots survive server restarts.
-- Farm and workbench chunks use persistent, fully ticking NeoForge tickets only while a measurement is active.
-- Removing the core, destroying the workbench or losing a required dimension aborts safely without generating output.
+- Farm and Blackbox chunks use persistent, fully ticking NeoForge tickets only while a measurement is active.
+- Removing the core, destroying the Blackbox or losing a required dimension aborts safely without generating output.
 - Re-entering a measuring farm cancels the measurement and clears its profile so it can be edited and measured again.
 
 ### Dimension Cores
@@ -76,7 +76,7 @@ All environments stay flat and intentionally omit normal terrain, ores and struc
 The Village Archive is a deliberately optional Easter egg and is **disabled by default**. An operator enables it in the Admin Book or through the authoritative server configuration. On a dedicated server, the server setting decides the feature state for every player.
 
 - When enabled, a player who kills a Villager with a Sacrificial Sword receives a Villager Head.
-- Placing a Dimensional Workbench near a Nitwit turns the closest one into a Dimensional Archivist.
+- Placing a Blackbox near a Nitwit turns the closest one into a Dimensional Archivist.
 - Archivists sell sealed, pre-programmed cores. These cores replay a known farm profile but cannot be named, entered, upgraded or remeasured.
 - The regular Sword recipe is available only while the module is enabled; the recipe list and Archivist trades refresh when an operator changes the setting.
 
@@ -90,17 +90,16 @@ The Village Archive is a deliberately optional Easter egg and is **disabled by d
 
 The same trader also offers an empty Dimension Core, the 2x2 Cell Upgrade, Stability Upgrade and Mob Spawn Upgrade at progressively higher levels. The archive cores use the normal simulation and peak replay system, so they can be placed directly into a Blackbox. The sealed Iron Farm Core models a modest Java Edition three-Villager-and-Zombie farm: 360 Iron Ingots and 90 Poppies per hour, arriving in two randomly shifted Golem-kill peaks every 80 seconds.
 
-### Workbench and Blackbox
+### Blackbox Simulation
 
-- Both machines provide one core slot, nine item input slots, eighteen item output slots, four input fluid tanks, four output fluid tanks and separate FE buffers.
-- The Dimensional Workbench builds, measures and simulates farms in one block.
 - A Blackbox starts automatically when a programmed core is inserted.
-- A cycle only starts when every measured item, fluid, energy and mob input is available.
-- Output capacity is checked before production, so resources are never silently deleted.
-- Without a Stability Upgrade, measured item peaks and pauses are moderately randomized for every cycle while totals remain exact.
-- With a reusable Stability Upgrade, item, fluid and energy output is distributed evenly across the cycle.
-- Automation can insert resources from the sides and extract simulated fluid or energy output from the bottom.
-- Required mobs can be supplied in occupied boats or minecarts; the passenger is accepted and the vehicle remains outside.
+- It has one core slot, nine item input slots, eighteen item output slots, a single input fluid buffer, a single output fluid buffer, and separate FE buffers.
+- Item, fluid, and FE inputs are consumed gradually over the recorded cycle. A profile can therefore use more FE per cycle than the 500 kFE buffer if power continues to arrive while it runs.
+- Full visible output storage never stops the profile: pending resources are retained in a persistent internal buffer until they can be delivered.
+- Every face is independently configurable for item, fluid, or FE input, output, both, or disabled.
+- Without a Stability Upgrade, measured item peaks and pauses are replayed with a small cycle-to-cycle offset while totals remain exact.
+- With a reusable Stability Upgrade, item, fluid, and energy output is distributed evenly across the cycle.
+- Required mobs can be delivered in occupied boats or minecarts. The vehicle and passenger are moved into the core's farm cell.
 
 ### Upgrades
 
@@ -116,9 +115,23 @@ Recipes are intentionally affordable because upgrades reduce server load rather 
 | Nether Environment | New core | Selects Nether properties |
 | End Environment | New core | Selects End properties |
 | Mob Spawn | New core | Enables natural spawning for that cell |
-| Stability | Workbench or Blackbox | Smooths simulated resource output |
+| Stability | Blackbox | Smooths simulated resource output |
+| Output Filter | Blackbox | Discards selected item outputs only in that machine |
+| Core Split | Anvil / Distribution Matrix | Permanently creates independent output cores |
 
-Core setup upgrades are consumed in the Dimensional Workbench and must be applied before the core creates its first cell. The Stability Upgrade remains in the machine and is reusable.
+Core setup upgrades are consumed at an Anvil and must be applied before the core creates its first cell. The Stability and Output Filter upgrades remain in the Blackbox and are reusable.
+
+### Output Filters and Core Splitting
+
+- An Output Filter Upgrade opens a scrollable list of the programmed core's measured item outputs.
+- Clicking an item enables or discards it for that Blackbox only. Filtered outputs are not inserted, but all required inputs are still consumed.
+- Filter settings are stored on the upgrade, so the same core can produce every output in another Blackbox.
+- A Core Split Upgrade turns a multi-output core into individual output cores. Each result keeps the complete original input profile and measured item timing.
+- Splitting is permanent and retires the original farm cell. The Core Distribution Matrix provides a preview before confirmation.
+
+### Optional Spawner Blackbox
+
+With Apotheosis, Apothic Spawners, and Mob Grinding Utils installed, the Spawner Blackbox runs real mob-loot rolls from up to five Apothic Spawners. It accepts Mob Masher modules, produces experience fluid, and can filter individual drops, armor, gems, and Apothic rarity groups.
 
 ### Blueprint Library
 
@@ -139,7 +152,7 @@ Blueprints currently store block states, not block-entity NBT, inventories, enti
 - The Admin Book uses ghost slots to maintain the server's denied-block list.
 - Operators can set the duration used by future measurements directly in the Admin Book.
 - Operators can enable or disable the optional Village Archive directly in the Admin Book.
-- Ender Chests, Blackboxes and Dimensional Workbenches are denied in farm cells by default.
+- Ender Chests and Blackboxes are denied in farm cells by default.
 - A second Admin Book view lists registered cells and deletes abandoned cells with confirmation.
 - Farm ownership can be private, shared with the owner's scoreboard team, or public when allowed by server config.
 
@@ -165,13 +178,13 @@ All craftable BlackBox content uses standard Minecraft JSON recipes, so JEI and 
 
 ## Quick Start
 
-1. Craft a Dimensional Workbench, Dimension Core, both farm ports and the Handbook.
-2. Insert the core, enter a farm name and choose its access mode.
+1. Craft a Blackbox, Dimension Core, both farm ports, and the Handbook.
+2. Insert the core, enter a farm name, and choose its access mode.
 3. Optionally apply a 2x2/3x3 cell, environment or mob-spawn upgrade before the first visit.
 4. Enter the cell and build the farm.
 5. Feed external resources through the blue Farm Input and route products into the green Farm Output.
 6. Leave through Dimensional Bedrock and wait for measurement to finish.
-7. Keep the programmed core in the workbench or move it into a Blackbox.
+7. Keep the programmed core in any Blackbox and configure its input and output sides.
 
 ## Current Limitations
 
@@ -189,9 +202,9 @@ All craftable BlackBox content uses standard Minecraft JSON recipes, so JEI and 
 There is no stable release build yet.
 
 1. Install Java 21.
-2. Clone the repository and open its root folder in VS Code.
-3. Install the recommended Java and Gradle extensions.
-4. Run the VS Code task `Minecraft-Client starten (NeoForge)` to start the development client.
+2. Clone the repository and open its root folder in your editor of choice.
+3. Import the Gradle project with Java 21 configured.
+4. Run `runClient` to start a development client.
 
 Windows build:
 
@@ -205,17 +218,17 @@ Linux or macOS build:
 ./gradlew --no-problems-report build
 ```
 
-The generated development JAR is written to `build/libs/BlackBox-1.0.jar`.
+The generated development JAR is written to `build/libs/BlackBox-1.2.0.jar`.
 
 ### Lunar Client Testing
 
-BlackBox uses standard NeoForge 1.21.1 APIs and has no additional client-side dependencies. For Lunar Client, create or select a Minecraft 1.21.1 profile using NeoForge 21.1.190 or newer, then install `BlackBox-1.0.jar` through that profile's Mods page. Lunar Features may stay enabled; disable them in the profile only when isolating a compatibility problem.
+BlackBox uses standard NeoForge 1.21.1 APIs and has no additional client-side dependencies. For Lunar Client, create or select a Minecraft 1.21.1 profile using NeoForge 21.1.190 or newer, then install `BlackBox-1.2.0.jar` through that profile's Mods page. Lunar Features may stay enabled; disable them in the profile only when isolating a compatibility problem.
 
 A separately packaged and validated server release will be prepared during the final release phase.
 
 ## Development
 
-BlackBox is maintained as a standard NeoForge Java project. Core farm, measurement, simulation, networking, capability and Blueprint logic live directly in the source tree.
+BlackBox is maintained as a standard Gradle NeoForge Java project. Core farm, measurement, simulation, networking, capability and Blueprint logic live in `src/main/java/io/github/marcschlicker/blackbox/`.
 
 Testing with modded machines, multiplayer ownership, server restarts, unusual farms and high-throughput resource networks is especially valuable. Issues and pull requests are welcome.
 

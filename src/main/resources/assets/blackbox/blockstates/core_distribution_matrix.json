@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "blackbox:block/core_distribution_matrix" }
+  }
+}

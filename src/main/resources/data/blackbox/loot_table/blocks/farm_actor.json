@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "blackbox:blocks/farm_actor",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "blackbox:farm_actor"
+        }
+      ]
+    }
+  ]
+}
